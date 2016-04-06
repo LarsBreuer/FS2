@@ -1,0 +1,68 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="72dp"
+	android:orientation="horizontal"
+	android:background="@color/backgroundcolor"
+	android:descendantFocusability="blocksDescendants"
+	>
+	
+	<LinearLayout
+	    android:layout_width="65dip"
+		android:layout_height="fill_parent"
+		android:orientation="vertical"
+		android:gravity="center"
+		android:layout_marginLeft="30dip"
+	>
+    
+    	<TextView 
+        	android:id="@+id/player_number"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:textStyle="bold"
+			android:textColor="@color/standardfarbe"
+			android:maxLines="1"
+			android:ellipsize="end"
+			android:textSize="24dip"
+    	/>
+    	
+    </LinearLayout>
+  
+	<LinearLayout
+	    android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:orientation="vertical"
+	>	
+	
+		<TextView android:id="@+id/player_name"
+			android:layout_width="fill_parent"
+			android:layout_height="36dp"
+			android:gravity="left|bottom"
+			android:textColor="@color/standardfarbe"
+			android:maxLines="1"
+			android:ellipsize="end"
+			android:textSize="24dip"
+		/>
+
+		<TextView android:id="@+id/player_position"
+			android:layout_width="fill_parent"
+			android:layout_height="18dp"
+			android:gravity="left|top"
+			android:textColor="@color/standardfarbe"
+			android:maxLines="1"
+			android:ellipsize="end"
+			android:textSize="12dip"
+		/>
+		
+		<TextView android:id="@+id/player_team"
+			android:layout_width="fill_parent"
+			android:layout_height="18dp"
+			android:gravity="left|top"
+			android:textColor="@color/standardfarbe"
+			android:maxLines="1"
+			android:ellipsize="end"
+			android:textSize="12dip"
+		/>
+	
+	</LinearLayout>
+	
+</LinearLayout>

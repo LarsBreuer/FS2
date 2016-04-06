@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+	android:background="@null"
+	android:layout_height="48dp"
+	android:paddingLeft="20dp"
+	android:paddingRight="20dp"
+	android:gravity="center_vertical"
+	android:orientation="horizontal">
+    	
+	<LinearLayout
+	    android:id="@+id/stat_home"
+       	android:layout_width="wrap_content"
+       	android:layout_height="wrap_content" 
+       	android:orientation="vertical"
+       	android:layout_alignParentLeft="true"
+   	> 
+   
+    	<TextView
+			android:id="@+id/txtStatTeamHome"
+			android:layout_width="60dp"
+			android:layout_height="48dp"
+			android:textColor="@android:color/white"
+			android:textStyle="bold"
+  			android:gravity="center"
+  			android:textSize="18dip" />  
+	    
+	</LinearLayout>
+
+	<LinearLayout
+	    android:id="@+id/stat_away"
+       	android:layout_width="wrap_content"
+       	android:layout_height="wrap_content" 
+       	android:orientation="vertical"
+       	android:layout_alignParentRight="true"
+   	> 
+   
+    	<TextView
+			android:id="@+id/txtStatTeamAway"
+ 			android:layout_width="60dp"
+ 			android:layout_height="48dp"
+ 			android:textColor="@android:color/white"
+ 			android:textStyle="bold"
+  			android:gravity="center"
+   			android:textSize="18dip" /> 
+	    
+	</LinearLayout>
+	
+	<LinearLayout
+	    android:id="@+id/stat_head"
+	    android:layout_toRightOf="@+id/stat_home"
+       	android:layout_toLeftOf="@+id/stat_away"
+       	android:layout_width="wrap_content"
+       	android:layout_height="wrap_content"
+       	android:orientation="vertical"
+       	android:layout_centerInParent="true"
+   	> 
+   
+    	<TextView
+			android:id="@+id/txtStatHead"
+			android:layout_width="fill_parent"
+			android:layout_height="48dp"
+			android:textColor="@android:color/white"
+			android:textStyle="bold"
+  			android:gravity="center"
+   			android:textSize="24dip"
+   			android:layout_centerInParent="true"
+       		android:singleLine="true" />
+    
+	</LinearLayout>
+
+</RelativeLayout>

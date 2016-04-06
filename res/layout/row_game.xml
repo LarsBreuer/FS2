@@ -1,0 +1,54 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="48dp"
+	android:orientation="horizontal"
+	android:background="@android:color/white"
+	>
+	
+    <LinearLayout
+	    android:layout_width="34dp"
+		android:layout_height="fill_parent"
+		android:orientation="vertical"
+		android:gravity="center"
+	>
+	
+		<ImageView 
+			android:id="@+id/logo_strikes"
+			android:layout_width="16dip"
+			android:layout_height="16dip"
+		/>
+		
+	</LinearLayout>
+  
+	<LinearLayout
+	    android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:orientation="vertical"
+		android:layout_marginLeft="34dp"
+	>
+		
+	    <TextView android:id="@+id/rowGameDate"
+			android:layout_width="fill_parent"
+			android:layout_height="20dp"
+			android:gravity="left|bottom"
+			android:textColor="@color/grey_dark"
+			android:text="Test"
+			android:maxLines="1"
+			android:ellipsize="end"
+			android:textSize="12dip"
+		/>
+	
+		<TextView android:id="@+id/rowGameFixture"
+			android:layout_width="fill_parent"
+			android:layout_height="28dp"
+			android:gravity="left|top"
+			android:textColor="@color/grey_dark"
+			android:text="Test"
+			android:maxLines="1"
+			android:ellipsize="end"
+			android:textSize="18dip"
+		/>
+	
+	</LinearLayout>
+	
+</RelativeLayout>

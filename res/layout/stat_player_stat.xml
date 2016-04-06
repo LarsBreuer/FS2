@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+  	android:layout_height="fill_parent"
+  	android:background="@color/blue" 
+	android:orientation="vertical"
+>
+	
+    <LinearLayout
+        android:id="@+id/lyt_overview_smart"
+       	android:layout_width="fill_parent"
+       	android:layout_height="wrap_content"
+       	android:orientation="vertical"
+    > 
+    
+		<LinearLayout
+		    android:id="@+id/lyt_button_ludr"
+       		android:layout_width="fill_parent"
+       		android:layout_height="wrap_content"
+       		android:gravity="center"
+       		android:orientation="horizontal"
+    	> 
+    
+			<Button 
+      		  	android:id="@+id/left"
+      	  		android:background="@drawable/arrow_left"
+        		android:layout_width="18dp"
+        		android:layout_height="18dp"
+        		android:layout_marginRight="10dp"
+        		android:gravity="center_vertical|center_horizontal"
+       			android:layout_marginTop="18dp"
+        		android:layout_marginBottom="18dp"
+    		/>
+		
+			<Button 
+        		android:id="@+id/up"
+        		android:background="@drawable/arrow_up"
+        		android:layout_width="18dp"
+        		android:layout_height="18dp"
+        		android:layout_marginRight="10dp"
+        		android:gravity="center_vertical|center_horizontal"
+       			android:layout_marginTop="18dp"
+        		android:layout_marginBottom="18dp"
+    		/>
+		
+			<Button 
+        		android:id="@+id/down"
+        		android:background="@drawable/arrow_down"
+        		android:layout_width="18dp"
+        		android:layout_height="18dp"
+        		android:layout_marginRight="10dp"
+        		android:gravity="center_vertical|center_horizontal"
+       			android:layout_marginTop="18dp"
+        		android:layout_marginBottom="18dp"
+    		/>
+		
+			<Button 
+        		android:id="@+id/right"
+        		android:background="@drawable/arrow_right"
+        		android:layout_width="18dp"
+        		android:layout_height="18dp"
+        		android:gravity="center_vertical|center_horizontal"
+       			android:layout_marginTop="18dp"
+        		android:layout_marginBottom="18dp"
+    		/>	
+		
+		</LinearLayout>
+
+		<TextView 
+	   		android:id="@+id/player"
+	   		android:text="Player"
+	       	android:layout_width="fill_parent"
+    	   	android:layout_height="wrap_content"
+        	android:gravity="center"
+        	android:textColor="@android:color/white"
+        	android:textSize="24dip"
+		/>
+		
+		<TextView 
+	    	android:id="@+id/game"
+	    	android:text="Game"
+        	android:layout_width="fill_parent"
+        	android:layout_height="wrap_content"
+       		android:gravity="center"
+        	android:textColor="@android:color/white"
+        	android:textSize="14dip"
+        	android:layout_marginBottom="18dp"
+		/>
+	
+	</LinearLayout>
+	
+    <LinearLayout
+		android:id="@+id/lyt_overview_tab"
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:gravity="right"
+    	android:orientation="horizontal"
+    > 
+    
+		<Button 
+       		android:id="@+id/tab_right"
+      	  		android:background="@drawable/arrow_right"
+        		android:layout_width="18dp"
+        		android:layout_height="18dp"
+        		android:layout_marginRight="10dp"
+        		android:gravity="center_vertical|center_horizontal"
+       			android:layout_marginTop="18dp"
+        		android:layout_marginBottom="18dp"
+    	/>	
+	
+	</LinearLayout>
+	
+    <ListView
+    	android:id="@android:id/list"
+    	android:layout_width="fill_parent"
+    	android:layout_height="fill_parent"
+    	android:dividerHeight="4dp"
+    	android:divider="@drawable/list_divider"
+    	android:listSelector="@android:color/transparent" 
+		android:cacheColorHint="@android:color/transparent"
+  	/>
+  
+</LinearLayout>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+  	android:layout_height="fill_parent"
+  	android:background="@color/blue" 
+	android:orientation="vertical"
+>
+
+    <TextView 
+		android:id="@+id/headline"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+       	android:gravity="center|bottom"
+		android:textColor="@android:color/white"
+		android:textSize="24dip"
+		android:textStyle="bold"
+		android:layout_marginTop="9dip"
+	/>
+    
+    <TextView 
+	    android:id="@+id/text"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center|bottom"
+        android:textColor="@android:color/white"
+        android:textSize="14dip"
+        android:layout_marginTop="18dp"
+        android:layout_marginLeft="9dp"
+		android:layout_marginRight="9dp"
+	/>
+    
+	<EditText
+	    android:id="@+id/team_search"
+	    android:inputType="textCapWords"
+	    android:layout_width="fill_parent"
+        android:layout_height="36dp"
+        android:paddingLeft="9dip"
+        android:layout_marginTop="18dp"
+        android:layout_marginLeft="9dp"
+		android:layout_marginRight="9dp"
+        android:textColor="@color/grey_dark"
+        android:textSize="18dp" 
+        android:background="@android:color/white"
+	/>
+	
+	<Button 
+	    android:id="@+id/btn_team_search"
+		android:background="@color/grey_dark"
+        android:layout_width="fill_parent"
+        android:layout_height="36dp"
+        android:text="@string/search"
+        android:textColor="@android:color/white"
+        android:textSize="18dip" 
+        android:layout_marginTop="18dp"
+        android:layout_marginBottom="18dp"
+        android:layout_marginLeft="9dp"
+		android:layout_marginRight="9dp"
+	/>
+	
+	<ListView
+    	android:id="@android:id/list"
+    	android:layout_width="fill_parent"
+    	android:layout_height="fill_parent"
+    	android:dividerHeight="4dp"
+    	android:divider="@drawable/list_divider"
+    	android:listSelector="@android:color/transparent" 
+		android:cacheColorHint="@android:color/transparent"
+  	/>
+  
+</LinearLayout>

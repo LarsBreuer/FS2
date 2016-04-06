@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/row_ticker"
+	android:layout_width="fill_parent"
+	android:layout_height="60dip"
+	android:orientation="vertical"
+	android:background="@color/blue"
+>
+
+	<LinearLayout 
+    	android:id="@+id/row_content"
+		android:layout_width="fill_parent"
+		android:layout_height="60dip"
+		android:orientation="horizontal"
+		android:background="@android:color/white"
+	>
+	
+		<LinearLayout
+    		android:layout_width="16dip"
+    		android:layout_height="60dip"
+    		android:orientation="vertical"
+    	>
+    
+			<View 
+		    	android:id="@+id/rowTickerTeamColor"
+        		android:layout_width="16dip"
+  				android:layout_height="60dip"
+  				android:background="@color/heimblau"
+    		/>
+		
+		</LinearLayout>
+    
+		<LinearLayout
+    		android:layout_width="70dip"
+    		android:layout_height="60dip"
+    		android:orientation="vertical"
+    	>
+    
+	    	<TextView 
+	    	    android:id="@+id/rowTickerTime"
+      			android:layout_width="70dip"
+      			android:layout_height="20dip"
+      			android:gravity="center"
+      			android:textColor="@color/grey_dark"
+      			android:maxLines="1"
+      			android:ellipsize="end"
+      			android:textSize="12dip"
+    		/>
+	    
+	    	<RelativeLayout
+    			android:layout_width="70dip"
+    			android:layout_height="40dip"
+    			android:gravity="center"
+    		>
+    		
+				<ImageView
+    				android:id="@+id/rowTickerIcon"
+    				android:layout_width="wrap_content"
+    				android:layout_height="wrap_content"
+    			/>
+
+				<TextView
+    				android:id="@+id/rowTickerText"
+    				android:layout_width="wrap_content"
+    				android:layout_height="wrap_content"
+    				android:layout_alignTop="@+id/rowTickerIcon"
+    				android:layout_alignBottom="@+id/rowTickerIcon"
+					android:textStyle="bold"
+					android:textSize="17dip"
+    				android:gravity="center"
+    				android:textColor="@color/grey_dark" 
+    			/>	
+			
+			</RelativeLayout>
+		
+		</LinearLayout>
+	
+		<LinearLayout
+    		android:layout_width="wrap_content"
+    		android:layout_height="60dip"
+    		android:orientation="vertical"
+    		>
+    	
+    		<TextView android:id="@+id/rowTickerActivity"
+      			android:layout_width="wrap_content"
+      			android:layout_height="20dip"
+      			android:gravity="center_vertical|left"
+      			android:textColor="@color/grey_dark"
+      			android:maxLines="1"
+      			android:ellipsize="end"
+      			android:textSize="12dip"
+    		/>
+    	
+    		<LinearLayout
+    			android:layout_width="wrap_content"
+    			android:layout_height="40dip"
+    			android:gravity="center"
+    		>
+			
+	    		<TextView android:id="@+id/rowTickerPlayer"
+      				android:layout_width="wrap_content"
+      				android:layout_height="40dip"
+      				android:gravity="center"
+		    		android:textStyle="bold"
+      				android:textColor="@color/grey_dark"
+      				android:maxLines="1"
+      				android:ellipsize="end"
+      				android:textSize="17dip"
+    			/>
+	    	
+	    	</LinearLayout>
+	
+		</LinearLayout>
+	
+	</LinearLayout>
+
+	<LinearLayout
+	    android:layout_width="10dip"
+		android:layout_height="fill_parent"
+		android:orientation="vertical"
+		android:gravity="center"
+		android:layout_alignParentRight="true"
+	>
+	
+		<ImageView
+			android:background="@drawable/forward"
+			android:layout_width="7dip"
+			android:layout_height="12dip"
+			android:gravity="center_vertical|center_horizontal"
+		>
+
+		</ImageView>
+		
+	</LinearLayout>
+
+</RelativeLayout>

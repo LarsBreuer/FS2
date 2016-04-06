@@ -1,0 +1,66 @@
+<LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:background="@android:color/white"
+	android:layout_height="48dp"
+	android:paddingLeft="9dp"
+	android:paddingRight="9dp"
+	android:gravity="center_vertical"
+	android:orientation="horizontal">
+ 
+    <LinearLayout
+	    android:id="@+id/stat_head"
+	    android:layout_width="0dp"
+       	android:layout_weight="5"
+       	android:layout_height="48dp"
+       	android:orientation="vertical"
+       	android:layout_centerInParent="true"
+   	> 
+    
+    	<TextView
+        	android:id="@+id/goal_name"
+        	android:layout_width="fill_parent"
+        	android:layout_height="24dp"
+       	 	android:gravity="center_vertical|left"
+        	android:textColor="@color/grey_dark"
+        	android:singleLine="true"
+        	android:textSize="18dip" />
+    	
+    	<TextView
+        	android:id="@+id/goal_team_name"
+        	android:layout_width="fill_parent"
+        	android:layout_height="24dp"
+       	 	android:gravity="center_vertical|left"
+        	android:textColor="@color/grey_dark"
+        	android:singleLine="true"
+        	android:textSize="12dip" />
+    	
+    </LinearLayout>
+        
+    <TextView
+  		android:id="@+id/goal_count"
+  		android:layout_width="0dp"
+  		android:layout_height="48dp"
+  		android:layout_weight="1"
+  		android:textColor="@color/grey_dark"
+    	android:gravity="center_vertical|center_horizontal"
+    	android:textSize="18dip" />    
+    
+    <TextView
+  		android:id="@+id/goal_attempt"
+  		android:layout_width="0dp"
+  		android:layout_height="48dp"
+  		android:layout_weight="1"
+        android:textColor="@color/grey_dark"
+        android:gravity="center_vertical|center_horizontal"
+        android:textSize="18dip" />
+      	
+	<TextView
+  		android:id="@+id/goal_effective"
+  		android:layout_width="0dp"
+  		android:layout_height="48dp"
+  		android:layout_weight="2"
+        android:textColor="@color/grey_dark"
+        android:gravity="center_vertical|center_horizontal"
+        android:textSize="18dip" />
+      	
+</LinearLayout>

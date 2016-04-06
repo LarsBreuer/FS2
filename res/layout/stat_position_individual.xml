@@ -1,0 +1,422 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:background="@color/blue"
+>
+
+    <LinearLayout
+        android:id="@+id/lyt_overview_smart"
+    	android:orientation="vertical"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:gravity="center_vertical|center_horizontal"
+	>
+	
+		<LinearLayout
+	    	android:id="@+id/lyt_button_ludr"
+       		android:layout_width="fill_parent"
+   			android:layout_height="wrap_content"
+      		android:gravity="center"
+       		android:orientation="horizontal"
+       		android:paddingLeft="18dp"
+			android:paddingRight="18dp"
+    	> 
+    
+			<Button 
+     	 		android:id="@+id/left"
+      			android:background="@drawable/arrow_left"
+        		android:layout_width="18dp"
+        		android:layout_height="18dp"
+        		android:layout_marginRight="10dp"
+        		android:gravity="center_vertical|center_horizontal"
+       			android:layout_marginTop="9dp"
+        		android:layout_marginBottom="9dp"
+    		/>
+		
+			<Button 
+        		android:id="@+id/up"
+        		android:background="@drawable/arrow_up"
+        		android:layout_width="18dp"
+        		android:layout_height="18dp"
+        		android:layout_marginRight="10dp"
+        		android:gravity="center_vertical|center_horizontal"
+       			android:layout_marginTop="9dp"
+        		android:layout_marginBottom="9dp"
+    		/>
+		
+			<Button 
+        		android:id="@+id/down"
+        		android:background="@drawable/arrow_down"
+        		android:layout_width="18dp"
+        		android:layout_height="18dp"
+        		android:layout_marginRight="10dp"
+        		android:gravity="center_vertical|center_horizontal"
+       			android:layout_marginTop="9dp"
+        		android:layout_marginBottom="9dp"
+    		/>
+		
+			<Button 
+        		android:id="@+id/right"
+        		android:background="@drawable/arrow_right"
+        		android:layout_width="18dp"
+        		android:layout_height="18dp"
+        		android:gravity="center_vertical|center_horizontal"
+       			android:layout_marginTop="9dp"
+        		android:layout_marginBottom="9dp"
+    		/>	
+		
+		</LinearLayout>
+
+		<TextView 
+			android:id="@+id/player"
+	   		android:text="Player"
+	    	android:layout_width="fill_parent"
+    		android:layout_height="wrap_content"
+        	android:gravity="center"
+        	android:textColor="@android:color/white"
+        	android:textSize="24dip"
+		/>
+		
+		<TextView 
+	   		android:id="@+id/game"
+	   		android:text="Game"
+       		android:layout_width="fill_parent"
+       		android:layout_height="wrap_content"
+    		android:gravity="center"
+       		android:textColor="@android:color/white"
+       		android:textSize="14dip"
+       		android:layout_marginBottom="9dp"
+		/>
+		
+	</LinearLayout>
+	
+	<LinearLayout
+		android:id="@+id/lyt_overview_tab"
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:gravity="right"
+    	android:orientation="horizontal"
+    	android:paddingLeft="18dp"
+		android:paddingRight="18dp"
+    > 
+    
+		<Button 
+       		android:id="@+id/tab_right"
+       		android:background="@drawable/arrow_right"
+       		android:layout_width="18dp"
+       		android:layout_height="18dp"
+       		android:gravity="center_vertical|center_horizontal"
+    		android:layout_marginTop="18dp"
+       		android:layout_marginBottom="18dp"
+    	/>	
+	
+	</LinearLayout>
+	
+	<SeekBar
+		android:id="@+id/volume_bar"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginLeft="18dp"
+		android:layout_marginRight="18dp"
+		android:max="100"
+		android:progress="0"
+		android:progressDrawable="@drawable/progressbar"
+		android:thumbTint="@android:color/white"
+		android:secondaryProgress="0"
+	/>
+	
+	<LinearLayout
+    	android:orientation="horizontal"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:gravity="center_vertical|center_horizontal"
+		android:paddingLeft="18dp"
+		android:paddingRight="18dp"
+		android:paddingBottom="9dp"
+	>
+		
+	    <TextView 
+	        android:id="@+id/time"
+      		android:layout_width="wrap_content"
+      		android:layout_height="24dip"
+      		android:textColor="@android:color/white"
+      		android:maxLines="1"
+      		android:ellipsize="end"
+      		android:textSize="18dip"
+      		android:paddingRight="18dp"
+    	/>
+	    
+	    <TextView 
+	        android:id="@+id/activity"
+      		android:layout_width="wrap_content"
+      		android:layout_height="24dip"
+      		android:textColor="@android:color/white"
+      		android:maxLines="1"
+      		android:ellipsize="end"
+      		android:textSize="18dip"
+    	/>
+	    
+	</LinearLayout>
+        
+    <TableLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" 
+        android:layout_marginTop="10dp"
+        android:gravity="center_horizontal"
+    > 
+        
+        <TableRow
+        	android:layout_width="fill_parent"
+        	android:layout_height="wrap_content" 
+        	android:gravity="center_horizontal"
+        	android:baselineAligned="false"
+        >
+        	
+        	<Button 
+        		android:id="@+id/goal_uull"
+        		android:background="@drawable/goal_uull"
+        		android:layout_width="60dp"
+        		android:layout_height="40dp" 
+        		android:layout_marginRight="3dp"
+        		android:textColor="@color/grey_dark"
+        		android:gravity="center_horizontal|center_vertical"
+    		/>
+        	
+        	<Button 
+        		android:id="@+id/goal_uul"
+        		android:background="@drawable/goal_uul"
+        		android:layout_width="60dp"
+        		android:layout_height="40dp" 
+				android:textColor="@color/grey_dark"
+        		android:gravity="center_horizontal|center_vertical"
+    		/>
+        	
+        	<Button 
+        		android:id="@+id/goal_uum"
+        		android:background="@drawable/goal_uum"
+        		android:layout_width="60dp"
+        		android:layout_height="40dp" 
+        		android:layout_marginLeft="3dp"
+        		android:textColor="@color/grey_dark"
+        		android:gravity="center_horizontal|center_vertical"
+    		/>
+        	
+        	<Button 
+        		android:id="@+id/goal_uur"
+        		android:background="@drawable/goal_uur"
+        		android:layout_width="60dp"
+        		android:layout_height="40dp" 
+        		android:layout_marginLeft="3dp"
+        		android:textColor="@color/grey_dark"
+        		android:gravity="center_horizontal|center_vertical"
+    		/>
+        	
+        	<Button 
+        		android:id="@+id/goal_uurr"
+        		android:background="@drawable/goal_uurr"
+        		android:layout_width="60dp"
+        		android:layout_height="40dp" 
+        		android:layout_marginLeft="3dp"
+        		android:textColor="@color/grey_dark"
+        		android:gravity="center_horizontal|center_vertical"
+    		/>
+        
+    	</TableRow>
+
+        <TableRow
+        	android:layout_width="fill_parent"
+        	android:layout_height="wrap_content" 
+        	android:gravity="center_horizontal"
+        	android:baselineAligned="false"
+        >
+        	
+        	<Button 
+        		android:id="@+id/goal_ull"
+        		android:background="@drawable/goal_ull"
+        		android:layout_width="60dp"
+        		android:layout_height="40dp" 
+        		android:layout_marginRight="3dp"
+        		android:textColor="@color/grey_dark"
+        		android:gravity="center_horizontal|center_vertical"
+    		/>
+        	
+        	<Button 
+        		android:id="@+id/goal_ul"
+        		android:background="@drawable/goal_ul"
+        		android:layout_width="60dp"
+        		android:layout_height="40dp" 
+				android:textColor="@color/grey_dark"
+        		android:gravity="center_horizontal|center_vertical"
+    		/>
+        	
+        	<Button 
+        		android:id="@+id/goal_um"
+        		android:background="@drawable/goal_um"
+        		android:layout_width="60dp"
+        		android:layout_height="40dp" 
+        		android:layout_marginLeft="3dp"
+        		android:textColor="@color/grey_dark"
+        		android:gravity="center_horizontal|center_vertical"
+    		/>
+        	
+        	<Button 
+        		android:id="@+id/goal_ur"
+        		android:background="@drawable/goal_ur"
+        		android:layout_width="60dp"
+        		android:layout_height="40dp" 
+        		android:layout_marginLeft="3dp"
+        		android:textColor="@color/grey_dark"
+        		android:gravity="center_horizontal|center_vertical"
+    		/>
+        	
+        	<Button 
+        		android:id="@+id/goal_urr"
+        		android:background="@drawable/goal_urr"
+        		android:layout_width="60dp"
+        		android:layout_height="40dp" 
+        		android:layout_marginLeft="3dp"
+        		android:textColor="@color/grey_dark"
+        		android:gravity="center_horizontal|center_vertical"
+    		/>
+        
+    	</TableRow>
+    	
+        <TableRow
+        	android:layout_width="fill_parent"
+        	android:layout_height="wrap_content" 
+        	android:gravity="center_horizontal"
+        	android:baselineAligned="false"
+        >
+        	
+        	<Button 
+        		android:id="@+id/goal_mll"
+        		android:background="@drawable/goal_mll"
+        		android:layout_width="60dp"
+        		android:layout_height="40dp" 
+        		android:layout_marginRight="3dp"
+        		android:textColor="@color/grey_dark"
+        		android:gravity="center_horizontal|center_vertical"
+    		/>
+        	
+        	<Button 
+        		android:id="@+id/goal_ml"
+        		android:background="@drawable/goal_ml"
+        		android:layout_width="60dp"
+        		android:layout_height="40dp" 
+				android:textColor="@color/grey_dark"
+        		android:gravity="center_horizontal|center_vertical"
+    		/>
+        	
+        	<Button 
+        		android:id="@+id/goal_mm"
+        		android:background="@drawable/goal_mm"
+        		android:layout_width="60dp"
+        		android:layout_height="40dp" 
+        		android:layout_marginLeft="3dp"
+        		android:textColor="@color/grey_dark"
+        		android:gravity="center_horizontal|center_vertical"
+    		/>
+        	
+        	<Button 
+        		android:id="@+id/goal_mr"
+        		android:background="@drawable/goal_mr"
+        		android:layout_width="60dp"
+        		android:layout_height="40dp" 
+        		android:layout_marginLeft="3dp"
+        		android:textColor="@color/grey_dark"
+        		android:gravity="center_horizontal|center_vertical"
+    		/>
+        	
+        	<Button 
+        		android:id="@+id/goal_mrr"
+        		android:background="@drawable/goal_mrr"
+        		android:layout_width="60dp"
+        		android:layout_height="40dp" 
+        		android:layout_marginLeft="3dp"
+        		android:textColor="@color/grey_dark"
+        		android:gravity="center_horizontal|center_vertical"
+    		/>
+        
+    	</TableRow>
+
+        <TableRow
+        	android:layout_width="fill_parent"
+        	android:layout_height="wrap_content" 
+        	android:gravity="center_horizontal"
+        	android:baselineAligned="false"
+        >
+        	
+        	<Button 
+        		android:id="@+id/goal_lll"
+        		android:background="@drawable/goal_lll"
+        		android:layout_width="60dp"
+        		android:layout_height="40dp" 
+        		android:layout_marginRight="3dp"
+        		android:textColor="@color/grey_dark"
+        		android:gravity="center_horizontal|center_vertical"
+    		/>
+        	
+        	<Button 
+        		android:id="@+id/goal_ll"
+        		android:background="@drawable/goal_ll"
+        		android:layout_width="60dp"
+        		android:layout_height="40dp" 
+				android:textColor="@color/grey_dark"
+        		android:gravity="center_horizontal|center_vertical"
+    		/>
+        	
+        	<Button 
+        		android:id="@+id/goal_lm"
+        		android:background="@drawable/goal_lm"
+        		android:layout_width="60dp"
+        		android:layout_height="40dp" 
+        		android:layout_marginLeft="3dp"
+        		android:textColor="@color/grey_dark"
+        		android:gravity="center_horizontal|center_vertical"
+    		/>
+        	
+        	<Button 
+        		android:id="@+id/goal_lr"
+        		android:background="@drawable/goal_lr"
+        		android:layout_width="60dp"
+        		android:layout_height="40dp" 
+        		android:layout_marginLeft="3dp"
+        		android:textColor="@color/grey_dark"
+        		android:gravity="center_horizontal|center_vertical"
+    		/>
+        	
+        	<Button 
+        		android:id="@+id/goal_lrr"
+        		android:background="@drawable/goal_lrr"
+        		android:layout_width="60dp"
+        		android:layout_height="40dp" 
+        		android:layout_marginLeft="3dp"
+        		android:textColor="@color/grey_dark"
+        		android:gravity="center_horizontal|center_vertical"
+    		/>
+        
+    	</TableRow>
+    		
+    </TableLayout>
+    
+    <LinearLayout
+    	android:orientation="vertical"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:gravity="center_vertical|center_horizontal"
+		>
+		
+		<ImageButton 
+        	android:id="@+id/btn_field"
+        	android:background="@android:color/transparent"
+        	android:layout_width="300dp"
+        	android:layout_height="195dp" 
+        	android:gravity="center_vertical|center_horizontal"
+        
+    	/>
+
+	</LinearLayout>	
+					
+</LinearLayout>

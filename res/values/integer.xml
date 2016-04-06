@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>    
+    
+    <integer name="possession_id">10099</integer>
+    
+    <integer name="goal_id">10100</integer>
+    <integer name="goal_7m_id">10101</integer>
+    <integer name="goal_fb_id">10102</integer>
+    <integer name="miss_id">10150</integer>
+    <integer name="miss_7m_id">10151</integer>
+    <integer name="miss_fb_id">10152</integer>
+    <integer name="save_id">10200</integer>
+    <integer name="save_7m_id">10201</integer>
+    <integer name="save_fb_id">10202</integer>
+    <integer name="goal_against_id">10250</integer>
+    <integer name="goal_against_7m_id">10251</integer>
+    <integer name="goal_against_fb_id">10252</integer>
+    
+    <integer name="assist_goal_id">10160</integer>
+    <integer name="assist_miss_id">10161</integer>
+    
+    <integer name="defense_error_id">10170</integer>
+    <integer name="defense_success_id">10171</integer>
+    <integer name="block_error_id">10172</integer>
+    <integer name="block_success_id">10173</integer>
+    <integer name="foul_id">10174</integer>
+    
+    <integer name="tech_fault_id">10300</integer>
+    <integer name="fehlpass_id">10301</integer>
+    <integer name="steps_id">10302</integer>
+    <integer name="three_seconds_id">10303</integer>
+    <integer name="doppeldribbel_id">10304</integer>
+    <integer name="fuss_id">10305</integer>
+    <integer name="zeitspiel_id">10306</integer>
+    <integer name="kreis_id">10307</integer>
+    <integer name="stuermerfoul_id">10308</integer>
+    
+    <integer name="yellow_card_id">10400</integer>
+    <integer name="two_minutes_id">10401</integer>
+    <integer name="twoplustwo_id">10402</integer>
+    <integer name="red_card_id">10403</integer>
+    
+    <integer name="lineup_id">10500</integer>
+    <integer name="sub_in_id">10501</integer>
+    <integer name="sub_out_id">10502</integer>
+    <integer name="two_in_id">10503</integer>
+    
+    <integer name="timeout_id">10600</integer>
+    
+    <integer name="tactic_60_id">10700</integer>
+    <integer name="tactic_51_id">10701</integer>
+    <integer name="tactic_42_id">10702</integer>
+    <integer name="tactic_guarding_id">10703</integer>
+    <integer name="tactic_321_id">10704</integer>
+    
+    <integer name="Sprungwurf_id">10180</integer>
+    <integer name="Schlagwurf_id">10181</integer>
+    <integer name="Laufwurf_id">10182</integer>
+    <integer name="Fallwurf_id">10183</integer>
+    <integer name="Hueftwurf_id">10184</integer>
+    <integer name="kempa_id">10185</integer>
+    <integer name="Dreher_id">10186</integer>
+    <integer name="Heber_id">10187</integer>
+    <integer name="Leger_id">10188</integer>
+    <integer name="Abknickwurf_id">10189</integer>
+
+</resources>

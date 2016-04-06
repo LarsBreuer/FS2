@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="de.fivestrikes.fs2"
+    android:versionCode="4"
+    android:versionName="0.4" >
+
+    <uses-sdk
+        android:minSdkVersion="14"
+        android:targetSdkVersion="21" />
+    
+    <uses-permission 
+        android:name="android.permission.INTERNET" />
+    
+    <supports-screens
+        android:smallScreens="true"
+        android:normalScreens="true"
+        android:largeScreens="true"
+        android:xlargeScreens="true"
+        android:anyDensity="true" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/logo48"
+        android:label="@string/app_name"
+        android:theme="@style/MyCustomTheme"
+        android:windowSoftInputMode="adjustResize" >
+        
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name" 
+            android:theme="@android:style/Theme.Holo.NoActionBar" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        
+        <activity 
+            android:name=".MainSmartActivity"
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait" >
+        </activity>
+        
+        <activity 
+            android:name=".MainTabActivity"
+            android:label="@string/app_name" 
+            android:screenOrientation="landscape" >
+        </activity>
+        
+        <activity 
+            android:name=".SmartTeamList"
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait" >
+        </activity>
+        
+		<activity 
+            android:name=".SmartListWithText"
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait" >
+        </activity>
+
+		<activity 
+            android:name=".SmartTeamOnline"
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait" >
+        </activity>
+        
+		<activity 
+            android:name=".SmartTeamEdit"
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait" >
+        </activity>
+        
+		<activity 
+            android:name=".SmartClubChoose"
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait" >
+        </activity>
+        
+		<activity 
+            android:name=".LoginActivity"
+            android:label="@string/app_name" >
+        </activity>
+        
+		<activity 
+            android:name=".SmartPlayerList"
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait" >
+        </activity>
+        
+		<activity 
+            android:name="de.fivestrikes.fs2.SmartPlayerEdit"
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait" >
+        </activity>
+        
+		<activity 
+            android:name=".SmartTeamSelect"
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait" >
+        </activity>
+        
+		<activity 
+            android:name=".SmartPlayerSynch"
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait" >
+        </activity>
+        
+		<activity 
+            android:name=".SmartPlayerMerge"
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait" >
+        </activity>
+        
+		<activity 
+            android:name=".TabFragEmpty"
+            android:label="@string/app_name" 
+            android:screenOrientation="landscape" >
+        </activity>
+        
+		<activity 
+            android:name=".TabFragTeamList"
+            android:label="@string/app_name" 
+            android:screenOrientation="landscape" >
+        </activity>
+        
+		<activity 
+            android:name=".TabFragListWithText"
+            android:label="@string/app_name" 
+            android:screenOrientation="landscape" >
+        </activity>
+        
+		<activity 
+            android:name=".TabTeamActivity"
+            android:label="@string/app_name" 
+            android:screenOrientation="landscape" >
+        </activity>
+        
+		<activity 
+            android:name=".TabPlayerActivity"
+            android:label="@string/app_name" 
+            android:screenOrientation="landscape" >
+        </activity>
+        
+		<activity 
+            android:name=".SmartGameList"
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait" >
+        </activity>
+        
+		<activity 
+            android:name=".SmartGameEdit"
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait" >
+        </activity>
+        
+		<activity 
+            android:name=".SmartListWithClickbox"
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait" >
+        </activity>
+        
+		<activity 
+            android:name=".TabGameActivity"
+            android:label="@string/app_name" 
+            android:screenOrientation="landscape" >
+        </activity>
+        
+		<activity 
+            android:name=".TabStatActivity"
+            android:label="@string/app_name" 
+            android:screenOrientation="landscape" >
+        </activity>
+        
+        <activity 
+            android:name=".TabStatOverviewActivity"
+            android:label="@string/app_name" 
+            android:screenOrientation="landscape" >
+        </activity>
+        
+        <activity 
+            android:name=".TabStatPlayerOverviewActivity"
+            android:label="@string/app_name" 
+            android:screenOrientation="landscape" >
+        </activity>
+        
+		<activity 
+            android:name=".SmartTickerActivity"
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait" >
+        </activity>
+        
+		<activity 
+            android:name=".SmartTickerMenu"
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait" >
+        </activity>
+        
+		<activity 
+            android:name=".SmartTickerList"
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait" >
+        </activity>
+        
+		<activity 
+            android:name=".SmartTickerPlayer"
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait" >
+        </activity>
+        
+		<activity 
+            android:name=".SmartTickerArea"
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait" >
+        </activity>
+        
+		<activity 
+            android:name=".SmartTickerPosition"
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait" >
+        </activity>
+        
+		<activity 
+            android:name=".SmartTickerMark"
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait" >
+        </activity>
+        
+		<activity 
+            android:name=".SmartTickerText"
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait" >
+        </activity>
+        
+		<activity 
+            android:name=".SmartTickerLineup"
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait" >
+        </activity>
+        
+		<activity 
+            android:name=".SmartTickerTime"
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait" >
+        </activity>
+        
+		<activity 
+            android:name=".SmartStatList"
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait" >
+        </activity>
+        
+		<activity 
+            android:name=".SmartStatTeam"
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait" >
+        </activity>
+        
+		<activity 
+            android:name=".SmartStatScore"
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait" >
+        </activity>
+        
+		<activity 
+            android:name=".SmartStatPlayerList"
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait" >
+        </activity>
+        
+		<activity 
+            android:name=".SmartStatPlayerFirst"
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait" >
+        </activity>
+        
+		<activity 
+            android:name=".SmartStatPlayerStat"
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait" >
+        </activity>
+        
+		<activity 
+            android:name=".SmartStatPlayerTicker"
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait" >
+        </activity>
+        
+		<activity 
+            android:name=".SmartStatPlayerPositionOverview"
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait" >
+        </activity>
+        
+		<activity 
+            android:name=".SmartStatPlayerPositionIndividual"
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait" >
+        </activity>
+        
+		<activity 
+            android:name=".SmartStatGameActivity"
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait" >
+        </activity>
+        
+		<activity 
+            android:name=".TabTickerActivity"
+            android:label="@string/app_name" 
+            android:screenOrientation="landscape" >
+        </activity>
+        
+		<activity 
+            android:name=".TabStatGameActivity"
+            android:label="@string/app_name" 
+            android:screenOrientation="landscape" >
+        </activity>
+        
+    </application>
+
+</manifest>

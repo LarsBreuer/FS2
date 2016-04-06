@@ -1,0 +1,25 @@
+<resources>
+    
+    <style name="MyCustomTheme" parent="@android:style/Theme.Holo">
+        <item name="android:actionBarStyle">@style/MyActionBarTheme</item>
+        <item name="android:spinnerItemStyle">@style/TextViewSpinnerItem</item>
+    </style>
+
+    <style name="MyActionBarTheme" parent="@android:style/Widget.Holo.Light.ActionBar">
+        <item name="android:background">@drawable/action_bar_bg</item>
+        <item name="android:titleTextStyle">@style/MyTheme.ActionBar.TitleTextStyle</item>
+    </style>
+    
+    <style name="MyTheme.ActionBar.TitleTextStyle" parent="@android:style/TextAppearance">
+    	<item name="android:textColor">@android:color/white</item>
+    	<item name="android:textSize">24sp</item>
+    	<item name="android:textStyle">bold</item>
+  	</style>
+  	
+    <style name="TextViewSpinnerItem" parent="@android:style/Widget.TextView.SpinnerItem">
+    	<item name="android:paddingLeft">0dip</item>
+    	<item name="android:textColor">@color/grey_dark</item>
+    	<item name="android:textSize">18dp</item>
+	</style>
+	
+</resources>

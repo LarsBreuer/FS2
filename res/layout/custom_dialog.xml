@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" 
+    android:orientation="vertical"
+    android:background="@android:color/white"
+    android:paddingLeft="9dp"
+    android:paddingRight="9dp"
+>
+	
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/grey_dark"
+        android:textSize="24dp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginTop="18dp"
+	/>
+
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/grey_dark"
+        android:textSize="18dp"
+        android:layout_marginTop="18dp"
+	/>
+ 
+    <LinearLayout
+        android:id="@+id/lyt_button1"
+		android:layout_width="fill_parent"
+    	android:layout_height="wrap_content" 
+    	android:gravity="center"
+    	android:layout_marginTop="18dp"
+        android:layout_marginBottom="18dp"
+    >
+    
+    	<Button
+        	android:id="@+id/button1"
+        	android:background="@color/grey_dark"
+        	android:layout_width="200dp"
+        	android:layout_height="36dp"
+        	android:textSize="18dp"
+        	android:textColor="@android:color/white"
+        	android:gravity="center"
+        />
+    	
+    </LinearLayout>
+    
+    <LinearLayout 
+        android:id="@+id/lyt_button2"
+		android:layout_width="fill_parent"
+    	android:layout_height="wrap_content" 
+    	android:gravity="center"
+    	android:layout_marginBottom="18dp"
+    >
+    
+    	<Button
+        	android:id="@+id/button2"
+        	android:background="@color/grey_dark"
+        	android:layout_width="200dp"
+        	android:layout_height="36dp"
+        	android:textSize="18dp"
+        	android:textColor="@android:color/white"
+        	android:gravity="center"
+        />
+    	
+    </LinearLayout>
+    
+    <LinearLayout 
+        android:id="@+id/lyt_button3"
+		android:layout_width="fill_parent"
+    	android:layout_height="wrap_content" 
+    	android:gravity="center"
+    	android:layout_marginBottom="18dp"
+    >
+    
+    	<Button
+        	android:id="@+id/button3"
+        	android:background="@color/grey_dark"
+        	android:layout_width="200dp"
+        	android:layout_height="36dp"
+        	android:textSize="18dp"
+        	android:textColor="@android:color/white"
+        	android:gravity="center"
+        />
+    	
+    </LinearLayout>
+     
+</LinearLayout>

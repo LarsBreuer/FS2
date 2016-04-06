@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent"
+  android:background="@color/blue"
+>
+
+<LinearLayout 
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent"
+  android:paddingLeft="25dp"
+  android:paddingRight="25dp"
+  android:orientation="vertical"
+>
+  
+	<TextView 
+	    android:text="@string/email_address" 
+        android:layout_width="fill_parent"
+        android:layout_height="48dp"
+        android:gravity="left|bottom"
+        android:textColor="@color/standardfarbe"
+        android:textStyle="bold"
+        android:textSize="24dip" 
+	/>
+  		
+	<EditText
+	    android:id="@+id/user_email"	    
+	    android:layout_width="fill_parent"
+        android:layout_height="48dp"
+        android:ems="10" 
+        android:inputType="textEmailAddress" >
+	    <requestFocus />
+	</EditText>
+
+	<TextView 
+	    android:text="@string/password" 
+        android:layout_width="fill_parent"
+        android:layout_height="48dp"
+        android:gravity="left|bottom"
+        android:textColor="@color/standardfarbe"
+        android:textStyle="bold"
+        android:textSize="24dip" 
+	/>
+
+	<EditText
+	    android:id="@+id/user_password"
+	    android:layout_width="fill_parent"
+        android:layout_height="48dp"
+        android:ems="10" 
+        android:inputType="textPassword"
+	/>
+	
+	<Button 
+		android:background="@drawable/button_green"
+		android:layout_width="fill_parent"
+		android:layout_height="48dp"
+		android:text="@string/login"
+		android:textColor="@android:color/white"
+		android:textSize="24dip" 
+		android:layout_marginTop="80dp"
+		android:onClick="btnSmartLoginClick"
+	/>
+
+</LinearLayout>
+</ScrollView>

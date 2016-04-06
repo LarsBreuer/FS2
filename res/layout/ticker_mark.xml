@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:background="@color/blue"
+	android:paddingLeft="9dp"
+	android:paddingRight="9dp"
+>
+		
+    <TextView 
+		android:id="@+id/headline"
+		android:layout_width="fill_parent"
+		android:layout_height="54dp"
+        android:gravity="center|bottom"
+		android:textColor="@android:color/white"
+		android:textSize="24dip"
+		android:textStyle="bold"
+		android:layout_marginBottom="18dip"
+	/>
+
+    <LinearLayout
+    	android:layout_width="fill_parent"
+    	android:layout_height="70dip"
+    	android:gravity="center_vertical"
+    	android:orientation="horizontal"
+    	android:paddingBottom="18dip"
+    >
+
+        <LinearLayout
+            android:layout_width="54dip" 
+			android:layout_height="54dip"
+			android:layout_marginLeft="9dip"
+			android:layout_marginRight="9dip"
+		>
+            
+            <Button
+				android:id="@+id/mark_one"
+				android:background="@drawable/stroke_one_white"
+				android:layout_width="6dip" 
+				android:layout_height="54dip"
+			>
+			
+            </Button>
+            
+        </LinearLayout>
+
+		<Button 
+			android:id="@+id/explanation_one"
+			android:background="@null" 
+      		android:layout_width="wrap_content"
+      		android:layout_height="fill_parent"
+      		android:gravity="left|center_vertical"
+      		android:textColor="@android:color/white"
+      		android:textSize="14dip"
+    	>
+            
+		</Button>
+
+	</LinearLayout>
+	
+    <LinearLayout
+    	android:layout_width="fill_parent"
+    	android:layout_height="70dip"
+    	android:gravity="center_vertical"
+    	android:orientation="horizontal"
+    	android:paddingBottom="18dip"
+    >
+
+        <LinearLayout
+            android:layout_width="54dip" 
+			android:layout_height="54dip"
+			android:layout_marginLeft="9dip"
+			android:layout_marginRight="9dip"
+		>
+            
+            <Button
+				android:id="@+id/mark_two"
+				android:background="@drawable/stroke_two_white"
+				android:layout_width="17dip" 
+				android:layout_height="54dip"
+			>
+			
+            </Button>
+            
+        </LinearLayout>
+
+		<Button 
+			android:id="@+id/explanation_two"
+			android:background="@null" 
+      		android:layout_width="wrap_content"
+      		android:layout_height="fill_parent"
+      		android:gravity="left|center_vertical"
+      		android:textColor="@android:color/white"
+      		android:textSize="14dip"
+    	>
+            
+		</Button>
+
+	</LinearLayout>
+	
+    <LinearLayout
+    	android:layout_width="fill_parent"
+    	android:layout_height="70dip"
+    	android:gravity="center_vertical"
+    	android:orientation="horizontal"
+    	android:paddingBottom="18dip"
+    >
+
+        <LinearLayout
+            android:layout_width="54dip" 
+			android:layout_height="54dip"
+			android:layout_marginLeft="9dip"
+			android:layout_marginRight="9dip"
+		>
+            
+            <Button
+				android:id="@+id/mark_three"
+				android:background="@drawable/stroke_three_white"
+				android:layout_width="26dip" 
+				android:layout_height="54dip"
+			>
+			
+            </Button>
+            
+        </LinearLayout>
+
+		<Button 
+			android:id="@+id/explanation_three"
+			android:background="@null" 
+      		android:layout_width="wrap_content"
+      		android:layout_height="fill_parent"
+      		android:gravity="left|center_vertical"
+      		android:textColor="@android:color/white"
+      		android:textSize="14dip"
+    	>
+            
+		</Button>
+
+	</LinearLayout>
+	
+    <LinearLayout
+    	android:layout_width="fill_parent"
+    	android:layout_height="70dip"
+    	android:gravity="center_vertical"
+    	android:orientation="horizontal"
+    	android:paddingBottom="18dip"
+    >
+
+        <LinearLayout
+            android:layout_width="54dip" 
+			android:layout_height="54dip"
+			android:layout_marginLeft="9dip"
+			android:layout_marginRight="9dip"
+		>
+            
+            <Button
+				android:id="@+id/mark_four"
+				android:background="@drawable/stroke_four_white"
+				android:layout_width="33dip" 
+				android:layout_height="54dip"
+			>
+			
+            </Button>
+            
+        </LinearLayout>
+
+		<Button 
+			android:id="@+id/explanation_four"
+			android:background="@null" 
+      		android:layout_width="wrap_content"
+      		android:layout_height="fill_parent"
+      		android:gravity="left|center_vertical"
+      		android:textColor="@android:color/white"
+      		android:textSize="14dip"
+    	>
+            
+		</Button>
+
+	</LinearLayout>
+	
+    <LinearLayout
+    	android:layout_width="fill_parent"
+    	android:layout_height="70dip"
+    	android:gravity="center_vertical"
+    	android:orientation="horizontal"
+    	android:paddingBottom="18dip"
+    >
+
+        <LinearLayout
+            android:layout_width="54dip" 
+			android:layout_height="54dip"
+			android:layout_marginLeft="9dip"
+			android:layout_marginRight="9dip"
+		>
+            
+            <Button
+				android:id="@+id/mark_five"
+				android:background="@drawable/stroke_five_white"
+				android:layout_width="51dip" 
+				android:layout_height="54dip"
+			>
+			
+            </Button>
+            
+        </LinearLayout>
+
+		<Button 
+			android:id="@+id/explanation_five"
+			android:background="@null" 
+      		android:layout_width="wrap_content"
+      		android:layout_height="fill_parent"
+      		android:gravity="left|center_vertical"
+      		android:textColor="@android:color/white"
+      		android:textSize="14dip"
+    	>
+            
+		</Button>
+
+	</LinearLayout>
+					
+</LinearLayout>

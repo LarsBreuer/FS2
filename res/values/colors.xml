@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="standardfarbe">#437597</color>
+    <color name="button_blau_rand">#355170</color>
+    <color name="button_orange_rand">#DB6412</color>
+    <color name="button_green_rand">#389B2D</color>
+    <color name="hellblau">#E0E7E9</color>
+    <color name="transparent">#00000000</color>
+    <color name="heimblau">#404895</color>
+    <color name="auswrot">#CB061D</color>
+    <color name="backgroundcolor">#FFFFFF</color>
+    <color name="rowdark">#A4D3EE</color>
+    <color name="rowlight">#BFEFFF</color>
+    
+    
+    <color name="grey_dark">#355264</color>
+    <color name="blue">#5D8AA8</color>
+    <color name="blue_light">#76B4DB</color>
+    <color name="blue_very_light">#A3CAE5</color>
+    <color name="blue_dark">#377DB0</color>
+    <color name="blue_very_dark">#536878</color>
+    <color name="orange">#FF714D</color>
+    <color name="green">#98C05F</color>
+    <color name="red">#CE4C4C</color>
+    <color name="yellow">#FFE8A2</color>
+    
+    
+    <color name="default_screen_bg">#f9f9f9</color>
+    <color name="rounded_container_bg">#222222</color>
+    <color name="rounded_container_border">#3b3f44</color>
+    <color name="light_gray_header_color">#646663</color>
+    
+    
+</resources>
