@@ -1,5 +1,6 @@
 package de.fivestrikes.fs2;
 
+import java.util.ArrayList;
 import android.content.Context;
 import android.app.Activity;
 import android.content.res.Configuration;
@@ -64,7 +65,7 @@ public class HelperText {
  * 
  */
 	
-/** TODO -2- => Generieren der Tickermeldungen überarbeiten - gerade bei Torwurf um weitere Informationen ergänzen*/
+/** TODO -4- => Generieren der Tickermeldungen überarbeiten - gerade bei Torwurf um weitere Informationen ergänzen*/
 	public String generateTickerEventNote(Integer ticker_event_id, Context ctxt, Resources res) {
 		
 		Integer goal_id = res.getInteger(R.integer.goal_id);
@@ -93,6 +94,8 @@ public class HelperText {
 		Integer two_minutes_id = res.getInteger(R.integer.two_minutes_id);
 		Integer twoplustwo_id = res.getInteger(R.integer.twoplustwo_id);
 		Integer red_card_id = res.getInteger(R.integer.red_card_id);
+		Integer sub_in_id = res.getInteger(R.integer.sub_in_id);
+		Integer sub_out_id = res.getInteger(R.integer.sub_out_id);
 		Integer timeout_id = res.getInteger(R.integer.timeout_id);
 		Integer tactic_60_id = res.getInteger(R.integer.tactic_60_id);
 		Integer tactic_51_id = res.getInteger(R.integer.tactic_51_id);
@@ -116,6 +119,7 @@ public class HelperText {
 		String ticker_red_card_id = null;
 		String ticker_timeout_id = null;
 		String ticker_tactic_id   = null;
+		String ticker_change_id   = null;
 		strText = "";
 		
 		// Durch die Ticker-Aktivitäten des Events gehen  
@@ -136,7 +140,8 @@ public class HelperText {
 				ticker_miss_id = ticker_id;
 			}
 			if (sqlHelper.getTickerActivityIDByID(ticker_id).equals(defense_error_id) || sqlHelper.getTickerActivityIDByID(ticker_id).equals(block_error_id) || 
-					sqlHelper.getTickerActivityIDByID(ticker_id).equals(defense_success_id) || sqlHelper.getTickerActivityIDByID(ticker_id).equals(block_success_id)) {
+					sqlHelper.getTickerActivityIDByID(ticker_id).equals(defense_success_id) || sqlHelper.getTickerActivityIDByID(ticker_id).equals(block_success_id) ||
+					sqlHelper.getTickerActivityIDByID(ticker_id).equals(foul_id)) {
 				ticker_defense_id = ticker_id;
 			}
 			if (sqlHelper.getTickerActivityIDByID(ticker_id).equals(tech_fault_id) || sqlHelper.getTickerActivityIDByID(ticker_id).equals(fehlpass_id) || sqlHelper.getTickerActivityIDByID(ticker_id).equals(steps_id) ||
@@ -164,9 +169,15 @@ public class HelperText {
 					sqlHelper.getTickerActivityIDByID(ticker_id).equals(tactic_321_id) || sqlHelper.getTickerActivityIDByID(ticker_id).equals(tactic_guarding_id)) {
 				ticker_tactic_id = ticker_id;
 			}
+			if (sqlHelper.getTickerActivityIDByID(ticker_id).equals(sub_in_id) || sqlHelper.getTickerActivityIDByID(ticker_id).equals(sub_out_id)) {
+				ticker_change_id = ticker_id;
+			}
 		}
 		
 		// Je nach Aktion die Tickermeldung einrichten
+		if (ticker_change_id != null) {
+			strText = ticker_change(ticker_event_id, res);
+		}
 		if (ticker_tactic_id != null) {
 			strText = ticker_tactic(ticker_tactic_id, res);
 		}
@@ -299,8 +310,12 @@ public class HelperText {
 		String club_name = sqlHelper.getClubNameByTickerEventAndHomeOrAway(ticker_id, home_or_away);
 		String defense = sqlHelper.getActivityStringByActivityID(sqlHelper.getTickerActivityIDByID(ticker_id), res);
 		String player_id = sqlHelper.getTickerPlayerIDByID(ticker_id);
-		String player_name = sqlHelper.getPlayerForenameByID(player_id) + " " + sqlHelper.getPlayerSurenameByID(player_id);
-		String player_number = sqlHelper.getPlayerNumberByID(player_id);	
+		String player_name = null;
+		String player_number = null;
+		if (player_id != null) {
+			player_name = sqlHelper.getPlayerForenameByID(player_id) + " " + sqlHelper.getPlayerSurenameByID(player_id);
+			player_number = sqlHelper.getPlayerNumberByID(player_id);	
+		}
 		
 		String strText = defense + " durch den Spieler " + player_name + " (" + player_number + ") von " + club_name + ".";
 		
@@ -363,4 +378,99 @@ public class HelperText {
 	
 	}
 	
+	public String ticker_change(Integer ticker_event_id, Resources res) {
+		
+		String ticker_id = null;
+		Integer sub_in_id = res.getInteger(R.integer.sub_in_id);
+		Integer sub_out_id = res.getInteger(R.integer.sub_out_id);
+		ArrayList<String> player_id_sub_in = new ArrayList<String>();
+		String player_id = null;
+		String player_id_sub_out = null;
+		String strText = "";
+		String player_name_in = null;
+		String player_number_in = null;
+		String player_name_out = null;
+		String player_number_out = null;
+		Integer home_or_away = null;
+		String club_name = null;
+		
+		// Kontrollieren, ob mehrere Spieler aufgestellt wurden, ob es auch eine Auswechselung gab
+		// Durch die Ticker-Aktivitäten des Events gehen  
+		String[] tickerArgs={String.valueOf(ticker_event_id)};
+		SQLiteDatabase db = sqlHelper.getWritableDatabase();
+		Cursor cTicker = db.rawQuery("SELECT * FROM ticker_activity WHERE ticker_event_id = ? ORDER BY time ASC", tickerArgs);
+		cTicker.moveToFirst();
+		
+		// Alle Tickermeldungen abfragen und Tickeraktivität ermitteln
+		for (cTicker.moveToFirst(); !cTicker.isAfterLast(); cTicker.moveToNext()) {
+			
+			ticker_id = sqlHelper.getTickerActivityID(cTicker);
+			home_or_away = sqlHelper.getTickerHomeOrAwayByID(ticker_id);
+			club_name = sqlHelper.getClubNameByTickerEventAndHomeOrAway(ticker_id, home_or_away);
+			
+			if (sqlHelper.getTickerActivityIDByID(ticker_id).equals(sub_in_id)) {
+				player_id_sub_in.add(sqlHelper.getTickerPlayerIDByID(ticker_id));
+			}
+			if (sqlHelper.getTickerActivityIDByID(ticker_id).equals(sub_out_id)) {
+				player_id_sub_out = sqlHelper.getTickerPlayerIDByID(ticker_id);
+			}
+		}
+		
+		Integer sub_in_size = player_id_sub_in.size();
+		
+		// Kontrollieren, ob es sich um eine einfache Ein- und Auswechselung handelt
+		if (player_id_sub_out != null && sub_in_size == 1) {
+			
+			player_id = player_id_sub_in.get(0);
+			player_name_in = sqlHelper.getPlayerForenameByID(player_id) + " " + sqlHelper.getPlayerSurenameByID(player_id);
+			player_number_in = sqlHelper.getPlayerNumberByID(player_id);
+			
+			player_id = player_id_sub_out;
+			player_name_out = sqlHelper.getPlayerForenameByID(player_id) + " " + sqlHelper.getPlayerSurenameByID(player_id);
+			player_number_out = sqlHelper.getPlayerNumberByID(player_id);
+			
+			strText = club_name + " hat gewechselt. " + player_name_out + " (" +player_number_out + ") " + "kommt für " +
+						player_name_in + " (" +player_number_in + ").";
+			
+		} else {
+			
+			if (player_id_sub_out == null && sub_in_size == 1) {
+				
+				player_id = player_id_sub_in.get(0);
+				
+				player_name_in = sqlHelper.getPlayerForenameByID(player_id) + " " + sqlHelper.getPlayerSurenameByID(player_id);
+				player_number_in = sqlHelper.getPlayerNumberByID(player_id);
+				
+				strText = club_name + " hat " + player_name_in + " (" +player_number_in + ") " + "eingewechselt.";
+				
+			} else {
+				
+				if (sub_in_size > 1) {
+					
+					strText = "Aufstellung von " + club_name + ":";
+					
+					for (int i = 0; i < sub_in_size; i++) {
+						
+						player_id = player_id_sub_in.get(i);
+						player_name_in = sqlHelper.getPlayerForenameByID(player_id) + " " + sqlHelper.getPlayerSurenameByID(player_id);
+						player_number_in = sqlHelper.getPlayerNumberByID(player_id);
+						
+						// Bei dem letzten Spieler einen anderen Text schreiben
+						if (i == sub_in_size  - 1) {
+							
+							strText = strText + " " + player_name_in + " (" + player_number_in + ").";
+							
+						} else {
+							
+							strText = strText + " " + player_name_in + " (" + player_number_in + "), ";
+							
+						}
+					}
+				}
+			}
+		}
+		
+		return(strText);
+		
+	}
 }

@@ -1,7 +1,9 @@
 package de.fivestrikes.fs2;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.os.Bundle;
@@ -21,13 +23,16 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 
-public class SmartStatList extends ListActivity {
+public class SmartStatGameTicker extends ListActivity {
 
 	HelperSQL sqlHelper=null;
+	Bundle args = null;
 	Cursor model=null;
-	HelperAdapterGame adapter=null;
-	String game_id=null;
+	HelperAdapterStatGameTicker adapter=null;
+	View view;
+	String game_id;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -35,58 +40,58 @@ public class SmartStatList extends ListActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.list);
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		view = findViewById(android.R.id.content);
 		
 /* Helper generieren */
 		
 		sqlHelper=new HelperSQL(this);
-
+		
+/* Daten aus Activity laden */ 
+	        
+		args = getIntent().getExtras();
+		game_id = args.getString("GameID");
+		
+/* Layout festlegen */
+		
+		sqlHelper=new HelperSQL(this);
+		model=sqlHelper.getAllGameTickerEvent(game_id);
+		startManagingCursor(model);
+		adapter=new HelperAdapterStatGameTicker(SmartStatGameTicker.this, model, game_id);
+		setListAdapter(adapter);
+		
 /* Action Bar konfigurieren */
 		
 		ActionBar actionBar = getActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);
 		actionBar.show();
 		
-/* Liste mit allen Spielen einrichten */
-		
-		refreshContent(game_id);		
-		
 	}
-	
-/* Inhalt neu laden, wenn Activity erneut aufgerufen wird */
 	
 	@Override
-	public void onResume() {
+	public void onDestroy() {
+		
+		super.onDestroy();	  
 
-		super.onResume();
-		refreshContent(game_id);
-	    	
 	}
 	
-	public void refreshContent(String game_id) {
-	
-		sqlHelper=new HelperSQL(this);
-		model=sqlHelper.getAllGameCursor();
-		startManagingCursor(model);
-		adapter=new HelperAdapterGame(SmartStatList.this, model, game_id);
-		setListAdapter(adapter);
-		        
-	}
-	
-/* Spielerauswahl */
+/* Tickerauswahl */
 	
 	@Override
 	public void onListItemClick(ListView list, View view, int position, long id) {
-	
-		game_id = String.valueOf(id);
-		Intent i=new Intent(SmartStatList.this, SmartListWithText.class);
-		Bundle args = new Bundle();
-		args.putString("GameID", game_id);
-		args.putString("InputString", "StatOverview");
+
+		int ticker_event_id = (int) (long) id;
+		String strInput = "EventText";
+		
+		args.putString("InputString", strInput);
+		args.putInt("TickerEventID", ticker_event_id);
+		
+		Intent i = new Intent(SmartStatGameTicker.this, SmartTickerText.class);
 		i.putExtras(args);
 		startActivity(i);
-			
+		
 	}
 	
+
 /* Action Bar einrichten */
 	
 	@Override
@@ -100,24 +105,24 @@ public class SmartStatList extends ListActivity {
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		
+
 		switch (item.getItemId()) {
         
 			case android.R.id.home: 
 				onBackPressed();
 				break;
-			
+
 			default:
 				return super.onOptionsItemSelected(item);
-		
+      	  	
 		}
-
+        
 		return true;
         
 	}
 	
 	private void CreateMenu(Menu menu) {
-	
 		
 	}
+
 }

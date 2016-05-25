@@ -17,6 +17,7 @@ public class TabTeamActivity extends FragmentActivity {
 
 	HelperSQL helper = null;
 	TabFragTeamList fragTeamList;
+	Bundle args;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +48,7 @@ public class TabTeamActivity extends FragmentActivity {
         
 		if (findViewById(R.id.frag_team_edit) != null) {
 
-			Bundle args = new Bundle();
+			if (args == null) args = new Bundle();
 			args.putString("Activity", "Team");
 			
 			if (savedInstanceState != null) {return;}

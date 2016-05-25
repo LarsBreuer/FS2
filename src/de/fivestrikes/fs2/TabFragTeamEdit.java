@@ -13,6 +13,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,7 @@ import android.widget.Toast;
 public class TabFragTeamEdit extends Fragment {
 	
 	HelperLayout lytHelper = null;
+	Bundle args;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater,
@@ -38,7 +40,7 @@ public class TabFragTeamEdit extends Fragment {
 
 /* Daten aus Activity laden */ 
         
-		Bundle args = getArguments();
+		args = getArguments();
 		
 /* Layout festlegen */
 		

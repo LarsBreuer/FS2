@@ -99,7 +99,7 @@
 <string name="sub_in">Einwechselung</string>
 <string name="sub_out">Auswechselung</string>
 <string name="lineup">Aufstellung</string>
-<string name="back">zurueck </string>
+<string name="back">Zurück </string>
 <string name="goal_area">Wurfecke</string>
 <string name="throw_position">Wurfposition</string>
 <string name="goalkeeper_goal_against">Torwart Gegentor</string>
@@ -214,6 +214,7 @@
 <string name="text_import_completed">Der Import wurde erfolgreich abgeschlossen.</string>
 <string name="text_import_failed_title">Import fehlgeschlagen</string>
 <string name="text_import_failed">Der Import der Datenbank ist fehlgeschlagen. Es wurde keine importfähige Datei gefunden. Gehe in der Five Strikes Lite App in der Übersicht auf Export, um eine Datei zu erstellen.</string>
+<string name="text_missed_shot">Bei einem Torwurf kann dieses Feld nicht ausgewählt werden.</string>
 <string name="delete_team">Mannschaft löschen</string>
 <string name="text_team_delete">Möchtest Du die Mannschaft wirklich löschen?</string>
 <string name="delete_player">Spieler löschen</string>

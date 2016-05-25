@@ -33,6 +33,7 @@ public class SmartTickerLineup extends ListActivity {
 
 	HelperLayout lytHelper = null;
 	HelperSQL sqlHelper=null;
+	HelperText txtHelper = null;
 	Cursor model=null;
 	LineupAdapter adapter = null;
 	String team_id, game_id, player_id, player_position_id, realtime, activity_result, teamname, activity_string;
@@ -42,6 +43,7 @@ public class SmartTickerLineup extends ListActivity {
 	static boolean[] checkBoxState;
 	int count_player;
 	Context ctxt;
+	Resources res;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +53,7 @@ public class SmartTickerLineup extends ListActivity {
 		
 		sqlHelper=new HelperSQL(this);
 		lytHelper = new HelperLayout();
+		txtHelper=new HelperText();
 		
 /* Daten aus Activity laden */ 
 		
@@ -70,6 +73,8 @@ public class SmartTickerLineup extends ListActivity {
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		
 		view = findViewById(android.R.id.content);
+		res = getResources(); 
+		ctxt = view.getContext();
 		
 /* Action Bar konfigurieren */
 		
@@ -103,6 +108,7 @@ public class SmartTickerLineup extends ListActivity {
 	public void refreshContent(String team_id, String game_id, Integer home_or_away) {
 
 /* Überschrift setzen */
+		
 		if (home_or_away.equals(1)) team_id = sqlHelper.getGameTeamHomeIDByID(game_id);
 		if (home_or_away.equals(0)) team_id = sqlHelper.getGameTeamAwayIDByID(game_id);
 		teamname = sqlHelper.getTeamClubShortByID(team_id);
@@ -295,17 +301,25 @@ public class SmartTickerLineup extends ListActivity {
 	    			player_position_id = sqlHelper.getPlayerPositionFirstByID(player_id);
 	    			
 	    			sqlHelper.insertTickerActivity(game_id, ticker_event_id, (int) (long) time_lineup, realtime, sub_in_id, home_or_away, player_id, null, null, null, null, activity_string, null);
-	    			if (player_position_id.substring(2,4).equals("01")) {
-	    				if (home_or_away.equals(1)) {
-	    					sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, Integer.parseInt(player_id), null, null, null, null, null, null, null, null, null, null);
-	        			}
-	    				if (home_or_away.equals(0)) {
-	        				sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, Integer.parseInt(player_id), null, null, null, null, null, null, null, null, null);
-	        			}
-	        		}
+	    			
+	    			if (player_position_id != null) {
+	    				if (player_position_id.substring(2,4).equals("01")) {
+		    				if (home_or_away.equals(1)) {
+		    					sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, Integer.parseInt(player_id), null, null, null, null, null, null, null, null, null, null);
+		        			}
+		    				if (home_or_away.equals(0)) {
+		        				sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, Integer.parseInt(player_id), null, null, null, null, null, null, null, null, null);
+		        			}
+		        		}
+	    			}
 	    		}
 	    		model.moveToNext();
 	    	}
+	    	
+	    	// Tickermeldung generieren
+	    	Log.v("SmartTickerLineup ctxt", String.valueOf(ctxt));
+	    	String ticker_event_note = txtHelper.generateTickerEventNote(ticker_event_id, ctxt, res);
+		sqlHelper.updateTickerEvent(String.valueOf(ticker_event_id), null, null, ticker_event_note, null);
 	    	
 	    	if (home_or_away.equals(1)) {
 			

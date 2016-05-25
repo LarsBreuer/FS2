@@ -138,7 +138,7 @@ public class SmartTickerPlayer extends ListActivity {
 		sqlHelper = new HelperSQL(this);
 		model = sqlHelper.getAllPlayerCursorByTeamID(team_id);
 		startManagingCursor(model);
-		adapter = new HelperAdapterTickerPlayer(SmartTickerPlayer.this, model, game_id);
+		adapter = new HelperAdapterTickerPlayer(SmartTickerPlayer.this, model, game_id, args);
 		setListAdapter(adapter);
 		        
 	}

@@ -28,6 +28,7 @@ public class TabPlayerActivity extends FragmentActivity {
 	HelperOnlineGetJSON getJsonHelper=null;
 	String team_id = null;
 	String server_team_id = null;
+	String player_id = null;
 	Bundle args = null;
 	TabFragPlayerList fragPlayerList;
 	
@@ -42,10 +43,11 @@ public class TabPlayerActivity extends FragmentActivity {
 		sqlHelper = new HelperSQL(this);
 		getJsonHelper = new HelperOnlineGetJSON();
 		
-/* Daten aus Activity laden */ 		
+/* Daten aus Activity laden */
 		
-		team_id = getIntent().getStringExtra("TeamID");
-		server_team_id = sqlHelper.getTeamServerTeamID(team_id);
+		args = getIntent().getExtras();
+		team_id = args.getString("TeamID");
+		server_team_id = args.getString("ServerTeamID");
 		
 /* Action Bar konfigurieren */
 		
@@ -54,9 +56,6 @@ public class TabPlayerActivity extends FragmentActivity {
 		actionBar.show();
 	
 /* Fragments einrichten */
-		
-		args = new Bundle();
-		args.putString("TeamID", team_id);
 		args.putString("Activity", "Player");
 
 		if (findViewById(R.id.frag_player_list) != null) {
@@ -103,10 +102,12 @@ public class TabPlayerActivity extends FragmentActivity {
 			case 0:
 				
 				// Füge neuen Spieler ein
-				args = new Bundle();
+				player_id = null;								//player_id auf null setzen, damit ein neuer Spieler angelegt werden kann
+				args.putString("PlayerID", player_id);
+				
 				fragPlayerList = (TabFragPlayerList) getSupportFragmentManager().findFragmentById(R.id.frag_player_list);
-				args.putString("TeamID", team_id);
 				fragPlayerList.refreshContent(team_id, null, args);
+				
 				FragmentManager fragmentManager = getSupportFragmentManager();
 				FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 				TabFragPlayerEdit fragment = new TabFragPlayerEdit();
@@ -165,7 +166,6 @@ public class TabPlayerActivity extends FragmentActivity {
 		      	  			fragPlayerList = (TabFragPlayerList) getSupportFragmentManager().findFragmentById(R.id.frag_player_list);
 		      	  		
 		      	  			// Neutralisiere das Editierfenster
-		      	  			args = new Bundle();
 		      	  			args.putString("Activity", "Player");
 		      	  			fragPlayerList.refreshContent(team_id, null, args);
 		      			

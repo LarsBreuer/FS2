@@ -102,7 +102,7 @@ public class HelperLayout {
 	String team_id = null;
 	String team_home_id = null;
 	String team_away_id = null;
-	String server_team_home_id = null;
+	String server_team_home_id = null; 
 	String server_team_away_id = null;
 	String player_team_id = null;
 	String activity_team_id = null;
@@ -271,6 +271,7 @@ public class HelperLayout {
 	TabFragStatPlayerStatList fragStatPlayerList;
 	TabFragStatPlayerStat fragStatPlayerStat;
 	TabFragStatPlayerTicker fragStatPlayerTicker;
+	TabFragStatTickerActivity fragStatTickerActivity;
 	SmartTickerActivity smartActivity;
 	SmartTickerPlayer tickerPlayerActivity;
 	SmartListWithText listActivity;
@@ -383,7 +384,7 @@ public class HelperLayout {
 		}
 		
 /* Daten aus Activity laden */ 
-	        
+		
 		if (args != null) {
 			
 			team_id = args.getString("TeamID");
@@ -478,7 +479,6 @@ public class HelperLayout {
 				
 				if(screenInch > 6) {
 										
-					args = new Bundle();
 					args.putString("GenderID", gender_id);
 					args.putString("StageOfLifeID", stage_of_life_id);
 					args.putString("LevelID", level_id);
@@ -521,16 +521,18 @@ public class HelperLayout {
 				
 				if (team_id != null) {
 
+					args.putString("TeamID", team_id);
+					
 					if(screenInch > 6) {
 						
 						Intent i=new Intent(ctxt, TabPlayerActivity.class);
-						i.putExtra("TeamID", team_id);
+						i.putExtras(args);
 						ctxt.startActivity(i);
 						
 					} else {
 						
 						Intent i=new Intent(ctxt, SmartPlayerList.class);
-						i.putExtra("TeamID", team_id);
+						i.putExtras(args);
 						ctxt.startActivity(i);
 						
 					}
@@ -685,6 +687,8 @@ public class HelperLayout {
 			@Override
 	            public void onClick(View v) {
 				
+				edit_club_name = (EditText) view.findViewById(R.id.team_name);
+				edit_club_name_short = (EditText) view.findViewById(R.id.team_short);
 				club_name = edit_club_name.getText().toString();
 				club_name_short = edit_club_name_short.getText().toString();
 				Integer count_club_by_name=sqlHelper.countClubByName(club_name);
@@ -721,16 +725,16 @@ public class HelperLayout {
 						finishActivity(team_id, args);
 						
 					} else {														// Falls keine vorhandene Mannschaft ausgewählt wurde
-							
-						if (count_team.equals(0)) {									// Falls die Mannschaft noch nicht existiert
 						
+						if (count_team.equals(0)) {									// Falls die Mannschaft noch nicht existiert
+							
 							// ... nur neue Mannschaft einrichten
 							sqlHelper.insertTeam(null, club_id, null, team_type_id);
 							team_id = sqlHelper.getLastTeamID();
 							finishActivity(team_id, args);
 						
 						} else {													// ... ansonsten benachrichtigen, dass Mannschaft schon vorhanden ist
-													
+									
 							// DialogBox einrichten
 							final Dialog dialog = new Dialog(ctxt);
 							dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -755,7 +759,6 @@ public class HelperLayout {
 								@Override
 								public void onClick(View v) {
 									dialog.dismiss();
-									finishActivity(team_id, args);
 								}
 							});
 
@@ -854,46 +857,7 @@ public class HelperLayout {
 
 		   		dialog.show();
 		   		// Ende Dialogbox einrichten
-				/*
-				// Nachrichtenbox einrichten
-				AlertDialog.Builder builder = new AlertDialog.Builder(TeamEditActivity.this);
-				builder
-					.setTitle(R.string.delete)
-					.setMessage(R.string.text_team_delete)
-					.setIcon(android.R.drawable.ic_dialog_alert)
-					.setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
-						
-						public void onClick(DialogInterface dialog, int which) {
-							
-							if(sqlHelper.countSpielTeamId(team_id)>0){	// Existiert noch ein Spiel mit dieser Mannschaft?
-								
-								AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(TeamEditActivity.this);
-								alertDialogBuilder
-									.setTitle(R.string.text_deletion_not_possible)
-					        	    		.setMessage(R.string.text_deletion_team_not_possible)
-					        	    		.setPositiveButton("Ok",new DialogInterface.OnClickListener() {
-					        					public void onClick(DialogInterface dialog,int id) {
-
-					        					}
-					        	    		});
-								AlertDialog alertDialog = alertDialogBuilder.create();
-					        	    	alertDialog.show();
-								
-							} else {
-								
-								sqlHelper.deleteTeam(team_id);
-								
-							}
-						}
-					})
-					.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {			      	
-							
-						}
-					})
-					.show();
-				// Ende Nachrichtenbox
-				*/
+		   		
 			}
 		});
 		
@@ -1591,8 +1555,26 @@ public class HelperLayout {
 		   				} else {
 		   					
 		   					sqlHelper.deletePlayer(player_id);
-		   					((Activity)ctxt).finish();
-		   					
+
+		   					if(screenInch > 6) {
+		   						
+		   						args.putString("TeamID", team_id);
+		   						args.putString("Activity", "Player");
+		   						
+		   						fragPlayerList.refreshContent(team_id, null, args);
+
+		   						FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+		   						TabFragEmpty fragment = new TabFragEmpty();
+								fragment.setArguments(args);
+								fragmentTransaction.replace(R.id.frag_player_edit, fragment);
+								fragmentTransaction.commit();
+		   						
+								
+		   					} else {
+		   						
+		   						((Activity)ctxt).finish();
+		   						
+		   					}
 		   				}
 		   			}
 		   		});
@@ -1697,7 +1679,7 @@ public class HelperLayout {
 		Button btn_synch = (Button) view.findViewById(R.id.synch);
 		Button btn_save = (Button) view.findViewById(R.id.save);
 		Button btn_delete = (Button) view.findViewById(R.id.delete);
-/** TODO -2- => Runde Button bei Spiel editieren einbauen */
+/** TODO -3- => Runde Button bei Spiel editieren einbauen */
 
 /* Button beschriften */
 	        
@@ -2071,7 +2053,7 @@ public class HelperLayout {
  * Layout Anzeigetafel einrichten 
  *
  */
-			
+/** TODO -4- => Button letzte Aktion rückgängig machen */
 	public void lytTickerBoard(String id, final View contentView, final FragmentManager contentFragmentManager, Bundle contentArgs) {
 		
 		view = contentView;
@@ -2300,6 +2282,7 @@ public class HelperLayout {
 	    	
 /* Uhr stellen */
 /** TODO -3- => Anzeige der Uhr und Ergebnisse rund. Größe Ergebis abhängig von Anzahl der Tore */
+/** TODO -2- => Bei Spiel wenn man Zeit stellt und dann Aktion einstellt wird falsche Zeit angegebene */
 	    	btn_timer.setOnLongClickListener(new OnLongClickListener() { 
 	    		
 	    		@Override
@@ -2493,7 +2476,7 @@ public class HelperLayout {
 		if(metrics.density<1.6){
 			picSize = 150;
 		}
-/** TODO -2- => Unter die Button auch Bezeichnung schreiben, z.B. "Torwurf" unter den Torwurfbutton */
+/** TODO -3- => Unter die Button auch Bezeichnung schreiben, z.B. "Torwurf" unter den Torwurfbutton */
 		ImageButton btn_goal = (ImageButton) view.findViewById(R.id.menu_goal);
 		btn_goal.setImageResource(R.drawable.activity_goal);
 		scaleImage(btn_goal, picSize, "LinearLayout");
@@ -2844,6 +2827,7 @@ public class HelperLayout {
 			team_away_id = sqlHelper.getGameTeamAwayIDByID(game_id);
 			
 			if (strInput.equals("Assist") || strInput.equals("EditAssist")) activity_string = res.getString(R.string.assist);
+			if (strInput.equals("Defense") || strInput.equals("EditDefense")) activity_string = res.getString(R.string.defense);
 
 		}
 		
@@ -2900,7 +2884,7 @@ public class HelperLayout {
 				// Aktualisiere die Spielerliste
 				if (screenInch > 6) {
 					
-					fragTickerPlayer.refreshContent(team_id, game_id);
+					fragTickerPlayer.refreshContent(team_id, game_id, args);
 					
 				} else {
 					
@@ -2924,7 +2908,7 @@ public class HelperLayout {
 				// Aktualisiere die Spielerliste
 				if (screenInch > 6) {
 					
-					fragTickerPlayer.refreshContent(team_id, game_id);
+					fragTickerPlayer.refreshContent(team_id, game_id, args);
 					
 				} else {
 					
@@ -2949,7 +2933,6 @@ public class HelperLayout {
 		
 	public void lytTickerArea(Bundle contentArgs, final View contentView, final FragmentManager contentFragmentManager) {
 		
-/** TODO -1- => Wurfposition bei Siebenmeter automatisch auf den Siebenmeterpunkt setzen */
 		view = contentView;
 		ctxt = view.getContext();
 		res = ctxt.getResources();
@@ -2995,6 +2978,14 @@ public class HelperLayout {
 /* Activity IDs laden */
 		
 		activityIDs();
+		
+/* Wurfposition auf 7m setzen, falls ein 7m-Torwurf oder Fehlwurf ausgewählt wurde */
+
+		if (activity_id.equals(goal_7m_id) || activity_id.equals(miss_7m_id)) {
+			x_coord = 100;
+			y_coord = 75;
+			set_position = true;
+	 	}
 		
 /* Button einrichten */
 		
@@ -3057,6 +3048,8 @@ public class HelperLayout {
 			public void onClick(View view) {
 				if (activity_id.equals(miss_id) || activity_id.equals(miss_7m_id)  || activity_id.equals(miss_fb_id)) {
 					finishArea("uull");
+				} else {
+					Toast.makeText(((Activity)ctxt), ctxt.getString(R.string.text_missed_shot), Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
@@ -3066,6 +3059,8 @@ public class HelperLayout {
 			public void onClick(View view) {
 				if (activity_id.equals(miss_id) || activity_id.equals(miss_7m_id)  || activity_id.equals(miss_fb_id)) {
 					finishArea("uul");
+				} else {
+					Toast.makeText(((Activity)ctxt), ctxt.getString(R.string.text_missed_shot), Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
@@ -3075,6 +3070,8 @@ public class HelperLayout {
 			public void onClick(View view) {
 				if (activity_id.equals(miss_id) || activity_id.equals(miss_7m_id)  || activity_id.equals(miss_fb_id)) {
 					finishArea("uum");
+				} else {
+					Toast.makeText(((Activity)ctxt), ctxt.getString(R.string.text_missed_shot), Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
@@ -3084,6 +3081,8 @@ public class HelperLayout {
 			public void onClick(View view) {
 				if (activity_id.equals(miss_id) || activity_id.equals(miss_7m_id)  || activity_id.equals(miss_fb_id)) {
 					finishArea("uur");
+				} else {
+					Toast.makeText(((Activity)ctxt), ctxt.getString(R.string.text_missed_shot), Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
@@ -3093,6 +3092,8 @@ public class HelperLayout {
 			public void onClick(View view) {
 				if (activity_id.equals(miss_id) || activity_id.equals(miss_7m_id)  || activity_id.equals(miss_fb_id)) {
 					finishArea("uurr");
+				} else {
+					Toast.makeText(((Activity)ctxt), ctxt.getString(R.string.text_missed_shot), Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
@@ -3102,6 +3103,8 @@ public class HelperLayout {
 			public void onClick(View view) {
 				if (activity_id.equals(miss_id) || activity_id.equals(miss_7m_id)  || activity_id.equals(miss_fb_id)) {
 					finishArea("ull");
+				} else {
+					Toast.makeText(((Activity)ctxt), ctxt.getString(R.string.text_missed_shot), Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
@@ -3132,6 +3135,8 @@ public class HelperLayout {
 			public void onClick(View view) {
 				if (activity_id.equals(miss_id) || activity_id.equals(miss_7m_id)  || activity_id.equals(miss_fb_id)) {
 					finishArea("urr");
+				} else {
+					Toast.makeText(((Activity)ctxt), ctxt.getString(R.string.text_missed_shot), Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
@@ -3141,6 +3146,8 @@ public class HelperLayout {
 			public void onClick(View view) {
 				if (activity_id.equals(miss_id) || activity_id.equals(miss_7m_id)  || activity_id.equals(miss_fb_id)) {
 					finishArea("mll");
+				} else {
+					Toast.makeText(((Activity)ctxt), ctxt.getString(R.string.text_missed_shot), Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
@@ -3171,6 +3178,8 @@ public class HelperLayout {
 			public void onClick(View view) {
 				if (activity_id.equals(miss_id) || activity_id.equals(miss_7m_id)  || activity_id.equals(miss_fb_id)) {
 					finishArea("mrr");
+				} else {
+					Toast.makeText(((Activity)ctxt), ctxt.getString(R.string.text_missed_shot), Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
@@ -3180,6 +3189,8 @@ public class HelperLayout {
 			public void onClick(View view) {
 				if (activity_id.equals(miss_id) || activity_id.equals(miss_7m_id)  || activity_id.equals(miss_fb_id)) {
 					finishArea("lll");
+				} else {
+					Toast.makeText(((Activity)ctxt), ctxt.getString(R.string.text_missed_shot), Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
@@ -3210,6 +3221,8 @@ public class HelperLayout {
 			public void onClick(View view) {
 				if (activity_id.equals(miss_id) || activity_id.equals(miss_7m_id)  || activity_id.equals(miss_fb_id)) {
 					finishArea("lrr");
+				} else {
+					Toast.makeText(((Activity)ctxt), ctxt.getString(R.string.text_missed_shot), Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
@@ -3608,7 +3621,7 @@ public class HelperLayout {
 		TextView explanation = (TextView) view.findViewById(R.id.explanation);
 		txt_ticker_event = (EditText) view.findViewById(R.id.ticker_text);
 		
-		if (strInput.equals("EventText")) {
+		if (strInput.equals("EventText") || strInput.equals("StatEventText")) {
 			
 			headline.setText(res.getString(R.string.ticker_message));
 			explanation.setText(res.getString(R.string.ticker_message_explanation));
@@ -3618,7 +3631,7 @@ public class HelperLayout {
 			
 		}
 		
-		if (strInput.equals("ActivityText")) {
+		if (strInput.equals("ActivityText") || strInput.equals("StatActivityText")) {
 			
 			headline.setText(res.getString(R.string.ticker_note));
 			explanation.setText(res.getString(R.string.ticker_note_explanation));
@@ -3637,18 +3650,33 @@ public class HelperLayout {
 				
 				ticker_note = txt_ticker_event.getText().toString();
 				
-				if (strInput.equals("ActivityText")) {
+				if (strInput.equals("ActivityText") || strInput.equals("StatActivityText")) {
 					
 					sqlHelper.updateTickerActivity(String.valueOf(ticker_activity_id), null, null, null, null, null, null, null, null, null, null, null, ticker_note, null, null, null);
 					
 					if(screenInch > 6) {
-/** TODO -3- => Statistik => Spielaktivitäten => Notiz zur Spielaktion => Bei Statistikanzeige andere Bezeichnung des dritten Fragments beachten */
-						// Aktualisiere die Spielliste
-						fragTickerList = (TabFragTickerList) fragmentManager.findFragmentById(R.id.frag_ticker_list);
-						fragTickerList.refreshContent(game_id);
-					
-						TabFragEmpty thirdFragment = new TabFragEmpty();
-						fragmentManager.beginTransaction().add(R.id.frag_ticker_setup, thirdFragment).commit();
+						
+						FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+						
+						if (strInput.equals("ActivityText")) {
+							
+							// Aktualisiere die Spielliste
+							fragTickerList = (TabFragTickerList) fragmentManager.findFragmentById(R.id.frag_ticker_list);
+							fragTickerList.refreshContent(game_id);
+						
+							TabFragEmpty thirdFragment = new TabFragEmpty();
+							fragmentManager.beginTransaction().add(R.id.frag_ticker_setup, thirdFragment).commit();
+							
+						}
+						
+						if (strInput.equals("StatActivityText")) {
+							
+							TabFragEmpty fragment = new TabFragEmpty();
+							fragment.setArguments(args);
+							fragmentTransaction.replace(R.id.frag_stat_ticker_content_2, fragment);
+							fragmentTransaction.commit();
+							
+						}
 					
 					} else {
 					
@@ -3657,18 +3685,39 @@ public class HelperLayout {
 					}
 				}
 				
-				if (strInput.equals("EventText")) {
+				if (strInput.equals("EventText") || strInput.equals("StatEventText")) {
 					
 					sqlHelper.updateTickerEvent(String.valueOf(ticker_event_id), null , null, ticker_note, null);
 					
 					if(screenInch > 6) {
 					
-						// Aktualisiere die Spielliste
-						fragTickerList = (TabFragTickerList) fragmentManager.findFragmentById(R.id.frag_ticker_list);
-						fragTickerList.refreshContent(game_id);
+						FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+						
+						if (strInput.equals("EventText")) {
+							
+							// Aktualisiere die Spielliste
+							fragTickerList = (TabFragTickerList) fragmentManager.findFragmentById(R.id.frag_ticker_list);
+							fragTickerList.refreshContent(game_id);
 					
-						TabFragEmpty thirdFragment = new TabFragEmpty();
-						fragmentManager.beginTransaction().add(R.id.frag_ticker_setup, thirdFragment).commit();
+							TabFragEmpty thirdFragment = new TabFragEmpty();
+							fragmentManager.beginTransaction().add(R.id.frag_ticker_setup, thirdFragment).commit();
+							
+						}
+						
+						if (strInput.equals("StatEventText")) {
+							
+							// Aktualisiere die Spielliste
+							TabFragStatTickerEvent fragStatEvent = (TabFragStatTickerEvent) fragmentManager.findFragmentById(R.id.frag_stat_ticker_content_1);
+							game_id = args.getString("GameID");
+							fragStatEvent.refreshContent(game_id);
+					
+							TabFragEmpty fragment = new TabFragEmpty();
+							fragment.setArguments(args);
+							fragmentTransaction.replace(R.id.frag_stat_ticker_content_2, fragment);
+							fragmentTransaction.commit();
+							
+						}
+						
 					
 					} else {
 					
@@ -3929,6 +3978,12 @@ public class HelperLayout {
 			lyt_text.removeAllViews();
 			lyt_button.removeAllViews();
 		}
+		
+		if (strInput.equals("TabStatTicker")) {
+			lyt_headline.removeAllViews();
+			lyt_text.removeAllViews();
+			lyt_button.removeAllViews();
+		}
 	
 		// Zelltexte anlegen
 		
@@ -4094,8 +4149,7 @@ public class HelperLayout {
 									res.getString(R.string.player_statistic) + " " + team_home_short,
 									res.getString(R.string.player_statistic) + " " + team_away_short,
 									res.getString(R.string.activities),
-									res.getString(R.string.ticker),
-									res.getString(R.string.export)};
+									res.getString(R.string.ticker)};
 			
 		}
 		
@@ -4105,9 +4159,14 @@ public class HelperLayout {
 									res.getString(R.string.score_chart),
 									res.getString(R.string.player_statistic) + " " + team_home_short,
 									res.getString(R.string.player_statistic) + " " + team_away_short,
-									res.getString(R.string.activities),
-									res.getString(R.string.ticker),
-									res.getString(R.string.export)};
+									res.getString(R.string.ticker)};
+			
+		}
+		
+		if (strInput.equals("TabStatTicker")) {
+			
+			values = new String[] { 	res.getString(R.string.activities),
+									res.getString(R.string.input_text)};
 			
 		}
 		
@@ -4121,7 +4180,11 @@ public class HelperLayout {
 				if (strInput.equals("TabStatOverview")) {
 					fragListWithText = (TabFragListWithText) fragmentManager.findFragmentById(R.id.frag_stat_list);
 				} else {
-					fragListWithText = (TabFragListWithText) fragmentManager.findFragmentById(R.id.frag_ticker_setup);
+					if (strInput.equals("TabStatTicker")) {
+						fragListWithText = (TabFragListWithText) fragmentManager.findFragmentById(R.id.frag_stat_ticker_list);
+					} else {
+						fragListWithText = (TabFragListWithText) fragmentManager.findFragmentById(R.id.frag_ticker_setup);
+					}
 				}
 			}
 			fragListWithText.setListAdapter(adapter);
@@ -4315,7 +4378,7 @@ public class HelperLayout {
 			if (strInput.equals("EditThrowingTechnique")) {
 				
 				if (screenInch > 6) {
-/** TODO -3- => Kontrollieren, ob diese Funktion funktioniert: Tablet beim Editieren der Wurftechnik die Spielleiste aktualisieren und das Setup-Bildschirm löschen */
+					
 					// Aktualisiere die Spielliste
 					fragTickerList = (TabFragTickerList) fragmentManager.findFragmentById(R.id.frag_ticker_list);
 					fragTickerList.refreshContent(game_id);
@@ -4359,7 +4422,7 @@ public class HelperLayout {
 						
 						// Abwehr
 						if (sqlHelper.getGameInputDefense(game_id).equals(1)) {
-							
+/** TODO -4- => Den gesamten Punkt "Abwehr" überarbeiten. Siehe dazu auch die eMail von Patrick Lafrenz vom 08.03.2016 unter Punkt 6. */
 							args.putString("InputString", "Defense");
 							FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 							TabFragTickerPlayer fragment = new TabFragTickerPlayer();
@@ -4397,7 +4460,7 @@ public class HelperLayout {
 				
 				// Benotung für den Wurf
 				if (sqlHelper.getGameInputMark(game_id).equals(1)) {
-					Log.v("HelperLayout", "Mark 1");
+					
 					Intent i = new Intent(ctxt, SmartTickerMark.class);
 					i.putExtras(args);
 					((Activity)ctxt).startActivity(i);
@@ -4510,7 +4573,7 @@ public class HelperLayout {
 						fragmentTransaction.commit();
 					
 					} else {
-						Log.v("HelperLayout", "Mark 2");
+						
 						Intent i = new Intent(ctxt, SmartTickerMark.class);
 						i.putExtras(args);
 						((Activity)ctxt).startActivity(i);
@@ -4568,7 +4631,7 @@ public class HelperLayout {
 						fragmentTransaction.commit();
 					
 					} else {
-						Log.v("HelperLayout", "Mark 3");
+						
 						Intent i = new Intent(ctxt, SmartTickerMark.class);
 						i.putExtras(args);
 						((Activity)ctxt).startActivity(i);
@@ -4749,7 +4812,7 @@ public class HelperLayout {
 					fragmentTransaction.commit();	
 					
 				} else {
-					Log.v("HelperLayout", "Mark 4");
+					
 					Intent i = new Intent(ctxt, SmartTickerMark.class);
 					i.putExtras(args);
 					((Activity)ctxt).startActivity(i);
@@ -4996,7 +5059,7 @@ public class HelperLayout {
 					fragmentTransaction.commit();	
 					
 				} else {
-					Log.v("HelperLayout", "Mark 5");
+					
 					Intent i = new Intent(ctxt, SmartTickerMark.class);
 					i.putExtras(args);
 					((Activity)ctxt).startActivity(i);
@@ -5255,7 +5318,7 @@ public class HelperLayout {
 					fragmentTransaction.commit();	
 					
 				} else {
-					Log.v("HelperLayout", "Mark 6");
+					
 					Intent i = new Intent(ctxt, SmartTickerMark.class);
 					i.putExtras(args);
 					((Activity)ctxt).startActivity(i);
@@ -5426,7 +5489,7 @@ public class HelperLayout {
 					fragmentTransaction.commit();
 					
 				} else {
-					Log.v("HelperLayout", "Mark 7");
+					
 					Intent i = new Intent(ctxt, SmartTickerMark.class);
 					i.putExtras(args);
 					((Activity)ctxt).startActivity(i);
@@ -5593,7 +5656,7 @@ public class HelperLayout {
 					fragmentTransaction.commit();
 					
 				} else {
-					Log.v("HelperLayout", "Mark 8");
+					
 					Intent i = new Intent(ctxt, SmartTickerMark.class);
 					i.putExtras(args);
 					((Activity)ctxt).startActivity(i);
@@ -6131,7 +6194,7 @@ public class HelperLayout {
 			}
 			
 		}
-		Log.v("Helperayout strInput", strInput);
+		
 		if (strInput.equals("StatOverview")) {
 			
 			final Dialog dialog = new Dialog(ctxt);
@@ -6198,63 +6261,13 @@ public class HelperLayout {
 				
 				break;
 			case 5:						// Tickermeldungen
-/** TODO -1- => Statistik zur Tickermeldung einbauen (das Gleiche auch bei Tablet) */
 				
-				// Nachrichtenbox einrichten
-				dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-				dialog.setContentView(R.layout.custom_dialog);
+				args.putString("GameID", game_id);
+				
+				i = new Intent(ctxt, SmartStatGameTicker.class);
+				i.putExtras(args);
+				((Activity)ctxt).startActivity(i);
 
-				// Texte setzen
-				title.setText(R.string.text_patience);
-				text.setText(R.string.text_function_not_available);
-				
-				// Button definieren
-				lyt_button2.removeAllViews();
-				lyt_button3.removeAllViews();
-				
-				dialogButton1.setText(R.string.okay);
-				
-				dialogButton1.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						dialog.dismiss();
-					}
-				});
-
-				dialog.show();
-				// Ende Nachrichtenbox
-
-				strInput = "StatOverview";
-				args.putString("InputString", strInput);
-				
-				break;
-			case 6:						// Export
-/** TODO -2- => Export eines Spiels auf den Server einbauen */
-				
-				// DialogBox einrichten
-				dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-				dialog.setContentView(R.layout.custom_dialog);
-
-				// Texte setzen
-				title.setText(R.string.synchro);
-				text.setText(R.string.text_login_not_possible);
-				
-				// Button definieren
-				lyt_button2.removeAllViews();
-				lyt_button3.removeAllViews();
-				
-				dialogButton1.setText(R.string.okay);
-				
-				dialogButton1.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						dialog.dismiss();
-					}
-				});
-
-				dialog.show();
-				// Ende Nachrichtenbox
-				
 				strInput = "StatOverview";
 				args.putString("InputString", strInput);
 				
@@ -6316,87 +6329,38 @@ public class HelperLayout {
 				
 				
 				break;
-			case 4:						// Spielaktionen
+			case 4:						// Ticker
 
-/** TODO -3- => Tablet-Version: Neue Activity für Spielaktionen einfügen: links Filter, Mitte Liste der Spielaktionen, rechts Kommentar zur Spielaktion, wenn eine Spielaktion ausgewählt wurde.  */ 
-
-				// DialogBox einrichten
-				dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-				dialog.setContentView(R.layout.custom_dialog);
-
-				// Texte setzen
-				title.setText(R.string.text_patience);
-				text.setText(R.string.text_function_not_available);
-				
-				// Button definieren
-				lyt_button2.removeAllViews();
-				lyt_button3.removeAllViews();
-				
-				dialogButton1.setText(R.string.okay);
-				
-				dialogButton1.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						dialog.dismiss();
-					}
-				});
-				// Ende Nachrichtenbox
-
-				dialog.show();
+				i = new Intent(ctxt, TabStatTickerActivity.class);
+				i.putExtras(args);
+				((Activity)ctxt).startActivity(i);
 				
 				break;
-			case 5:						// Tickermeldungen
-/** TODO -3- => Tickermeldungen auf dem Tablet einbauen */
+			}
+		}
+		
+		if (strInput.equals("TabStatTicker")) {
+			
+			FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+			
+			switch(position) {
+			case 0:						// Ticker
 				
-				// DialogBox einrichten
-				dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-				dialog.setContentView(R.layout.custom_dialog);
+				TabFragStatTickerActivity fragStatActivity = new TabFragStatTickerActivity();
+				fragStatActivity.setArguments(args);
+				fragmentTransaction.replace(R.id.frag_stat_ticker_content_1, fragStatActivity);
+				fragmentTransaction.commit();
 
-				// Texte setzen
-				title.setText(R.string.text_patience);
-				text.setText(R.string.text_function_not_available);
+				break;
+			case 1:						// Tickermeldung
 				
-				// Button definieren
-				lyt_button2.removeAllViews();
-				lyt_button3.removeAllViews();
-				
-				dialogButton1.setText(R.string.okay);
-				
-				dialogButton1.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						dialog.dismiss();
-					}
-				});
-				// Ende Nachrichtenbox
+				TabFragStatTickerEvent fragStatEvent = new TabFragStatTickerEvent();
+				fragStatEvent.setArguments(args);
+				fragmentTransaction.replace(R.id.frag_stat_ticker_content_1, fragStatEvent);
+				fragmentTransaction.commit();
 				
 				break;
-			case 6:						// Export
-/** TODO -2- => Export eines Spiels auf den Server einbauen */
-				
-				// DialogBox einrichten
-				dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-				dialog.setContentView(R.layout.custom_dialog);
-
-				// Texte setzen
-				title.setText(R.string.synchro);
-				text.setText(R.string.text_login_not_possible);
-				
-				// Button definieren
-				lyt_button2.removeAllViews();
-				lyt_button3.removeAllViews();
-				
-				dialogButton1.setText(R.string.okay);
-				
-				dialogButton1.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						dialog.dismiss();
-					}
-				});
-				// Ende Nachrichtenbox
-				
-				break;
+			
 			}
 		}
 	}
@@ -6466,7 +6430,9 @@ public class HelperLayout {
 				activity_team_id = team_away_id;
 				activity_against_team_id = team_home_id;
 			}
-			if (player_position_first.length() == 4) player_position = (player_position_first.substring(3,4));
+			if (player_position_first != null) {
+				if (player_position_first.length() == 4) player_position = (player_position_first.substring(3,4));
+			}
 			if (activity_id.equals(defense_success_id)) {
 				ticker_defense_id = ticker_activity_id;
 				strInput = "Defense";
@@ -6558,7 +6524,7 @@ public class HelperLayout {
 					
 					// Benotung der Vorlage
 					if (sqlHelper.getGameInputMark(game_id).equals(1)) {
-						Log.v("HelperLayout", "Mark 9");
+						
 						Intent i = new Intent(ctxt, SmartTickerMark.class);
 						i.putExtras(args);
 						((Activity)ctxt).startActivity(i);
@@ -6606,6 +6572,8 @@ public class HelperLayout {
 
 			if (strInput.equals("Defense")) {
 				
+				Log.v("HelperLayout", "Defense aufgerufen");
+				Log.v("HelperLayout getGameInputMark", String.valueOf(sqlHelper.getGameInputMark(game_id).equals(1)));
 				Integer ticker_home_or_away = sqlHelper.getTickerHomeOrAwayByID(String.valueOf(ticker_activity_id));
 				if (home_or_away.equals(ticker_home_or_away)) {
 					sqlHelper.updateTickerActivity(String.valueOf(ticker_defense_id), null, null, null, null, null, null, player_id, null, null, null, null, null, null, null, null);
@@ -6627,20 +6595,33 @@ public class HelperLayout {
 			
 					} else {
 						
-						// Aktualisiere die Spielliste
-						fragTickerList = (TabFragTickerList) fragmentManager.findFragmentById(R.id.frag_ticker_list);
-    						fragTickerList.refreshContent(game_id);
-    						
-    						TabFragEmpty thirdFragment = new TabFragEmpty();
-    						fragmentManager.beginTransaction().add(R.id.frag_ticker_setup, thirdFragment).commit();
+						// Tickermeldung
+						if (sqlHelper.getGameInputText(game_id).equals(1)) {
+							
+							args.putString("InputString", "EventText");
+							FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+							TabFragTickerText fragment = new TabFragTickerText();
+							fragment.setArguments(args);
+							fragmentTransaction.replace(R.id.frag_ticker_setup, fragment);
+							fragmentTransaction.commit();
+							
+						} else {
 						
+							// Aktualisiere die Spielliste
+							fragTickerList = (TabFragTickerList) fragmentManager.findFragmentById(R.id.frag_ticker_list);
+							fragTickerList.refreshContent(game_id);
+    						
+							TabFragEmpty thirdFragment = new TabFragEmpty();
+							fragmentManager.beginTransaction().add(R.id.frag_ticker_setup, thirdFragment).commit();
+							
+						}
 					}
 					
 				} else {
 					
 					// Benotung der Abwehraktion
 					if (sqlHelper.getGameInputMark(game_id).equals(1)) {
-						Log.v("HelperLayout", "Mark 10");
+						
 						Intent i = new Intent(ctxt, SmartTickerMark.class);
 						i.putExtras(args);
 						((Activity)ctxt).startActivity(i);
@@ -6648,8 +6629,20 @@ public class HelperLayout {
 						
 					} else {
 						
-						((Activity)ctxt).finish();
-						
+						// Tickermeldung
+						if (sqlHelper.getGameInputText(game_id).equals(1)) {
+							
+							args.putString("InputString", "EventText");
+							Intent i = new Intent(ctxt, SmartTickerText.class);
+							i.putExtras(args);
+							((Activity)ctxt).startActivity(i);
+							((Activity)ctxt).finish();
+							
+						} else {
+							
+							((Activity)ctxt).finish();
+							
+						}
 					}
 				}
 			}	
@@ -6662,13 +6655,16 @@ public class HelperLayout {
 			
 			// Bei Änderung Einwechselung des Torwarts diesen als Torwart im Spiel eintragen
 /** TODO -4- => Prüfen, ob es die letzte Einwechselung im Spiel war, da andernfalls der Torwart nicht im Spiel eingetragen werden muss */
-			if (sqlHelper.getPlayerPositionFirstByID(player_id).equals("1001")) {
-				if (sqlHelper.getTickerActivityIDByID(String.valueOf(ticker_activity_id)).equals(sub_in_id)) {
-					if (sqlHelper.getTickerHomeOrAwayByID(String.valueOf(ticker_activity_id)).equals(1)) {
-						sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, Integer.parseInt(player_id), null, null, null, null, null, null, null, null, null, null);
-					}
-					if (sqlHelper.getTickerHomeOrAwayByID(String.valueOf(ticker_activity_id)).equals(0)) {
-						sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, Integer.parseInt(player_id), null, null, null, null, null, null, null, null, null);
+			
+			if (sqlHelper.getPlayerPositionFirstByID(player_id) != null) {
+				if (sqlHelper.getPlayerPositionFirstByID(player_id).equals("1001")) {
+					if (sqlHelper.getTickerActivityIDByID(String.valueOf(ticker_activity_id)).equals(sub_in_id)) {
+						if (sqlHelper.getTickerHomeOrAwayByID(String.valueOf(ticker_activity_id)).equals(1)) {
+							sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, Integer.parseInt(player_id), null, null, null, null, null, null, null, null, null, null);
+						}
+						if (sqlHelper.getTickerHomeOrAwayByID(String.valueOf(ticker_activity_id)).equals(0)) {
+							sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, Integer.parseInt(player_id), null, null, null, null, null, null, null, null, null);
+						}
 					}
 				}
 			}
@@ -6913,7 +6909,7 @@ public class HelperLayout {
 							
 							// Benotung für den Wurf
 							if (sqlHelper.getGameInputMark(game_id).equals(1)) {
-								Log.v("HelperLayout", "Mark 11");
+								
 								Intent i = new Intent(ctxt, SmartTickerMark.class);
 								i.putExtras(args);
 								((Activity)ctxt).startActivity(i);
@@ -6962,7 +6958,6 @@ public class HelperLayout {
 							}
 						}
 					}
-					Log.v("HelperSQL", "fertig");
 				}
 			}
 		
@@ -7036,34 +7031,113 @@ public class HelperLayout {
 				// Überprüfen, ob Mannschaft gewechselt wurde
 				if (player_team_id.equals(activity_against_team_id)) {
 					sqlHelper.updateTickerActivity(String.valueOf(ticker_activity_id), null, null, null, null, null, null, player_id, null, null, null, null, null, null, null, null);
-					sqlHelper.updateTickerActivity(String.valueOf(ticker_foul_id), null, null, null, null, null, null, player_id, null, null, null, null, null, null, null, null);
+					if (ticker_foul_id != null) sqlHelper.updateTickerActivity(String.valueOf(ticker_foul_id), null, null, null, null, null, null, player_id, null, null, null, null, null, null, null, null);
+					ticker_foul_id = 0;
 				} else {
 					sqlHelper.updateTickerActivity(String.valueOf(ticker_activity_id), null, null, null, null, null, home_or_away, player_id, null, null, null, null, null, null, null, null);
-					sqlHelper.updateTickerActivity(String.valueOf(ticker_foul_id), null, null, null, null, null, home_or_away, player_id, null, null, null, null, null, null, null, null);
+					if (ticker_foul_id != null) sqlHelper.updateTickerActivity(String.valueOf(ticker_foul_id), null, null, null, null, null, home_or_away, player_id, null, null, null, null, null, null, null, null);
+					ticker_foul_id = 0;
 				}
 				ticker_event_note = txtHelper.generateTickerEventNote(ticker_event_id, ctxt, res);
 				sqlHelper.updateTickerEvent(String.valueOf(ticker_event_id), null, null, ticker_event_note, null);
 				
+				// Abfrage nach weiterer Eingabe
+				if (screenInch > 6) {
+					
+					// Benotung des Zweikampfs
+					if (sqlHelper.getGameInputMark(game_id).equals(1)) {
+						
+						FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+						TabFragTickerMark fragment = new TabFragTickerMark();
+						fragment.setArguments(args);
+						fragmentTransaction.replace(R.id.frag_ticker_setup, fragment);
+						fragmentTransaction.commit();
+						
+					} else {
+						
+						// Aktualisiere die Spielliste
+						fragTickerList = (TabFragTickerList) fragmentManager.findFragmentById(R.id.frag_ticker_list);
+    						fragTickerList.refreshContent(game_id);
+    						
+    						TabFragEmpty thirdFragment = new TabFragEmpty();
+    						fragmentManager.beginTransaction().add(R.id.frag_ticker_setup, thirdFragment).commit();
+						
+					}
+					
+				} else {
+					
+					if (sqlHelper.getGameInputMark(game_id).equals(1)) {
+						
+						Intent i = new Intent(ctxt, SmartTickerMark.class);
+						i.putExtras(args); 
+						((Activity)ctxt).startActivity(i);
+						((Activity)ctxt).finish();
+						
+					} else {
+						
+						((Activity)ctxt).finish();
+						
+					}
+				}
 			}
 
 /* Zwei Minuten */
 		
 			if (activity_id.equals(two_minutes_id) || activity_id.equals(twoplustwo_id)) {
-				
-/** TODO -2- => Nach Eingabe von Zwei Minuten kommt dann beim nächsten Mal z.B. bei Torwurf nach Eingabe eines Spielers die Abfrage nach der Abwehr */
+
 				// Überprüfen, ob Mannschaft gewechselt wurde
 				if (player_team_id.equals(activity_against_team_id)) {
 					sqlHelper.updateTickerActivity(String.valueOf(ticker_activity_id), null, null, null, null, null, null, player_id, null, null, null, null, null, null, null, null);
-					sqlHelper.updateTickerActivity(String.valueOf(ticker_foul_id), null, null, null, null, null, null, player_id, null, null, null, null, null, null, null, null);
+					if (ticker_foul_id != null) sqlHelper.updateTickerActivity(String.valueOf(ticker_foul_id), null, null, null, null, null, null, player_id, null, null, null, null, null, null, null, null);
 					sqlHelper.updateTickerActivity(String.valueOf(ticker_player_back_id), null, null, null, null, null, null, player_id, null, null, null, null, null, null, null, null);
+					ticker_foul_id = 0;
 				} else {
 					sqlHelper.updateTickerActivity(String.valueOf(ticker_activity_id), null, null, null, null, null, home_or_away, player_id, null, null, null, null, null, null, null, null);
-					sqlHelper.updateTickerActivity(String.valueOf(ticker_foul_id), null, null, null, null, null, home_or_away, player_id, null, null, null, null, null, null, null, null);
+					if (ticker_foul_id != null) sqlHelper.updateTickerActivity(String.valueOf(ticker_foul_id), null, null, null, null, null, home_or_away, player_id, null, null, null, null, null, null, null, null);
 					sqlHelper.updateTickerActivity(String.valueOf(ticker_player_back_id), null, null, null, null, null, home_or_away, player_id, null, null, null, null, null, null, null, null);
+					ticker_foul_id = 0;
 				}
 				ticker_event_note = txtHelper.generateTickerEventNote(ticker_event_id, ctxt, res);
 				sqlHelper.updateTickerEvent(String.valueOf(ticker_event_id), null, null, ticker_event_note, null);
 				
+				// Abfrage nach weiterer Eingabe
+				if (screenInch > 6) {
+					
+					// Benotung des Zweikampfs
+					if (sqlHelper.getGameInputMark(game_id).equals(1)) {
+						
+						FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+						TabFragTickerMark fragment = new TabFragTickerMark();
+						fragment.setArguments(args);
+						fragmentTransaction.replace(R.id.frag_ticker_setup, fragment);
+						fragmentTransaction.commit();
+						
+					} else {
+						
+						// Aktualisiere die Spielliste
+						fragTickerList = (TabFragTickerList) fragmentManager.findFragmentById(R.id.frag_ticker_list);
+    						fragTickerList.refreshContent(game_id);
+    						
+    						TabFragEmpty thirdFragment = new TabFragEmpty();
+    						fragmentManager.beginTransaction().add(R.id.frag_ticker_setup, thirdFragment).commit();
+						
+					}
+					
+				} else {
+					
+					if (sqlHelper.getGameInputMark(game_id).equals(1)) {
+						
+						Intent i = new Intent(ctxt, SmartTickerMark.class);
+						i.putExtras(args); 
+						((Activity)ctxt).startActivity(i);
+						((Activity)ctxt).finish();
+						
+					} else {
+						
+						((Activity)ctxt).finish();
+						
+					}
+				}
 			}
 		
 /* Rote Karte */
@@ -7073,21 +7147,61 @@ public class HelperLayout {
 				// Überprüfen, ob Mannschaft gewechselt wurde
 				if (player_team_id.equals(activity_against_team_id)) {
 					sqlHelper.updateTickerActivity(String.valueOf(ticker_activity_id), null, null, null, null, null, null, player_id, null, null, null, null, null, null, null, null);
-					sqlHelper.updateTickerActivity(String.valueOf(ticker_foul_id), null, null, null, null, null, null, player_id, null, null, null, null, null, null, null, null);
+					if (ticker_foul_id != null) sqlHelper.updateTickerActivity(String.valueOf(ticker_foul_id), null, null, null, null, null, null, player_id, null, null, null, null, null, null, null, null);
 					sqlHelper.updateTickerActivity(String.valueOf(ticker_player_back_id), null, null, null, null, null, null, player_id, null, null, null, null, null, null, null, null);
+					ticker_foul_id = 0;
 				} else {
 					sqlHelper.updateTickerActivity(String.valueOf(ticker_activity_id), null, null, null, null, null, home_or_away, player_id, null, null, null, null, null, null, null, null);
-					sqlHelper.updateTickerActivity(String.valueOf(ticker_foul_id), null, null, null, null, null, home_or_away, player_id, null, null, null, null, null, null, null, null);
+					if (ticker_foul_id != null) sqlHelper.updateTickerActivity(String.valueOf(ticker_foul_id), null, null, null, null, null, home_or_away, player_id, null, null, null, null, null, null, null, null);
 					sqlHelper.updateTickerActivity(String.valueOf(ticker_player_back_id), null, null, null, null, null, home_or_away, player_id, null, null, null, null, null, null, null, null);
+					ticker_foul_id = 0;
 				}
 				ticker_event_note = txtHelper.generateTickerEventNote(ticker_event_id, ctxt, res);
 				sqlHelper.updateTickerEvent(String.valueOf(ticker_event_id), null, null, ticker_event_note, null);
 				
+				// Abfrage nach weiterer Eingabe
+				if (screenInch > 6) {
+					
+					// Benotung des Zweikampfs
+					if (sqlHelper.getGameInputMark(game_id).equals(1)) {
+						
+						FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+						TabFragTickerMark fragment = new TabFragTickerMark();
+						fragment.setArguments(args);
+						fragmentTransaction.replace(R.id.frag_ticker_setup, fragment);
+						fragmentTransaction.commit();
+						
+					} else {
+						
+						// Aktualisiere die Spielliste
+						fragTickerList = (TabFragTickerList) fragmentManager.findFragmentById(R.id.frag_ticker_list);
+    						fragTickerList.refreshContent(game_id);
+    						
+    						TabFragEmpty thirdFragment = new TabFragEmpty();
+    						fragmentManager.beginTransaction().add(R.id.frag_ticker_setup, thirdFragment).commit();
+						
+					}
+					
+				} else {
+					
+					if (sqlHelper.getGameInputMark(game_id).equals(1)) {
+						
+						Intent i = new Intent(ctxt, SmartTickerMark.class);
+						i.putExtras(args); 
+						((Activity)ctxt).startActivity(i);
+						((Activity)ctxt).finish();
+						
+					} else {
+						
+						((Activity)ctxt).finish();
+						
+					}
+				}
 			}
 			
 /* Foul */
 			
-			if (!ticker_foul_id.equals(0)) {
+			if (activity_id.equals(red_card_id)) {
 			
 				sqlHelper.updateTickerActivity(String.valueOf(ticker_foul_id), null, null, null, null, null, null, player_id, null, null, null, null, null, null, null, null);
 				args.putString("InputString", "Defense");
@@ -7118,7 +7232,7 @@ public class HelperLayout {
 				} else {
 					
 					if (sqlHelper.getGameInputMark(game_id).equals(1)) {
-						Log.v("HelperLayout", "Mark 12");
+						
 						Intent i = new Intent(ctxt, SmartTickerMark.class);
 						i.putExtras(args); 
 						((Activity)ctxt).startActivity(i);
@@ -7131,7 +7245,28 @@ public class HelperLayout {
 					}
 				}
 			}
-		
+/* Auswechselung */
+			
+			if (activity_id.equals(sub_out_id)) {				// Auswechselung vor Einwechselung, da mit der Einwechselung die Activity-ID auf auswechseln gesetzt wird
+			
+				sqlHelper.updateTickerActivity(String.valueOf(ticker_activity_id), null, null, null, null, null, null, player_id, null, null, null, null, null, null, null, null);
+				
+				if (screenInch > 6) {
+					
+					// Aktualisiere die Spielliste
+					fragTickerList = (TabFragTickerList) fragmentManager.findFragmentById(R.id.frag_ticker_list);
+					fragTickerList.refreshContent(game_id);
+						
+					TabFragEmpty thirdFragment = new TabFragEmpty();
+					fragmentManager.beginTransaction().add(R.id.frag_ticker_setup, thirdFragment).commit();
+					
+				}
+				
+				// Tickermeldung schreiben
+				ticker_event_note = txtHelper.generateTickerEventNote(ticker_event_id, ctxt, res);
+				sqlHelper.updateTickerEvent(String.valueOf(ticker_event_id), null, null, ticker_event_note, null);
+			}
+			
 /* Einwechselung */
 			
 			if (activity_id.equals(sub_in_id)) {
@@ -7144,13 +7279,19 @@ public class HelperLayout {
 				}
 				
 				// Torwart eintragen, falls ein Torwart ausgewählt wurde
-				if (sqlHelper.getPlayerPositionFirstByID(player_id).equals("1001")) {
+				if (sqlHelper.getPlayerPositionFirstByID(player_id) != null) {
+					if (sqlHelper.getPlayerPositionFirstByID(player_id).equals("1001")) {
+						
+						if (home_or_away.equals(1)) sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, Integer.parseInt(player_id), null, null, null, null, null, null, null, null, null, null);
+						if (home_or_away.equals(0)) sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, Integer.parseInt(player_id), null, null, null, null, null, null, null, null, null);
 					
-					if (home_or_away.equals(1)) sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, Integer.parseInt(player_id), null, null, null, null, null, null, null, null, null, null);
-					if (home_or_away.equals(0)) sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, Integer.parseInt(player_id), null, null, null, null, null, null, null, null, null);
-				
+					}
 				}
-			
+				
+				// Tickermeldung schreiben
+				ticker_event_note = txtHelper.generateTickerEventNote(ticker_event_id, ctxt, res);
+				sqlHelper.updateTickerEvent(String.valueOf(ticker_event_id), null, null, ticker_event_note, null);
+				
 				// Neue Activity Auswechselung eintragen
 				activity_id = sub_out_id;
 				activity_string = sqlHelper.getActivityStringByActivityID(activity_id, res);
@@ -7180,14 +7321,6 @@ public class HelperLayout {
 					((Activity)ctxt).finish();
 									
 				}			
-			}
-			
-/* Auswechselung */
-			
-			if (activity_id.equals(sub_out_id)) {
-			
-				sqlHelper.updateTickerActivity(String.valueOf(ticker_activity_id), null, null, null, null, null, null, player_id, null, null, null, null, null, null, null, null);
-				
 			}
 		}
 	}
@@ -7301,7 +7434,7 @@ public class HelperLayout {
   				
   				// Zeit errechnen
   				elapsedTime = (long) (min * 60000) + (sec * 1000);
-  				
+/** TODO -4- => Wenn man bei Zwei Minuten die Zeit ändern auf Zeit bei Zwei Minuten zurück achten */
   				// Alle Ticker, die zu der Event ID passen updaten mit aktueller Zeit
   				String[] tickerArgs={String.valueOf(ticker_event_id)};
   				SQLiteDatabase db = sqlHelper.getWritableDatabase();
@@ -7344,7 +7477,6 @@ public class HelperLayout {
 	
  	public void finishArea(String strArea) {
  		
-/** TODO -1- => Wurf neben das Tor bei Torwurf nicht möglich */
  		sqlHelper = new HelperSQL(ctxt);
  		activityIDs();
  		
@@ -7369,6 +7501,28 @@ public class HelperLayout {
 		Button btn_goal_lr = (Button) view.findViewById(R.id.goal_lr);
 		Button btn_goal_lrr = (Button) view.findViewById(R.id.goal_lrr);
 		
+		if (strArea != null) {
+			btn_goal_uull.setText("");
+			btn_goal_uul.setText("");
+			btn_goal_uum.setText("");
+			btn_goal_uur.setText("");
+			btn_goal_uurr.setText("");
+			btn_goal_ull.setText("");
+			btn_goal_ul.setText("");
+			btn_goal_um.setText("");
+			btn_goal_ur.setText("");
+			btn_goal_urr.setText("");
+			btn_goal_mll.setText("");
+			btn_goal_ml.setText("");
+			btn_goal_mm.setText("");
+			btn_goal_mr.setText("");
+			btn_goal_mrr.setText("");
+			btn_goal_lll.setText("");
+			btn_goal_ll.setText("");
+			btn_goal_lm.setText("");
+			btn_goal_lr.setText("");
+			btn_goal_lrr.setText("");
+		}
  		if (strArea.equals("uull")) btn_goal_uull.setText("X");
 		if (strArea.equals("uul")) btn_goal_uul.setText("X");
 		if (strArea.equals("uum")) btn_goal_uum.setText("X");
@@ -7427,7 +7581,7 @@ public class HelperLayout {
 			}
  			
  		} else {
- /** TODO -1- => Torwart gehalten entfernen, wenn Wurf neben das Tor ging */
+ 			
  			if (!ticker_activity_id.equals(null)) {
  	 			sqlHelper.updateTickerActivity(String.valueOf(ticker_activity_id), null, null, null, null, null, null, null, strArea, null, null, null, null, null, null, null);
  	 		}
@@ -7435,6 +7589,28 @@ public class HelperLayout {
  	 			sqlHelper.updateTickerActivity(String.valueOf(ticker_activity_against_id), null, null, null, null, null, null, null, strArea, null, null, null, null, null, null, null);
  	 		}
  	 		
+ 	 		// Torwart gehalten entfernen, wenn Wurf neben das Tor ging
+ 	 		if (strInput.equals("Miss")) {
+ 	 			if (strArea.equals("uull") || strArea.equals("uul") || strArea.equals("uum") || strArea.equals("uur") || strArea.equals("uurr") || strArea.equals("ull") || strArea.equals("urr") || strArea.equals("mll") || strArea.equals("mrr") || strArea.equals("lll") || strArea.equals("lrr")) {
+ 	 				
+ 	 	 			String[] tickerArgs={String.valueOf(ticker_event_id)};
+ 	 				SQLiteDatabase db = sqlHelper.getWritableDatabase();
+ 	 				Cursor cTicker = db.rawQuery("SELECT * FROM ticker_activity WHERE ticker_event_id = ? ORDER BY time ASC", tickerArgs);
+ 	 				cTicker.moveToFirst();
+ 	 				String ticker_id = null;
+ 	 				
+ 	 	 	 		for (cTicker.moveToFirst(); !cTicker.isAfterLast(); cTicker.moveToNext()) {
+ 	 					
+ 	 					ticker_id = sqlHelper.getTickerActivityID(cTicker);
+ 	 					// Torwart gehalten entfernen, wenn Wurf neben das Tor ging
+ 						if (sqlHelper.getTickerActivityIDByID(ticker_id).equals(save_id) || sqlHelper.getTickerActivityIDByID(ticker_id).equals(save_7m_id) || sqlHelper.getTickerActivityIDByID(ticker_id).equals(save_fb_id)) { 
+ 							
+ 							sqlHelper.deleteTickerActivity(ticker_id);
+ 							
+ 						}
+ 	 				}
+ 	 			}
+ 	 		} 	 		
  		}
 
 		// Eingeben, dass Porition gesetzt
@@ -7556,7 +7732,7 @@ public class HelperLayout {
 				
 					// Benotung für den Wurf
 					if (sqlHelper.getGameInputMark(game_id).equals(1)) {
-						Log.v("HelperLayout", "Mark 13");
+						
 						Intent i = new Intent(ctxt, SmartTickerMark.class);
 						i.putExtras(args);
 						((Activity)ctxt).startActivity(i);
@@ -7712,7 +7888,7 @@ public class HelperLayout {
 		if (strInput.equals("Defense")) ticker_id = ticker_defense_id;
 		
 		sqlHelper.updateTickerActivity(String.valueOf(ticker_id), null, null, null, null, null, null, null, null, null, null, null, null, null, null, intMark);
-		Log.v("HelperLayout markActivity strInput", strInput);
+		
 		// Abfrage nach weiterer Eingabe
 		edit = false;
 		if (strInput.length() > 3) {
@@ -7721,7 +7897,7 @@ public class HelperLayout {
 			}
 		}
 		if (edit == true) {								// Bei Ticker Bearbeitung keine weitere Eingabe
-			Log.v("HelperLayout", "1");
+			
 			if (screenInch > 6) {
 			
 				FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -7876,25 +8052,25 @@ public class HelperLayout {
 			}
 			
 		} else {
-			Log.v("HelperLayout markActivity", "2");
+			
 			// Falls Benotung Wurf, dann Benotung Torwart
 			if (strInput.equals("Goal") || strInput.equals("Miss")) {
-				Log.v("HelperLayout markActivity", "3");
+				
 				if (strInput.equals("Goal")) args.putString("InputString", "GoalAgainst");
 				if (strInput.equals("Miss")) args.putString("InputString", "Save");
-				Log.v("HelperLayout", "Mark 14");
+				
 				Intent i = new Intent(ctxt, SmartTickerMark.class);
 				i.putExtras(args);
 				((Activity)ctxt).startActivity(i);
 				((Activity)ctxt).finish();
 				
 			} else {
-				Log.v("HelperLayout markActivity", "4");
+				
 				// Falls Benotung Torwart
 				if (strInput.equals("GoalAgainst") || strInput.equals("Save")) {
 					// dann Abfrage, ob Vorlage eingegeben werden soll
 					if (sqlHelper.getGameInputAssist(game_id).equals(1)) {
-						Log.v("HelperLayout markActivity", "5");
+						
 						args.putString("InputString", "Assist");
 						Intent i = new Intent(ctxt, SmartTickerPlayer.class);
 						i.putExtras(args);
@@ -7902,10 +8078,10 @@ public class HelperLayout {
 						((Activity)ctxt).finish();
 						
 					} else {
-						Log.v("HelperLayout markActivity", "6");
+						
 						// Abfrage, ob Abwehr eingegeben werden soll
 						if (sqlHelper.getGameInputDefense(game_id).equals(1)) {
-							Log.v("HelperLayout markActivity", "7");
+							
 							args.putString("InputString", "Defense");
 							Intent i = new Intent(ctxt, SmartTickerPlayer.class);
 							i.putExtras(args);
@@ -7913,10 +8089,10 @@ public class HelperLayout {
 							((Activity)ctxt).finish();
 							
 						} else {
-							Log.v("HelperLayout markActivity", "8");
+							
 							// Tickermeldung
 							if (sqlHelper.getGameInputText(game_id).equals(1)) {
-								Log.v("HelperLayout markActivity", "9");
+								
 								args.putString("InputString", "EventText");
 								Intent i = new Intent(ctxt, SmartTickerText.class);
 								i.putExtras(args);
@@ -7924,7 +8100,7 @@ public class HelperLayout {
 								((Activity)ctxt).finish();
 								
 							} else {
-								Log.v("HelperLayout markActivity", "10");
+								
 								((Activity)ctxt).finish();
 								
 							}
@@ -7932,13 +8108,13 @@ public class HelperLayout {
 					}
 					
 				} else {
-					Log.v("HelperLayout markActivity", "11");
+					
 					// Falls Vorlage
 					if (strInput.equals("Assist")) {
-						Log.v("HelperLayout markActivity", "12");
+						
 						// Abfrage, ob Abwehr eingegeben werden soll
 						if (sqlHelper.getGameInputDefense(game_id).equals(1)) {
-							Log.v("HelperLayout markActivity", "13");
+							
 							args.putString("InputString", "Defense");
 							Intent i = new Intent(ctxt, SmartTickerPlayer.class);
 							i.putExtras(args);
@@ -7946,10 +8122,10 @@ public class HelperLayout {
 							((Activity)ctxt).finish();
 							
 						} else {
-							Log.v("HelperLayout markActivity", "14");
+							
 							// Tickermeldung
 							if (sqlHelper.getGameInputText(game_id).equals(1)) {
-								Log.v("HelperLayout markActivity", "15");
+								
 								args.putString("InputString", "EventText");
 								Intent i = new Intent(ctxt, SmartTickerText.class);
 								i.putExtras(args);
@@ -7957,20 +8133,19 @@ public class HelperLayout {
 								((Activity)ctxt).finish();
 								
 							} else {
-								Log.v("HelperLayout markActivity", "15");
+								
 								((Activity)ctxt).finish();
 								
 							}
 						}
 					} else {
-						Log.v("HelperLayout markActivity", "16");
+						
 						// Falls Abwehr
 						if (strInput.equals("Defense") || strInput.equals("TechFault")) {
-							Log.v("HelperLayout markActivity", "17");
-							Log.v("HelperLayout", "Mark Defense aufgerufen");
+							
 							// Tickermeldung
 							if (sqlHelper.getGameInputText(game_id).equals(1)) {
-								Log.v("HelperLayout markActivity", "18");
+								
 								args.putString("InputString", "EventText");
 								Intent i = new Intent(ctxt, SmartTickerText.class);
 								i.putExtras(args);
@@ -7978,12 +8153,12 @@ public class HelperLayout {
 								((Activity)ctxt).finish();
 								
 							} else {
-								Log.v("HelperLayout markActivity", "19");
+								
 								((Activity)ctxt).finish();
 								
 							}
 						} else {
-							Log.v("HelperLayout markActivity", "20");
+							
 							((Activity)ctxt).finish();
 							
 						}
@@ -8920,6 +9095,13 @@ public class HelperLayout {
 		res = ctxt.getResources();
 		fragmentManager = contentFragmentManager;
 		args = contentArgs;
+		Boolean goalkeeper = false;
+		final Integer goals;
+		Integer goals_local = 0;
+		Integer attempts_local = 0;
+		
+		String str_goals = null;
+		String str_effective = "-";
 		
 /* Helper definieren */
 		sqlHelper = new HelperSQL(ctxt);
@@ -8958,6 +9140,10 @@ public class HelperLayout {
 			player_number = sqlHelper.getPlayerNumberByID(player_id);
 			player_forename = sqlHelper.getPlayerForenameByID(player_id);
 			player_surename = sqlHelper.getPlayerSurenameByID(player_id);
+			
+			if (sqlHelper.getPlayerPositionFirstByID(player_id) != null) {
+				if (sqlHelper.getPlayerPositionFirstByID(player_id).substring(2,4).equals("01")) goalkeeper = true;
+			}
 			
 			player = player_number + " " + player_forename + " " + player_surename;
 			
@@ -9001,6 +9187,8 @@ public class HelperLayout {
 		final TextView txt_effective = (TextView) view.findViewById(R.id.txt_effective);
 		final TextView txt_time = (TextView) view.findViewById(R.id.txt_time);
 		final TextView txt_mark = (TextView) view.findViewById(R.id.txt_mark);
+		final TextView label_goals = (TextView) view.findViewById(R.id.label_goals);
+		final TextView label_efficiency = (TextView) view.findViewById(R.id.label_efficiency);
 		
 		final ImageView img_goals = (ImageView) view.findViewById(R.id.img_goals);
 		final ImageView img_effective = (ImageView) view.findViewById(R.id.img_effective);
@@ -9014,15 +9202,31 @@ public class HelperLayout {
 		
 /* Statistik berechnen */
 
-		// Tore berechnen
-		final Integer goals = sqlHelper.count_ticker_goals(game_id, player_id, null, null);
-		final Integer goals_total = sqlHelper.count_ticker_goals(game_id, null, home_or_away, null);
-		String str_goals = String.valueOf(goals);
+		// Tore und Effektivität berechnen
+		if (goalkeeper == true) {
+			goals = sqlHelper.count_ticker_activity(game_id, null, player_id, save_id, null, null) +
+					sqlHelper.count_ticker_activity(game_id, null, player_id, save_7m_id, null, null) +
+					sqlHelper.count_ticker_activity(game_id, null, player_id, save_fb_id, null, null);
+			attempts_local = sqlHelper.count_ticker_activity(game_id, null, player_id, goal_against_id, null, null) +
+					sqlHelper.count_ticker_activity(game_id, null, player_id, goal_against_7m_id, null, null) +
+					sqlHelper.count_ticker_activity(game_id, null, player_id, goal_against_fb_id, null, null) +
+					sqlHelper.count_ticker_activity(game_id, null, player_id, save_id, null, null) +
+					sqlHelper.count_ticker_activity(game_id, null, player_id, save_7m_id, null, null) +
+					sqlHelper.count_ticker_activity(game_id, null, player_id, save_fb_id, null, null);
+			str_goals = String.valueOf(goals);
+			goals_local = attempts_local;
+			if (attempts_local > 0) str_effective = String.valueOf(goals * 100 / attempts_local) + "%";
+		} else {
+			goals = sqlHelper.count_ticker_goals(game_id, player_id, null, null);
+			goals_local = sqlHelper.count_ticker_goals(game_id, null, home_or_away, null);
+			str_goals = String.valueOf(goals);
+			
+			attempts_local = sqlHelper.count_ticker_goal_attempts(game_id, player_id, null, null);
+			if (attempts_local > 0) str_effective = String.valueOf(goals * 100 / attempts_local) + "%";
+		}
 		
-		// Effektivität berechnen
-		final Integer attempts = sqlHelper.count_ticker_goal_attempts(game_id, player_id, null, null);
-		String str_effective = "-";
-		if (attempts > 0) str_effective = String.valueOf(goals * 100 / attempts) + "%";
+		final Integer attempts = attempts_local;
+		final Integer goals_total = goals_local;
 		
 		// Spielzeit berechnen
 		time = sqlHelper.count_ticker_player_time(game_id, player_id,home_or_away, res);
@@ -9034,6 +9238,10 @@ public class HelperLayout {
 		String str_mark = String.valueOf(mark);
 		
 /* Text setzen */
+		if (goalkeeper == true) {
+			label_goals.setText(R.string.gk_save);
+			label_efficiency.setText(R.string.percentage);
+		}
 		txt_goals.setText(str_goals);
 		txt_effective.setText(str_effective);
 		txt_time.setText(str_time);
@@ -9094,6 +9302,7 @@ public class HelperLayout {
 		    			i = new Intent(ctxt, SmartStatPlayerPositionIndividual.class);
 					i.putExtras(args);
 					((Activity)ctxt).startActivity(i);
+					((Activity)ctxt).finish();
 
 		            }
 		      });
@@ -9138,6 +9347,7 @@ public class HelperLayout {
 					i = new Intent(ctxt, SmartStatPlayerStat.class);
 					i.putExtras(args);
 					((Activity)ctxt).startActivity(i);
+					((Activity)ctxt).finish();
 
 		            }
 		      });
@@ -9182,6 +9392,7 @@ public class HelperLayout {
 					i = new Intent(ctxt, SmartStatPlayerStat.class);
 					i.putExtras(args);
 					((Activity)ctxt).startActivity(i);
+					((Activity)ctxt).finish();
 		    			
 		            }
 		      });
@@ -9194,6 +9405,7 @@ public class HelperLayout {
 					i = new Intent(ctxt, SmartStatPlayerStat.class);
 					i.putExtras(args);
 					((Activity)ctxt).startActivity(i);
+					((Activity)ctxt).finish();
 
 		            }
 		      });
@@ -9300,7 +9512,6 @@ public class HelperLayout {
 							
 							icon = img_effective;
 							if (attempts > 0) grade = goals * 360 / attempts; else grade = 0;
-							
 							// Grafik einrichten
 					  		Bitmap bitMap2 = Bitmap.createBitmap(x_length, y_length, Bitmap.Config.ARGB_8888);
 					  		bitMap = bitMap2.copy(bitMap2.getConfig(), true);
@@ -9363,7 +9574,7 @@ public class HelperLayout {
 
 /*
  * 
- * Torschützenliste 
+ * Liste der Spielerstatistik 
  *
  */
 				
@@ -9500,6 +9711,7 @@ public class HelperLayout {
 					i = new Intent(ctxt, SmartStatPlayerFirst.class);
 					i.putExtras(args);
 					((Activity)ctxt).startActivity(i);
+					((Activity)ctxt).finish();
 
 		            }
 		      });
@@ -9544,6 +9756,7 @@ public class HelperLayout {
 					i = new Intent(ctxt, SmartStatPlayerStat.class);
 					i.putExtras(args);
 					((Activity)ctxt).startActivity(i);
+					((Activity)ctxt).finish();
 
 		            }
 		      });
@@ -9588,6 +9801,7 @@ public class HelperLayout {
 					i = new Intent(ctxt, SmartStatPlayerStat.class);
 					i.putExtras(args);
 					((Activity)ctxt).startActivity(i);
+					((Activity)ctxt).finish();
 		    			
 		            }
 		      });
@@ -9600,6 +9814,7 @@ public class HelperLayout {
 					i = new Intent(ctxt, SmartStatPlayerPositionOverview.class);
 					i.putExtras(args);
 					((Activity)ctxt).startActivity(i);
+					((Activity)ctxt).finish();
 
 		            }
 		      });
@@ -9713,12 +9928,88 @@ public class HelperLayout {
 						
 					}
 					
-					if (statPlayerList.get(x) > 0) {
-
-						playerStatMap.put(stat_title, String.valueOf(statPlayerList.get(x)));
-						
+					// Tore und gehaltene Bälle nur eintragen, falls es tatsächlich gab 
+					if (x == 0 || x == 1 || x == 2) {
+						if (statPlayerList.get(0) + statPlayerList.get(1) + statPlayerList.get(2) > 0) {
+							playerStatMap.put(stat_title, String.valueOf(statPlayerList.get(x)));
+						}
 					}
-					
+					if (x == 3 || x == 4 || x == 5) {
+						if (statPlayerList.get(3) + statPlayerList.get(4) + statPlayerList.get(5) > 0) {
+							playerStatMap.put(stat_title, String.valueOf(statPlayerList.get(x)));
+						}
+					}
+					if (x == 6 || x == 7 || x == 8) {
+						if (statPlayerList.get(6) + statPlayerList.get(7) + statPlayerList.get(8) > 0) {
+							playerStatMap.put(stat_title, String.valueOf(statPlayerList.get(x)));
+						}
+					}
+					if (x == 9 || x == 10 || x == 11) {
+						if (statPlayerList.get(9) + statPlayerList.get(10) + statPlayerList.get(11) > 0) {
+							playerStatMap.put(stat_title, String.valueOf(statPlayerList.get(x)));
+						}
+					}
+					if (x == 12 || x == 13 || x == 14) {
+						if (statPlayerList.get(12) + statPlayerList.get(13) + statPlayerList.get(14) > 0) {
+							playerStatMap.put(stat_title, String.valueOf(statPlayerList.get(x)));
+						}
+					}
+					if (x == 15 || x == 16 || x == 17) {
+						if (statPlayerList.get(15) + statPlayerList.get(16) + statPlayerList.get(17) > 0) {
+							playerStatMap.put(stat_title, String.valueOf(statPlayerList.get(x)));
+						}
+					}
+					if (x == 18 || x == 19 || x == 20) {
+						if (statPlayerList.get(18) + statPlayerList.get(19) + statPlayerList.get(20) > 0) {
+							playerStatMap.put(stat_title, String.valueOf(statPlayerList.get(x)));
+						}
+					}
+					if (x == 21 || x == 22 || x == 23) {
+						if (statPlayerList.get(21) + statPlayerList.get(22) + statPlayerList.get(23) > 0) {
+							playerStatMap.put(stat_title, String.valueOf(statPlayerList.get(x)));
+						}
+					}
+					if (x == 24 || x == 25 || x == 26) {
+						if (statPlayerList.get(24) + statPlayerList.get(25) + statPlayerList.get(26) > 0) {
+							playerStatMap.put(stat_title, String.valueOf(statPlayerList.get(x)));
+						}
+					}
+					if (x == 27 || x == 28 || x == 29) {
+						if (statPlayerList.get(27) + statPlayerList.get(28) + statPlayerList.get(29) > 0) {
+							playerStatMap.put(stat_title, String.valueOf(statPlayerList.get(x)));
+						}
+					}
+					if (x == 30 || x == 31 || x == 32) {
+						if (statPlayerList.get(30) + statPlayerList.get(31) + statPlayerList.get(32) > 0) {
+							playerStatMap.put(stat_title, String.valueOf(statPlayerList.get(x)));
+						}
+					}
+					if (x == 33 || x == 34 || x == 35) {
+						if (statPlayerList.get(33) + statPlayerList.get(34) + statPlayerList.get(35) > 0) {
+							playerStatMap.put(stat_title, String.valueOf(statPlayerList.get(x)));
+						}
+					}
+					if (x == 36 || x == 37 || x == 38) {
+						if (statPlayerList.get(36) + statPlayerList.get(37) + statPlayerList.get(38) > 0) {
+							playerStatMap.put(stat_title, String.valueOf(statPlayerList.get(x)));
+						}
+					}
+					if (x == 39 || x == 40 || x == 41) {
+						if (statPlayerList.get(39) + statPlayerList.get(40) + statPlayerList.get(41) > 0) {
+							playerStatMap.put(stat_title, String.valueOf(statPlayerList.get(x)));
+						}
+					}
+					if (x == 42 || x == 43 || x == 44) {
+						if (statPlayerList.get(42) + statPlayerList.get(43) + statPlayerList.get(44) > 0) {
+							playerStatMap.put(stat_title, String.valueOf(statPlayerList.get(x)));
+						}
+					}
+					if (x == 45 || x == 46 || x == 47) {
+						if (statPlayerList.get(45) + statPlayerList.get(46) + statPlayerList.get(47) > 0) {
+							playerStatMap.put(stat_title, String.valueOf(statPlayerList.get(x)));
+						}
+					}
+
 				} else {
 					
 					x = 47;
@@ -9847,7 +10138,7 @@ public class HelperLayout {
 						
 					}
 					
-					if (statPlayerList.get(x) > 0) {
+					if (statPlayerList.get(x) != 0) {
 
 						playerStatMap.put(stat_title, String.valueOf(statPlayerList.get(x)));
 						
@@ -10178,6 +10469,7 @@ public class HelperLayout {
 		    			i = new Intent(ctxt, SmartStatPlayerStat.class);
 					i.putExtras(args);
 					((Activity)ctxt).startActivity(i);
+					((Activity)ctxt).finish();
 
 		            }
 		      });
@@ -10222,6 +10514,7 @@ public class HelperLayout {
 		    			i = new Intent(ctxt, SmartStatPlayerPositionOverview.class);
 					i.putExtras(args);
 					((Activity)ctxt).startActivity(i);
+					((Activity)ctxt).finish();
 
 		            }
 		      });
@@ -10266,6 +10559,7 @@ public class HelperLayout {
 		    			i = new Intent(ctxt, SmartStatPlayerPositionOverview.class);
 					i.putExtras(args);
 					((Activity)ctxt).startActivity(i);
+					((Activity)ctxt).finish();
 		    			
 		            }
 		      });
@@ -10278,6 +10572,7 @@ public class HelperLayout {
 		    			i = new Intent(ctxt, SmartStatPlayerPositionIndividual.class);
 					i.putExtras(args);
 					((Activity)ctxt).startActivity(i);
+					((Activity)ctxt).finish();
 
 		            }
 		      });
@@ -10704,6 +10999,7 @@ public class HelperLayout {
 		    			i = new Intent(ctxt, SmartStatPlayerPositionOverview.class);
 					i.putExtras(args);
 					((Activity)ctxt).startActivity(i);
+					((Activity)ctxt).finish();
 
 		            }
 		      });
@@ -10792,6 +11088,7 @@ public class HelperLayout {
 		    			i = new Intent(ctxt, SmartStatPlayerPositionIndividual.class);
 					i.putExtras(args);
 					((Activity)ctxt).startActivity(i);
+					((Activity)ctxt).finish();
 		    			
 		            }
 		      });
@@ -10804,6 +11101,7 @@ public class HelperLayout {
 		    			i = new Intent(ctxt, SmartStatPlayerFirst.class);
 					i.putExtras(args);
 					((Activity)ctxt).startActivity(i);
+					((Activity)ctxt).finish();
 
 		            }
 		      });
@@ -11127,7 +11425,9 @@ public class HelperLayout {
 				
 				// Falls Tor- oder Fehlwurf...
 				if (ticker_activity_id.equals(goal_id) || ticker_activity_id.equals(goal_7m_id) ||	ticker_activity_id.equals(goal_fb_id) || 
-						ticker_activity_id.equals(miss_id) || ticker_activity_id.equals(miss_7m_id) || ticker_activity_id.equals(miss_fb_id)) {
+						ticker_activity_id.equals(miss_id) || ticker_activity_id.equals(miss_7m_id) || ticker_activity_id.equals(miss_fb_id) ||
+						ticker_activity_id.equals(save_id) || ticker_activity_id.equals(save_7m_id) || ticker_activity_id.equals(save_fb_id) ||
+						ticker_activity_id.equals(goal_against_id) || ticker_activity_id.equals(goal_against_7m_id) || ticker_activity_id.equals(goal_against_fb_id)) {
 					
 /* Statistiken Wurfposition berechnen */
 					
@@ -11209,6 +11509,7 @@ public class HelperLayout {
 								if (ticker_activity_id.equals(save_fb_id)) click_position_save_fb = click_position_save_fb + 1;
 								if (ticker_activity_id.equals(goal_against_id)) click_position_goal_against = click_position_goal_against + 1;
 								if (ticker_activity_id.equals(goal_against_7m_id)) click_position_goal_against_7m = click_position_goal_against_7m + 1;
+								if (ticker_activity_id.equals(goal_against_fb_id)) click_position_goal_against_fb = click_position_goal_against_fb + 1;
 							
 							}
 						}
@@ -11334,7 +11635,10 @@ public class HelperLayout {
 		
 /* Felder Wurfecke einrichten */
 
-		if (sqlHelper.getPlayerPositionFirstByID(player_id).substring(2,4).equals("01")) goalkeeper = true;
+		if (sqlHelper.getPlayerPositionFirstByID(player_id) != null) {
+			if (sqlHelper.getPlayerPositionFirstByID(player_id).substring(2,4).equals("01")) goalkeeper = true;
+		}
+		
 		text_size = btn_goal_uull.getWidth() / 21;
 		
 		// Wurfecke kennzeichnen und beschriften
@@ -11439,9 +11743,15 @@ public class HelperLayout {
 				
 				if (attempts > 0) {
 					
-					if (percent <=33) btn.setBackgroundColor(res.getColor(R.color.red));
-			  		if (percent > 33 && percent < 66) btn.setBackgroundColor(res.getColor(R.color.yellow));
-			  		if (percent >=66) btn.setBackgroundColor(res.getColor(R.color.green));
+					if (goalkeeper == true) {
+			  			if (percent <= 25) btn.setBackgroundColor(res.getColor(R.color.red));
+	  			  		if (percent > 25 && percent < 40) btn.setBackgroundColor(res.getColor(R.color.yellow));
+	  			  		if (percent >= 40) btn.setBackgroundColor(res.getColor(R.color.green));
+			  		} else {
+			  			if (percent <=33) btn.setBackgroundColor(res.getColor(R.color.red));
+				  		if (percent > 33 && percent < 66) btn.setBackgroundColor(res.getColor(R.color.yellow));
+				  		if (percent >=66) btn.setBackgroundColor(res.getColor(R.color.green));
+			  		}
 					
 			  		position_text = String.valueOf(plus) + " / " + String.valueOf(attempts) + "\n" + String.valueOf(percent) + " %";
 			  		btn.setTextSize(text_size);
@@ -11500,10 +11810,17 @@ public class HelperLayout {
   			  		Paint paint = new Paint();
   			  		paint.setAntiAlias(true);
   			  		// Farbe je nach Erfolgsquote
+  			  		
   			  		if (attempts > 0)  {
-  			  			if (percent <=33) paint.setColor(res.getColor(R.color.red));
-  			  			if (percent > 33 && percent < 66) paint.setColor(res.getColor(R.color.yellow));
-  			  			if (percent >=66) paint.setColor(res.getColor(R.color.green));
+  			  			if (goalkeeper == true) {
+  			  				if (percent <= 25) paint.setColor(res.getColor(R.color.red));
+  	  			  			if (percent > 25 && percent < 40) paint.setColor(res.getColor(R.color.yellow));
+  	  			  			if (percent >= 40) paint.setColor(res.getColor(R.color.green));
+  			  			} else {
+  			  				if (percent <= 33) paint.setColor(res.getColor(R.color.red));
+  	  			  			if (percent > 33 && percent < 66) paint.setColor(res.getColor(R.color.yellow));
+  	  			  			if (percent >= 66) paint.setColor(res.getColor(R.color.green));
+  			  			}  			  			
   			  		}
   			  		
   			  		// Box zeichnen
@@ -11584,7 +11901,7 @@ public class HelperLayout {
 /* Spielfeldgrafik über die Wurffelder setzen */
   			
   			Bitmap BitmapOrg = BitmapFactory.decodeResource(ctxt.getResources(), R.drawable.field);
-
+  			
   			int width = BitmapOrg.getWidth();
   			int height = BitmapOrg.getHeight();
 
@@ -11625,9 +11942,15 @@ public class HelperLayout {
 			// Kreislayout definieren
 	  		paint.setAntiAlias(true);
 	  		if (attempts > 0)  {
-		  		if (percent <=33) paint.setColor(res.getColor(R.color.red));
-		  		if (percent > 33 && percent < 66) paint.setColor(res.getColor(R.color.yellow));
-		  		if (percent >=66) paint.setColor(res.getColor(R.color.green));
+	  			if (goalkeeper == true) {
+		  			if (percent <= 25) paint.setColor(res.getColor(R.color.red));
+			  		if (percent > 25 && percent < 40) paint.setColor(res.getColor(R.color.yellow));
+			  		if (percent >= 40) paint.setColor(res.getColor(R.color.green));
+		  		} else {
+		  			if (percent <= 33) paint.setColor(res.getColor(R.color.red));
+			  		if (percent > 33 && percent < 66) paint.setColor(res.getColor(R.color.yellow));
+			  		if (percent >= 66) paint.setColor(res.getColor(R.color.green));
+		  		}
 		  	}
 	  		
 	  		// Kreis zeichnen
@@ -11690,12 +12013,12 @@ public class HelperLayout {
 
 /*
  * 
- * Wurfstatistik - Individuell 
+ * Statistik Tickermeldungen 
  *
  */
 	
 	public void lytStatTickerActicity(Bundle contentArgs, final View contentView, final FragmentManager contentFragmentManager, SmartStatGameActivity activity) {
-		
+/** TODO -4- => Filtern nach Abwehrformation (z.B. bei einer 5:1 Abwehr wurden soundsoviel Tore zugelassen) */
 		view = contentView;
 		ctxt = view.getContext();
 		res = ctxt.getResources();
@@ -11734,14 +12057,13 @@ public class HelperLayout {
 /* Arraylist definieren */
 		
 		stat_game_activities = sqlHelper.getStatGameActivities();
-		Log.v("HelperLayout stat_game_activities", stat_game_activities);
+		
 		// Falls alle Aktivitäten angezeigt werden sollen, wähle die ganze Datenbank
 		if (stat_game_activities.equals("IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")) {
-			Log.v("HelperLayout", "Alle Statistiken ausgewählt");
 			c = sqlHelper.getAllGameTicker(game_id);
 			
 		} else {
-			Log.v("HelperLayout", "Einzelabfrage ausgewählt");
+			
 			activityList = sqlHelper.getActivityListFromActivityString();
 
 			// Abfrage, ob die einzelnen Spielaktionen angezeigt werden sollen
@@ -11845,7 +12167,7 @@ public class HelperLayout {
 			} else {
 				foul_active = "0";
 			}
-			if (activityList[20] == 1) {
+			if (activityList[20] == 1) { 
 				tech_fault_active = String.valueOf(res.getInteger(R.integer.tech_fault_id));
 			} else {
 				tech_fault_active = "0";
@@ -11974,15 +12296,16 @@ public class HelperLayout {
 		
 /* Teamliste einrichten */
 		
-		smartStatGameActivity.startManagingCursor(c);
 		HelperAdapterTicker adapter=new HelperAdapterTicker(ctxt, c, null);
 		
 		if (screenInch > 6) {
 			
-			
+			fragStatTickerActivity = (TabFragStatTickerActivity) fragmentManager.findFragmentById(R.id.frag_stat_ticker_content_1);
+			fragStatTickerActivity.setListAdapter(adapter);
 			
 		} else {
 			
+			smartStatGameActivity.startManagingCursor(c);
 			smartStatGameActivity.setListAdapter(adapter);
 			
 		}
@@ -12000,7 +12323,11 @@ public class HelperLayout {
 				
 				if (screenInch > 6) {
 					
-					
+					FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+					TabFragListWithClickbox fragment = new TabFragListWithClickbox();
+					fragment.setArguments(args);
+					fragmentTransaction.replace(R.id.frag_stat_ticker_content_2, fragment);
+					fragmentTransaction.commit();
 					
 				} else {
 					
@@ -12229,7 +12556,7 @@ public class HelperLayout {
 	    		elapsedTime = System.currentTimeMillis() - time_start + time_sofar;
 	    		((TextView) view.findViewById(R.id.btn_timer)).setText(fctHelper.updateTimer(elapsedTime));
 	    		mHandler.postDelayed(this,REFRESH_RATE);
-	    		
+/** TODO -4- => Anwurf zweite Halbzeit automatisch einstellen */
 	    		/* Uhr stoppen bei Halbzeitpause */
 	    		if (elapsedTime > sqlHelper.getGameDurationHalftimeByID(game_id) * 60 * 1000 &&
 	    				sqlHelper.getGameCurrentHalftimeByID(game_id) == 0) {
@@ -12249,6 +12576,7 @@ public class HelperLayout {
 	    		}
 	    		
 	    		/* Uhr stoppen bei Spielende */
+/** TODO -2- => Bei Spielende Tickermeldung, dass das Spiel beendet ist */
 	    		if (elapsedTime > sqlHelper.getGameDurationHalftimeByID(game_id) * 2 * 60 * 1000 &&
 	    				sqlHelper.getGameCurrentHalftimeByID(game_id) == 1){
 	    			
@@ -12835,12 +13163,10 @@ public class HelperLayout {
 						fragmentTransaction.commit();
 						
 					} else {
-						
-						Log.v("HelperLayout", "Starte SmartTickerPlayer");
+					
 						Intent i = new Intent(ctxt,SmartTickerPlayer.class);
 						i.putExtras(args);
 						((Activity)ctxt).startActivity(i);
-						Log.v("HelperLayout", "Beende SmartTickerPlayer");
 						
 					}
 				}
@@ -12960,7 +13286,7 @@ public class HelperLayout {
  * Eingabe der Auszeit
  *
  */
-	
+/** TODO -4- => Auszeit stoppen schon wenn Button Auszeit gedrückt ausgewählt */
 	public void activityTimeout(SmartTickerActivity smartActivity, Integer timeout_home_or_away) {
 		
 		// Timeout eintragen
@@ -12993,6 +13319,7 @@ public class HelperLayout {
 		
 		if (screenInch > 6) {
 			
+			fragTickerList.startStop();
 			fragTickerList.refreshContent(game_id);
 			
 		} else {

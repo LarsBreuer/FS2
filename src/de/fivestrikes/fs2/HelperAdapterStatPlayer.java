@@ -124,7 +124,7 @@ public class HelperAdapterStatPlayer extends BaseAdapter {
 			}
 			
 			// Text einrücken, falls Versuch oder Quote
-			if (label.equals(res.getString(R.string.attempts)) || label.equals(res.getString(R.string.percentage))) {
+			if (label.equals(res.getString(R.string.attempts)) || label.equals(res.getString(R.string.percentage)) || label.equals(res.getString(R.string.throws_str))) {
 				int leftPadding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 18, res.getDisplayMetrics());
 				labelTextView.setPadding(leftPadding, 0, 0, 0);
 			}

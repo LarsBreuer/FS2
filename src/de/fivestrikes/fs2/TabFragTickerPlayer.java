@@ -100,18 +100,19 @@ public class TabFragTickerPlayer extends ListFragment {
 
 /* Spielerliste einrichten */
 		
-		refreshContent(team_id, game_id);	
+		refreshContent(team_id, game_id, args);	
 		
 		return view;
 	
 	}
 	
-	public void refreshContent(String team_id, String game_id) {
+	public void refreshContent(String team_id, String game_id, Bundle contentArgs) {
 		
+		args = contentArgs;
 		sqlHelper=new HelperSQL(getActivity());
 		model = sqlHelper.getAllPlayerCursorByTeamID(team_id);
 		getActivity().startManagingCursor(model);
-		adapter = new HelperAdapterTickerPlayer(getActivity(), model, game_id);
+		adapter = new HelperAdapterTickerPlayer(getActivity(), model, game_id, args);
 		setListAdapter(adapter);
 		        
 	}

@@ -5,14 +5,21 @@
     android:orientation="horizontal"
     android:background="@color/blue" >
     
-    <fragment android:name="de.fivestrikes.fs2.TabFragGameList"   
-			  android:id="@+id/frag_game_list"
+    <fragment android:name="de.fivestrikes.fs2.TabFragEmpty"   
+			  android:id="@+id/frag_stat_ticker_list"
 			  android:layout_weight="1"
 			  android:layout_width="0px"
 			  android:layout_height="match_parent" />
+    
+    <fragment android:name="de.fivestrikes.fs2.TabFragEmpty"   
+			  android:id="@+id/frag_stat_ticker_content_1"
+			  android:layout_weight="1"
+			  android:layout_width="0px"
+			  android:layout_height="match_parent"
+			  android:layout_marginLeft="9dp" />
 	
 	<fragment android:name="de.fivestrikes.fs2.TabFragEmpty"  
-			  android:id="@+id/frag_game_edit"
+			  android:id="@+id/frag_stat_ticker_content_2"
 			  android:layout_weight="1"
 			  android:layout_width="0px"
 			  android:layout_height="match_parent"

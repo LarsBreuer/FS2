@@ -210,6 +210,39 @@ public class MainTabActivity extends Activity {
 		
 	}
 	
+	public void btnTabInfoClick (View view){
+		
+		// DialogBox einrichten
+		final Dialog dialog = new Dialog(MainTabActivity.this);
+		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		dialog.setContentView(R.layout.custom_dialog);
+
+		// Texte setzen
+		TextView title = (TextView) dialog.findViewById(R.id.title);
+		TextView text = (TextView) dialog.findViewById(R.id.text);
+		title.setText(R.string.text_patience);
+		text.setText(R.string.text_function_not_available);
+		
+		// Button definieren
+		LinearLayout lyt_button2 = (LinearLayout) dialog.findViewById(R.id.lyt_button2);
+		lyt_button2.removeAllViews();
+		LinearLayout lyt_button3 = (LinearLayout) dialog.findViewById(R.id.lyt_button3);
+		lyt_button3.removeAllViews();
+		
+		Button dialogButton1 = (Button) dialog.findViewById(R.id.button1);
+		dialogButton1.setText(R.string.okay);
+		
+		dialogButton1.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				dialog.dismiss();
+			}
+		});
+
+		dialog.show();
+		
+	}
+	
 	public void btnTabLoginClick (View view){
 
 		if (auth_token.equals("")) {

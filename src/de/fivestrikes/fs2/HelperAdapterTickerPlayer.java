@@ -9,6 +9,7 @@ import android.app.AlertDialog;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -47,9 +48,12 @@ public class HelperAdapterTickerPlayer extends CursorAdapter {
 	String player_position_second=null;
 	String player_position_third=null;
 	String game_id = null;
+	Integer ticker_activity_id = null;
+	Integer current_time = null;
 	Context ctxt = null;
+	Resources res;
 	
-	public HelperAdapterTickerPlayer(Context context, Cursor c, String id) {
+	public HelperAdapterTickerPlayer(Context context, Cursor c, String id, Bundle args) {
 		
 		super(context, c);
 		game_id = id;
@@ -59,6 +63,8 @@ public class HelperAdapterTickerPlayer extends CursorAdapter {
 		screenDensity=fctHelper.getScreenDensity(context);
 		lytHelper=new HelperLayout();
 		playerHelper= new SmartPlayerList();
+		ticker_activity_id = args.getInt("TickerActivityID");
+		current_time = sqlHelper.getTickerTimeByActivityID(String.valueOf(ticker_activity_id));
 		
 	}
 
@@ -66,7 +72,7 @@ public class HelperAdapterTickerPlayer extends CursorAdapter {
 	public void bindView(View row, Context ctxt, Cursor c) {
 		
 		TickerPlayerHolder holder=(TickerPlayerHolder)row.getTag();
-		holder.populateFrom(c, sqlHelper, game_id);
+		holder.populateFrom(c, sqlHelper, game_id, current_time);
 		
 	}
 	
@@ -83,10 +89,98 @@ public class HelperAdapterTickerPlayer extends CursorAdapter {
 	
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		
+/** TODO -0- => Symbole für Einwechslung und Strafen verändern sich beim scrollen */
 		View view = super.getView(position, convertView, parent);  
 		ctxt = parent.getContext();
+		res = ctxt.getResources();
+		Cursor c = (Cursor) getItem(position);
+		ImageView img_player_active = (ImageView) view.findViewById(R.id.logo_synch);
+		ImageButton img_penalty=(ImageButton) view.findViewById(R.id.btn_synch);
+		Integer yellow_card_id,  two_minutes_id, twoplustwo_id, red_card_id, sub_in_id, sub_out_id, two_in_id;
+				
+		String player_id = sqlHelper.getPlayerID(c);
+		String ticker_id = null;
+		Boolean player_in = false;
 		
+		yellow_card_id = res.getInteger(R.integer.yellow_card_id);
+		two_minutes_id = res.getInteger(R.integer.two_minutes_id);
+		twoplustwo_id = res.getInteger(R.integer.twoplustwo_id);
+		red_card_id = res.getInteger(R.integer.red_card_id);
+		sub_in_id = res.getInteger(R.integer.sub_in_id);
+		sub_out_id = res.getInteger(R.integer.sub_out_id);
+		two_in_id = res.getInteger(R.integer.two_in_id);
+		
+		// Ist der Spieler aktuell eingesetzt worden?
+		
+		String[] args={game_id, player_id, String.valueOf(current_time)};
+		SQLiteDatabase db = sqlHelper.getWritableDatabase();
+		Cursor cTicker = db.rawQuery("SELECT * FROM ticker_activity WHERE game_id=? AND player_id = ? AND time < ? ORDER BY time DESC", args);
+		cTicker.moveToFirst();
+		
+		// Die letzten Tickermeldungen vor der aktuellen Zeit durchgehen und abfragen, ob der Spieler eingewechselt oder ausgewechselt wurde
+		for (cTicker.moveToFirst(); !cTicker.isAfterLast(); cTicker.moveToNext()) {
+			
+			ticker_id = sqlHelper.getTickerActivityID(cTicker);
+			
+			// Kontrollieren, ob es bei der Tickeraktion um eine Ein- oder Auswechslung geht
+			if (sqlHelper.getTickerActivityIDByID(ticker_id).equals(sub_in_id) || sqlHelper.getTickerActivityIDByID(ticker_id).equals(two_in_id)) {
+				player_in = true;
+				cTicker.moveToLast();
+			}
+			if (sqlHelper.getTickerActivityIDByID(ticker_id).equals(sub_out_id)) {
+				cTicker.moveToLast();
+			}
+
+		}
+		cTicker.close();
+		
+		if (player_in == true) {
+/** TODO -1- => Logo für Spieler eingewechselt einsetzen */
+			img_player_active.setImageResource(R.drawable.cloud_green);
+		}
+		
+		// Welche Strafen hat der Spieler
+		if (sqlHelper.count_ticker_activity(game_id, null, player_id, red_card_id, null, null) > 0) {				// Rote Karte eintragen
+			
+			img_penalty.setImageResource(R.drawable.red_card_mini);
+			
+	    	} else {
+	    		
+	    		if (sqlHelper.count_ticker_activity(game_id, null, player_id, yellow_card_id, null, null) > 0) {			// Gelbe Karte eintragen
+	    			
+	    			img_penalty.setImageResource(R.drawable.yellow_card_mini);
+	    			
+	    			if (sqlHelper.count_ticker_activity(game_id, null, player_id, two_minutes_id, null, null) == 1) {			// Gelbe Karte und zwei Minuten eintragen
+	    				
+	    				img_penalty.setImageResource(R.drawable.yellow_plus_two);
+	    				
+	    			}
+	    			
+	    			if (sqlHelper.count_ticker_activity(game_id, null, player_id, two_minutes_id, null, null) > 1 || 
+	    					sqlHelper.count_ticker_activity(game_id, null, player_id, twoplustwo_id, null, null)> 0) {			// Gelbe Karte und zwei Mal zwei Minuten eintragen
+	    				
+	    				img_penalty.setImageResource(R.drawable.yellow_two_plus_two);
+	    				
+	    			}
+	    			
+	    		} else {
+	    			
+	    			if (sqlHelper.count_ticker_activity(game_id, null, player_id, two_minutes_id, null, null) == 1) {
+	    				
+	    				img_penalty.setImageResource(R.drawable.two_minutes_mini);
+	    				
+	    			}
+	    			
+	    			if (sqlHelper.count_ticker_activity(game_id, null, player_id, two_minutes_id, null, null) == 2 || 
+	    					sqlHelper.count_ticker_activity(game_id, null, player_id, twoplustwo_id, null, null) > 0) {			// Gelbe Karte und zwei Mal zwei Minuten eintragen
+	    				
+	    				img_penalty.setImageResource(R.drawable.two_plus_two_minutes);
+	    				
+	    			}
+	    			
+	    		}
+	    	}
+
 		return view;
 		
 	}
@@ -99,7 +193,7 @@ class TickerPlayerHolder {
 	private TextView tv_player_position = null;
 	private ImageView img_player_active = null;
 	private ImageButton img_penalty = null;
-	Integer yellow_card_id,  two_minutes_id, twoplustwo_id, red_card_id;
+	Integer yellow_card_id,  two_minutes_id, twoplustwo_id, red_card_id, sub_in_id, sub_out_id, two_in_id;
 	Context ctxt=null;
 	Resources res;
     
@@ -115,63 +209,12 @@ class TickerPlayerHolder {
     	
 	}
     
-	void populateFrom(Cursor c, HelperSQL helper, String game_id) {
+	void populateFrom(Cursor c, HelperSQL helper, String game_id, Integer current_time) {
 		
 		String player_id = helper.getPlayerID(c);
 		String player_number=helper.getPlayerNumberByID(player_id);
 		String player_name=helper.getPlayerForenameByID(player_id)+" "+helper.getPlayerSurenameByID(player_id);
 		String player_position_id=helper.getPlayerPositionFirstByID(player_id);
-		
-		yellow_card_id = res.getInteger(R.integer.yellow_card_id);
-		two_minutes_id = res.getInteger(R.integer.two_minutes_id);
-		twoplustwo_id = res.getInteger(R.integer.twoplustwo_id);
-		red_card_id = res.getInteger(R.integer.red_card_id);
-		
-		// Ist der Spieler aktuell eingesetzt worden?
-/** TODO -4- => Anzeigen, ob der Spieler eingesetzt ist oder nicht */
-		// img_player_active.setImageResource(R.drawable.cloud_green);
-		
-		// Welche Strafen hat der Spieler
-		if (helper.count_ticker_activity(game_id, null, player_id, red_card_id, null, null) > 0) {				// Rote Karte eintragen
-			
-			img_penalty.setImageResource(R.drawable.red_card_mini);
-			
-	    	} else {
-	    		
-	    		if (helper.count_ticker_activity(game_id, null, player_id, yellow_card_id, null, null) > 0) {			// Gelbe Karte eintragen
-	    			
-	    			img_penalty.setImageResource(R.drawable.yellow_card_mini);
-	    			
-	    			if (helper.count_ticker_activity(game_id, null, player_id, two_minutes_id, null, null) == 1) {			// Gelbe Karte und zwei Minuten eintragen
-	    				
-	    				img_penalty.setImageResource(R.drawable.yellow_plus_two);
-	    				
-	    			}
-	    			
-	    			if (helper.count_ticker_activity(game_id, null, player_id, two_minutes_id, null, null) > 1 || 
-	    					helper.count_ticker_activity(game_id, null, player_id, twoplustwo_id, null, null)> 0) {			// Gelbe Karte und zwei Mal zwei Minuten eintragen
-	    				
-	    				img_penalty.setImageResource(R.drawable.yellow_two_plus_two);
-	    				
-	    			}
-	    			
-	    		} else {
-	    			
-	    			if (helper.count_ticker_activity(game_id, null, player_id, two_minutes_id, null, null) == 1) {
-	    				
-	    				img_penalty.setImageResource(R.drawable.two_minutes_mini);
-	    				
-	    			}
-	    			
-	    			if (helper.count_ticker_activity(game_id, null, player_id, two_minutes_id, null, null) == 2 || 
-	    					helper.count_ticker_activity(game_id, null, player_id, twoplustwo_id, null, null) > 0) {			// Gelbe Karte und zwei Mal zwei Minuten eintragen
-	    				
-	    				img_penalty.setImageResource(R.drawable.two_plus_two_minutes);
-	    				
-	    			}
-	    			
-	    		}
-	    	}
 		
 		// Texte setzen
 		tv_player_number.setText(player_number);

@@ -30,6 +30,7 @@ public class TabFragTickerLineup extends ListFragment {
 	
 	HelperLayout lytHelper = null;
 	HelperSQL sqlHelper=null;
+	HelperText txtHelper = null;
 	Cursor model=null;
 	LineupAdapter adapter = null;
 	String team_id, game_id, player_id, player_position_id, realtime, activity_result, teamname, activity_string;
@@ -40,6 +41,8 @@ public class TabFragTickerLineup extends ListFragment {
 	int count_player;
 	FragmentManager fragmentManager;
 	TabFragTickerList fragTickerList;
+	Context ctxt;
+	Resources res;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater,
@@ -49,6 +52,7 @@ public class TabFragTickerLineup extends ListFragment {
 		
 		sqlHelper=new HelperSQL(getActivity());
 		lytHelper = new HelperLayout();
+		txtHelper=new HelperText();
 		
 /* Daten aus Activity laden */ 
 	        
@@ -62,12 +66,12 @@ public class TabFragTickerLineup extends ListFragment {
 		lineup_id = getResources().getInteger(R.integer.lineup_id);
 		game_halftime = sqlHelper.getGameDurationHalftimeByID(game_id);
 		
-		
-		
 /* Grundlayout setzen */
 		
 		view = inflater.inflate(R.layout.tab_ticker_lineup, container, false);
 		fragmentManager = getFragmentManager();
+		res = getResources(); 
+		ctxt = view.getContext();
 		
 /* Button einrichten */
 		
@@ -275,17 +279,23 @@ public class TabFragTickerLineup extends ListFragment {
 	    			player_position_id = sqlHelper.getPlayerPositionFirstByID(player_id);
 	    			
 	    			sqlHelper.insertTickerActivity(game_id, ticker_event_id, (int) (long) time_lineup, realtime, sub_in_id, home_or_away, player_id, null, null, null, null, activity_string, null);
-	    			if (player_position_id.substring(2,4).equals("01")) {
-	    				if (home_or_away.equals(1)) {
-	    					sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, Integer.parseInt(player_id), null, null, null, null, null, null, null, null, null, null);
-	        			}
-	    				if (home_or_away.equals(0)) {
-	        				sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, Integer.parseInt(player_id), null, null, null, null, null, null, null, null, null);
-	        			}
-	        		}
+	    			if (player_position_id != null) {
+	    				if (player_position_id.substring(2,4).equals("01")) {
+		    				if (home_or_away.equals(1)) {
+		    					sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, Integer.parseInt(player_id), null, null, null, null, null, null, null, null, null, null);
+		        			}
+		    				if (home_or_away.equals(0)) {
+		        				sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, Integer.parseInt(player_id), null, null, null, null, null, null, null, null, null);
+		        			}
+		        		}
+	    			}
 	    		}
 	    		model.moveToNext();
 	    	}
+	    	
+	    	// Tickermeldung generieren
+	    	String ticker_event_note = txtHelper.generateTickerEventNote(ticker_event_id, ctxt, res);
+		sqlHelper.updateTickerEvent(String.valueOf(ticker_event_id), null, null, ticker_event_note, null);
 	    	
 	    	if (home_or_away.equals(1)) {
 			

@@ -853,7 +853,7 @@ class HelperSQL extends SQLiteOpenHelper {
 
 		String[] args={id};
 		return(getReadableDatabase()
-				.rawQuery("SELECT * FROM player WHERE team_id=?", args));
+				.rawQuery("SELECT * FROM player WHERE team_id=? ORDER BY player_number ASC", args));
 		
 	}
 	
@@ -983,13 +983,19 @@ class HelperSQL extends SQLiteOpenHelper {
 	
 	public String getPlayerString(String playerID, Integer number) {
 		
-		Cursor c = getPlayerCursorByID(playerID);
-		c.moveToFirst();
-		if(c.getCount()>0){
-			strResult=c.getString(number);
-		} else {
+		Cursor c = null;
+		if (playerID != null) {
+			c = getPlayerCursorByID(playerID);
+			c.moveToFirst();
+			if(c.getCount()>0){
+				strResult=c.getString(number);
+			} else {
+				strResult="";
+			}
+		}else {
 			strResult="";
 		}
+		
 		c.close();
 		return(strResult);
 		
@@ -1398,6 +1404,13 @@ class HelperSQL extends SQLiteOpenHelper {
 		
 	}
 	
+	public Cursor getAllGameTickerEvent(String id) {
+		
+		String[] args={id, ""};
+		return(getReadableDatabase().rawQuery("SELECT * FROM ticker_event WHERE game_id=? AND ticker_event_note != ? ORDER BY time DESC", args));
+		
+	}
+	
 	public Cursor getTickerEventCursorByID(String id) {
 
 		String[] args={id};
@@ -1534,6 +1547,12 @@ class HelperSQL extends SQLiteOpenHelper {
 	
 	public String getTickerEventID(Cursor c) {
 		return(c.getString(0));
+	}
+	
+	public Integer getTickerEventTimeByID(String ticker_event_id) {
+		Integer intValue = null;
+		if (getTickerEventString(ticker_event_id, 2) != null) intValue = Integer.parseInt(getTickerEventString(ticker_event_id, 2));
+		return(intValue);
 	}
 	
 	public String getTickerEventNoteByID(String ticker_event_id) {
@@ -2410,7 +2429,10 @@ class HelperSQL extends SQLiteOpenHelper {
 		statPlayerList.add(goals);
 		attempts = count_ticker_activity(game_id, null, player_id, goal_against_id, null, null) +
 				count_ticker_activity(game_id, null, player_id, goal_against_7m_id, null, null) +
-				count_ticker_activity(game_id, null, player_id, goal_against_fb_id, null, null);// Gesamt Würfe aufs Tor
+				count_ticker_activity(game_id, null, player_id, goal_against_fb_id, null, null) +
+				count_ticker_activity(game_id, null, player_id, save_id, null, null) +
+				count_ticker_activity(game_id, null, player_id, save_7m_id, null, null) +
+				count_ticker_activity(game_id, null, player_id, save_fb_id, null, null);// Gesamt Würfe aufs Tor
 		statPlayerList.add(attempts);
 		if (attempts > 0) {												// Gesamt Torwart Quote
 			statPlayerList.add(goals * 100 / attempts);
@@ -2493,7 +2515,7 @@ class HelperSQL extends SQLiteOpenHelper {
 		count_ticker = count_ticker_activity(game_id, null, player_id, doppeldribbel_id, null, null);
 		statPlayerList.add(count_ticker);
 		// 60 => davon Fuss
-		count_ticker = count_ticker_activity(game_id, null, player_id, doppeldribbel_id, null, null);
+		count_ticker = count_ticker_activity(game_id, null, player_id, fuss_id, null, null);
 		statPlayerList.add(count_ticker);
 		// 61 => davon Zeitspiel
 		count_ticker = count_ticker_activity(game_id, null, player_id, zeitspiel_id, null, null);
@@ -2525,7 +2547,7 @@ class HelperSQL extends SQLiteOpenHelper {
 		// 68 => Spielzeit des Spielers
 		count_ticker = count_ticker_player_time(game_id, player_id, home_or_away, res);
 		statPlayerList.add(count_ticker);
-		// 69 => + / - Statistik des Spielers 
+		// 69 => +/- Statistik des Spielers 
 		count_ticker = count_ticker_player_plusminus(game_id, player_id, res);
 		statPlayerList.add(count_ticker);
 		

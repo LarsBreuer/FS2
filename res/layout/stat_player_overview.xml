@@ -187,6 +187,7 @@
 	>
 		
 	    <TextView
+	        android:id="@+id/label_goals"
     		android:text="@string/goals"
     		android:layout_width="0dip"
         	android:layout_height="wrap_content"
@@ -199,6 +200,7 @@
     	/>
 	    
 	    <TextView
+	        android:id="@+id/label_efficiency"
     		android:text="@string/efficiency"
     		android:layout_width="0dip"
         	android:layout_height="wrap_content"

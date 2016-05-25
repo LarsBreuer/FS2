@@ -39,6 +39,7 @@ public class TabFragTeamList extends ListFragment {
 /* Daten aus Activity laden */ 
 	        
 		 args = getArguments();
+		 if (args == null) args = new Bundle(); 
 		 
 /* Helper generieren */
         
@@ -65,7 +66,6 @@ public class TabFragTeamList extends ListFragment {
 	    	Bundle args = getArguments();
 		if (args != null ) {
 			team_id = args.getString("TeamID");
-			args = null;
 		}
 		refreshContent(team_id, args);
     	
@@ -73,7 +73,11 @@ public class TabFragTeamList extends ListFragment {
     
 	public void refreshContent(String team_id, Bundle args) {
 		
-		if (team_id != null) Log.v("TabFragTeamList team_id", team_id);
+		if (args == null && team_id != null) {								// Falls man von Spieler einrichten zurück kommt richte die Team-ID ein
+			args = new Bundle();
+			args.putString("TeamID", team_id);
+		}
+		
 		model=sqlHelper.getAllTeamCursor();
 		getActivity().startManagingCursor(model);
 		adapter = new HelperAdapterTeam(getActivity(), model, team_id);
@@ -89,8 +93,6 @@ public class TabFragTeamList extends ListFragment {
 			fragmentTransaction.commit();
 			
 		}
-		
-        
 	}
     
 /*
@@ -113,7 +115,6 @@ public class TabFragTeamList extends ListFragment {
 		club_name_short = sqlHelper.getClubShortByTeamID(team_id);
 		server_club_id = sqlHelper.getTeamServerClubIDByTeamID(team_id);
 		
-		args = new Bundle();
 		args.putString("TeamID", team_id);
 		args.putString("ServerTeamID", server_team_id);
 		args.putString("ClubID", club_id);

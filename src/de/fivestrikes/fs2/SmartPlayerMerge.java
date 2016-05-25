@@ -83,13 +83,13 @@ public class SmartPlayerMerge extends ListActivity {
 		String connect_player_id = String.valueOf(id);
 		
 		// Überprüfen, ob die beiden Spieler schon einmal in einem gemeinsamen Spiel eingesetzt wurden
-/** TODO -2- => Überprüfen, ob die beiden Spieler schon einmal in einem gemeinsamen Spiel eingesetzt wurden */
+/** TODO -3- => Überprüfen, ob die beiden Spieler schon einmal in einem gemeinsamen Spiel eingesetzt wurden */
 		
 		// Falls nicht => Alle Spielaktionen mit dem Spieler ändern...
-/** TODO -2- => Die Player Server ID auch in den Spielaktionen eintragen */
+/** TODO -3- => Die Player Server ID auch in den Spielaktionen eintragen */
 		
 		// ... und den Spieler löschen
-/** TODO -2- => sqlHelper.deletePlayer(player_id);	 */	
+/** TODO -3- => sqlHelper.deletePlayer(player_id);	 */	
 		
 		Toast.makeText(getBaseContext(), getString(R.string.text_player_connect_suceeded), Toast.LENGTH_LONG).show();
 		finish();

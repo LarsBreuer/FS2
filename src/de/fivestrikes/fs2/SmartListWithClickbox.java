@@ -59,6 +59,7 @@ public class SmartListWithClickbox extends ListActivity {
 		lyt_button.removeAllViews();
 		Button btn_all_in = (Button) findViewById(R.id.all_in);
 		Button btn_all_out = (Button) findViewById(R.id.all_out);
+		Button btn_back = (Button) findViewById(R.id.back);
 		
 		if (strInput.equals("InputDepth")) {
 
@@ -176,6 +177,16 @@ public class SmartListWithClickbox extends ListActivity {
 				}
 				HelperAdapterTextWithClickbox adapter = new HelperAdapterTextWithClickbox(SmartListWithClickbox.this, values, game_id, args);
 				setListAdapter(adapter);
+				
+			}
+		});
+		
+		btn_back.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+	            public void onClick(View v) {
+
+				SmartListWithClickbox.this.finish();
 				
 			}
 		});

@@ -341,8 +341,7 @@ class TickerHolder {
 			txt_icon.setText("");
 		}
 		if (ticker_activity.equals(tactic_321_id)) {
-/** TODO -1- => Symbol Taktik 3-2-1 einfügen */
-			icon.setImageResource(R.drawable.ticker_symbol_tactic_42);
+			icon.setImageResource(R.drawable.ticker_symbol_tactic_321);
 			txt_icon.setText("");
 		}
 		if (ticker_activity.equals(tactic_guarding_id)) {

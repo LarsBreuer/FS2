@@ -31,6 +31,7 @@ public class TabFragListWithClickbox extends ListFragment {
 	Bundle args;
 	String[] values = null;
 	int[] activityList = null;
+	FragmentManager fragmentManager;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater,
@@ -43,6 +44,10 @@ public class TabFragListWithClickbox extends ListFragment {
 		
 		sqlHelper=new HelperSQL(getActivity());
 		lytHelper = new HelperLayout();
+		
+/* Layout festlegen */
+
+		fragmentManager = getFragmentManager();
 		
 /* Daten aus Activity laden */ 
 	        
@@ -63,6 +68,7 @@ public class TabFragListWithClickbox extends ListFragment {
 		lyt_button.removeAllViews();
 		Button btn_all_in = (Button) view.findViewById(R.id.all_in);
 		Button btn_all_out = (Button) view.findViewById(R.id.all_out);
+		Button btn_back = (Button) view.findViewById(R.id.back);
 
 		if (strInput.equals("InputDepth")) {
 
@@ -181,6 +187,36 @@ public class TabFragListWithClickbox extends ListFragment {
 				HelperAdapterTextWithClickbox adapter = new HelperAdapterTextWithClickbox(getActivity(), values, game_id, args);
 				setListAdapter(adapter);
 				
+			}
+		});
+		
+		btn_back.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+	            public void onClick(View v) {
+
+				FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+				
+				if (strInput.equals("InputDepth")) {
+					
+					TabFragGameEdit fragment = new TabFragGameEdit();
+					fragment.setArguments(args);
+					fragmentTransaction.replace(R.id.frag_game_edit, fragment);
+					fragmentTransaction.commit();
+					
+				}
+				
+				if (strInput.equals("TickerActivity")) {
+					
+					TabFragStatTickerActivity fragStatActivity = (TabFragStatTickerActivity) fragmentManager.findFragmentById(R.id.frag_stat_ticker_content_1);
+					fragStatActivity.refreshContent(args);
+					
+					TabFragEmpty fragment = new TabFragEmpty();
+					fragment.setArguments(args);
+					fragmentTransaction.replace(R.id.frag_stat_ticker_content_2, fragment);
+					fragmentTransaction.commit();
+					
+				}				
 			}
 		});
 		
