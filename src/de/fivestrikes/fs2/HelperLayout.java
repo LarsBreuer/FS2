@@ -1641,6 +1641,7 @@ public class HelperLayout {
 		if (game_id != null) {
 			
 			game_halftime = sqlHelper.getGameDurationHalftimeByID(game_id);
+			server_game_id = sqlHelper.getServerGameID(game_id);
 			home_id = sqlHelper.getGameTeamHomeIDByID(game_id);
 			away_id = sqlHelper.getGameTeamAwayIDByID(game_id);
 			if (home_id != null) {
@@ -1834,7 +1835,7 @@ public class HelperLayout {
 			
 			@Override
 			public void onClick(View v) {
-
+				
 				if (server_team_home_id != null && server_team_away_id != null) {
 					
 					/* 
@@ -1843,51 +1844,60 @@ public class HelperLayout {
 					 * 
 					 */
 					
-					// JSON object to hold the information, which is sent to the server
-					JSONObject jsonObjSend = new JSONObject();
+					String user_id = sqlHelper.getUserID();
 					
-					try {
+					// Kontrollieren ob Spiel schon synchronisert wurde.
+					// Falls noch nicht, dann jetzt synchronisieren.
+					
+					if (server_game_id.equals(null)) {
 						
-		                        // Add key/value pairs
-		                        jsonObjSend.put("user_id", "1");
-		                        jsonObjSend.put("team_home_id", server_team_home_id);
-		                        jsonObjSend.put("team_away_id", server_team_away_id);
-		                        jsonObjSend.put("club_home_name", club_home);
-		                        jsonObjSend.put("club_away_name", club_away);
-		                        jsonObjSend.put("duration_halftime", 30);
-		                        jsonObjSend.put("game_date", "1");
+						// JSON object to hold the information, which is sent to the server
+						JSONObject jsonObjSend = new JSONObject();
+						
+						try {
 
-		                        // Add a nested JSONObject (e.g. for header information)
-		                        JSONObject header = new JSONObject();
-		                        header.put("deviceType","Android"); // Device type
-		                        header.put("deviceVersion","2.0"); // Device OS version
-		                        header.put("language", "es-es");        // Language of the Android client
-		                        jsonObjSend.put("header", header);
-		                        
-		                        // Output the JSON object we're sending to Logcat:
-		                        Log.i(TAG, jsonObjSend.toString(2));
-		                        
-					} catch (JSONException e) {
-						e.printStackTrace();
-					}
-					
-					// Send the HttpPostRequest and receive a JSONObject in return
-					JSONObject jsonObjRecv = HttpClient.SendHttpPost(URL_GAMES, jsonObjSend, null);
-					try {
-						Log.v("Die ID lautet: ", jsonObjRecv.get("id").toString());
-						server_game_id = jsonObjRecv.get("id").toString();
-						sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, server_game_id);
-					}
-					catch (JSONException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					/*
-					 *  From here on do whatever you want with your JSONObject, e.g.
-					 *  1) Get the value for a key: jsonObjRecv.get("key");
-					 *  2) Get a nested JSONObject: jsonObjRecv.getJSONObject("key")
-					 *  3) Get a nested JSONArray: jsonObjRecv.getJSONArray("key") 
-					 */
+			                        // Add key/value pairs
+			                        jsonObjSend.put("user_id", user_id);
+			                        jsonObjSend.put("team_home_id", server_team_home_id);
+			                        jsonObjSend.put("team_away_id", server_team_away_id);
+			                        jsonObjSend.put("club_home_name", club_home);
+			                        jsonObjSend.put("club_away_name", club_away);
+			                        jsonObjSend.put("duration_halftime", game_halftime);
+			                        jsonObjSend.put("game_date", game_date);
+destdr; // ToDo: In Rails-Projekt unter db > schema nachschauen, welche Daten übermittelt werden sollen. Insbesondere auf das Format des Datums achten. 
+			                        // Add a nested JSONObject (e.g. for header information)
+			                        JSONObject header = new JSONObject();
+			                        header.put("deviceType","Android"); // Device type
+			                        header.put("deviceVersion","2.0"); // Device OS version
+			                        header.put("language", "es-es");        // Language of the Android client
+			                        jsonObjSend.put("header", header);
+			                        
+			                        // Output the JSON object we're sending to Logcat:
+			                        Log.i(TAG, jsonObjSend.toString(2));
+			                        
+						} catch (JSONException e) {
+							e.printStackTrace();
+						}
+						
+						// Send the HttpPostRequest and receive a JSONObject in return
+						JSONObject jsonObjRecv = HttpClient.SendHttpPost(URL_GAMES, jsonObjSend, null);
+						try {
+							Log.v("Die ID lautet: ", jsonObjRecv.get("id").toString());
+							server_game_id = jsonObjRecv.get("id").toString();
+							sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, server_game_id);
+						}
+						catch (JSONException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						/*
+						 *  From here on do whatever you want with your JSONObject, e.g.
+						 *  1) Get the value for a key: jsonObjRecv.get("key");
+						 *  2) Get a nested JSONObject: jsonObjRecv.getJSONObject("key")
+						 *  3) Get a nested JSONArray: jsonObjRecv.getJSONArray("key") 
+						 */
+						
+					}					
 					
 					/* 
 					 * 
@@ -1948,7 +1958,35 @@ public class HelperLayout {
 /** TODO -0- => Async einrichten während laden. Am Ende Meldung, dass Synchronisation erfolgreich war */
 				} else {
 					
-/** TODO -2- => Meldung einrichten, falls keine Server ID vorhanden sein sollte */
+					// Nachrichtenbox einrichten
+					final Dialog dialog = new Dialog(ctxt);
+					dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+					dialog.setContentView(R.layout.custom_dialog);
+
+					// Texte setzen
+					TextView title = (TextView) dialog.findViewById(R.id.title);
+					TextView text = (TextView) dialog.findViewById(R.id.text);
+					title.setText(R.string.synchro);
+					text.setText(R.string.text_synchro_game_not_possible);
+					
+					// Button definieren
+					LinearLayout lyt_button2 = (LinearLayout) dialog.findViewById(R.id.lyt_button2);
+					lyt_button2.removeAllViews();
+					LinearLayout lyt_button3 = (LinearLayout) dialog.findViewById(R.id.lyt_button3);
+					lyt_button3.removeAllViews();
+					
+					Button dialogButton1 = (Button) dialog.findViewById(R.id.button1);
+					dialogButton1.setText(R.string.okay);
+					
+					dialogButton1.setOnClickListener(new View.OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							dialog.dismiss();
+						}
+					});
+
+					dialog.show();
+					// Ende Nachrichtenbox
 					
 				}
 			}
@@ -8337,7 +8375,7 @@ public class HelperLayout {
 		    				intCurrentPossession = 0;
 		    			}
 		    		}
-				
+
 /* Führung / Unentschieden + Tore Überzahl / Unterzahl ermitteln */
 				
 				// Wurde ein Tor geschossen?

@@ -195,7 +195,7 @@ public class MainSmartActivity extends ListActivity {
 		}
 		if (position == 3) startActivity(new Intent(getApplicationContext(), SmartStatList.class));
 		if (position == 4) {
-/** TODO -2- => Bei Login auch Button registrieren einrichten */
+/** TODO -1- => Login in eigenes Fenster einbauen zusammen mit Registrierung */
 			if (auth_token.equals("")) {
 				
 				// Dialogbox einrichten
@@ -209,7 +209,7 @@ public class MainSmartActivity extends ListActivity {
 				btn_login.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-/** TODO -0- => Programm stürzt ab, nachdem man eingeloggt ist */
+
 						if (dialog != null && dialog.isShowing()) {
 							dialog.dismiss();
 						}

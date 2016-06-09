@@ -291,6 +291,16 @@ class HelperSQL extends SQLiteOpenHelper {
 		
 	}
 	
+	public String getUserID() {
+		
+		Cursor c = getApp();
+		c.moveToFirst();
+		String user_name = c.getString(5);
+		c.close();
+		return(user_name);
+		
+	}
+	
 	public int[] getActivityListFromActivityString() {
 		
 		int[] activityList = new int[42];
@@ -1936,7 +1946,10 @@ class HelperSQL extends SQLiteOpenHelper {
 				}
 				
 				// Wurde Spieler ausgewechselt?
-				if (getTickerActivityIDByID(ticker_id).equals(sub_out_id)) {
+				if (getTickerActivityIDByID(ticker_id).equals(sub_out_id) || 
+						getTickerActivityIDByID(ticker_id).equals(two_minutes_id) ||
+						getTickerActivityIDByID(ticker_id).equals(twoplustwo_id) ||
+						getTickerActivityIDByID(ticker_id).equals(red_card_id)) {
 					if (status.equals(1)) {
 						time = time + getTickerTimeByActivityID(ticker_id) - time_in;
 						status = 0;
@@ -2102,10 +2115,8 @@ class HelperSQL extends SQLiteOpenHelper {
 					} else {
 						plus_minus = plus_minus - 1;
 					}
-					
 				}
 			}
-			
 		}
 		
 		return(plus_minus);

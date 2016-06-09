@@ -310,6 +310,7 @@
 	<string name="text_patience">Wir bitten um Geduld</string>
 	<string name="text_function_not_available">Diese Funktion steht noch nicht zur Verfügung.</string>
 	<string name="text_login_not_possible">Das Synchronisieren mit dem Server ist nicht möglich, da Du nicht eingeloggt bist.</string>
+	<string name="text_synchro_game_not_possible">Das Synchronisieren des Spiels mit dem Server ist nicht möglich, da zumindest eine Mannschaft nicht synchronisiert ist.</string>
 	<string name="male_female">Geschlecht</string>
 	<string name="gents">Herren</string>
 	<string name="minis">Minis</string>
