@@ -33,7 +33,7 @@ import android.widget.Toast;
 
 
 public class LoginActivity extends Activity {
-/** TODO -3- => LoginActivity entfernen */
+/** TODO -1- => LoginActivity entfernen */
 	//private final static String LOGIN_API_ENDPOINT_URL = "http://calm-waters-7359.herokuapp.com/api/v1/sessions";
 	private SharedPreferences mPreferences;
 	private String mUserEmail;

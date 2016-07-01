@@ -72,7 +72,7 @@ public class HelperAdapterStatGameTicker extends CursorAdapter {
 	public void bindView(View row, Context ctxt, Cursor c) {
 			
 		TickerEventHolder holder=(TickerEventHolder)row.getTag();
-		holder.populateFrom(c, sqlHelper, fctHelper, lytHelper);
+		holder.populateFrom(game_id, c, sqlHelper, fctHelper, lytHelper);
 		
 	}
 	
@@ -125,7 +125,7 @@ class TickerEventHolder {
     	
 	}
     
-	void populateFrom(Cursor c, HelperSQL sqlHelper, HelperFunction fctHelper, HelperLayout lytHelper) {
+	void populateFrom(String game_id, Cursor c, HelperSQL sqlHelper, HelperFunction fctHelper, HelperLayout lytHelper) {
 		
 		Resources res = ctxt.getResources(); 
 		Integer possession_id = res.getInteger(R.integer.possession_id);
@@ -173,7 +173,7 @@ class TickerEventHolder {
 		Integer foul_id = res.getInteger(R.integer.foul_id);
 		String player_id = null;
 		String ticker_id = null;
-		Integer home_or_away = 1;
+		Integer home_or_away = null;
 		
 		// Event ermitteln		
 		String ticker_event_id = sqlHelper.getTickerActivityID(c);
@@ -183,78 +183,69 @@ class TickerEventHolder {
 		time = sqlHelper.getTickerEventTimeByID(ticker_event_id);
 		txt_time.setText(fctHelper.updateTimer(time) + " Min.");
 		
-/* Hauptkation ermittelen und dementsprechend Mannschaftsfare Logo und Überschrift setzen */
+/* Hauptkation ermitteln und dementsprechend Mannschaftsfarbe Logo und Überschrift setzen */
 		
-		// Durch die Ticker-Aktivitäten des Events gehen  
-		String[] tickerArgs={String.valueOf(ticker_event_id)};
-		SQLiteDatabase db = sqlHelper.getWritableDatabase();
-		Cursor cTicker = db.rawQuery("SELECT * FROM ticker_activity WHERE ticker_event_id = ? ORDER BY time ASC", tickerArgs);
-		cTicker.moveToFirst();
+		ArrayList<Integer> mainActivityList = sqlHelper.getTickerEventMainActivity(String.valueOf(ticker_event_id), res);
+		Integer ticker_activity_id = mainActivityList.get(0);
+		home_or_away = mainActivityList.get(1);
 		
-		// Alle Tickermeldungen abfragen und Tickeraktivität ermitteln
-		for (cTicker.moveToFirst(); !cTicker.isAfterLast(); cTicker.moveToNext()) {
+		String goals_home = String.valueOf(sqlHelper.count_ticker_goals(game_id, null, 1, time));
+		String goals_away = String.valueOf(sqlHelper.count_ticker_goals(game_id, null, 0, time));
+		String ticker_result = goals_home + " : " + goals_away;
+		
+		if (ticker_activity_id != null) {
 			
-			ticker_id = sqlHelper.getTickerActivityID(cTicker);
-			
-			if (sqlHelper.getTickerActivityIDByID(ticker_id).equals(defense_error_id) || sqlHelper.getTickerActivityIDByID(ticker_id).equals(block_error_id) || 
-					sqlHelper.getTickerActivityIDByID(ticker_id).equals(defense_success_id) || sqlHelper.getTickerActivityIDByID(ticker_id).equals(block_success_id)) {
+			if (ticker_activity_id.equals(defense_error_id)) {
 				icon.setImageResource(R.drawable.ticker_symbol_defense);
 				txt_icon.setText("");
 				txt_headline.setText(res.getString(R.string.defense));
-				home_or_away = sqlHelper.getTickerHomeOrAwayByID(ticker_id);
 			}
-			if (sqlHelper.getTickerActivityIDByID(ticker_id).equals(tech_fault_id) || sqlHelper.getTickerActivityIDByID(ticker_id).equals(fehlpass_id) || sqlHelper.getTickerActivityIDByID(ticker_id).equals(steps_id) ||
-					sqlHelper.getTickerActivityIDByID(ticker_id).equals(three_seconds_id) || sqlHelper.getTickerActivityIDByID(ticker_id).equals(doppeldribbel_id) ||
-					sqlHelper.getTickerActivityIDByID(ticker_id).equals(fuss_id) || sqlHelper.getTickerActivityIDByID(ticker_id).equals(zeitspiel_id) ||
-					sqlHelper.getTickerActivityIDByID(ticker_id).equals(kreis_id) || sqlHelper.getTickerActivityIDByID(ticker_id).equals(stuermerfoul_id)) {
+			if (ticker_activity_id.equals(tech_fault_id)) {
 				icon.setImageResource(R.drawable.ticker_symbol_tech_fault);
 				txt_icon.setText("");
 				txt_headline.setText(res.getString(R.string.tech_fault));
-				home_or_away = sqlHelper.getTickerHomeOrAwayByID(ticker_id);
 			}
-			if (sqlHelper.getTickerActivityIDByID(ticker_id).equals(yellow_card_id)) {
+			if (ticker_activity_id.equals(yellow_card_id)) {
 				icon.setImageResource(R.drawable.ticker_symbol_yellow_card);
 				txt_icon.setText("");
 				txt_headline.setText(res.getString(R.string.yellow_card));
-				home_or_away = sqlHelper.getTickerHomeOrAwayByID(ticker_id);
 			}
-			if (sqlHelper.getTickerActivityIDByID(ticker_id).equals(two_minutes_id) || sqlHelper.getTickerActivityIDByID(ticker_id).equals(twoplustwo_id)) {
+			if (ticker_activity_id.equals(two_minutes_id)) {
 				icon.setImageResource(R.drawable.ticker_symbol_two_out);
 				txt_icon.setText("");
 				txt_headline.setText(res.getString(R.string.two_minutes));
-				home_or_away = sqlHelper.getTickerHomeOrAwayByID(ticker_id);
 			}
-			if (sqlHelper.getTickerActivityIDByID(ticker_id).equals(red_card_id)) {
+			if (ticker_activity_id.equals(red_card_id)) {
 				icon.setImageResource(R.drawable.ticker_symbol_red_card);
 				txt_icon.setText("");
 				txt_headline.setText(res.getString(R.string.red_card));
-				home_or_away = sqlHelper.getTickerHomeOrAwayByID(ticker_id);
 			}
-			if (sqlHelper.getTickerActivityIDByID(ticker_id).equals(timeout_id)) {
+			if (ticker_activity_id.equals(timeout_id)) {
 				icon.setImageResource(R.drawable.ticker_symbol_timeout);
 				txt_icon.setText("");
 				txt_headline.setText(res.getString(R.string.timeout));
-				home_or_away = sqlHelper.getTickerHomeOrAwayByID(ticker_id);
 			}
-			if (sqlHelper.getTickerActivityIDByID(ticker_id).equals(tactic_60_id) || sqlHelper.getTickerActivityIDByID(ticker_id).equals(tactic_51_id) || sqlHelper.getTickerActivityIDByID(ticker_id).equals(tactic_42_id) ||
-					sqlHelper.getTickerActivityIDByID(ticker_id).equals(tactic_321_id) || sqlHelper.getTickerActivityIDByID(ticker_id).equals(tactic_guarding_id)) {
+			if (ticker_activity_id.equals(sub_in_id)) {
+				icon.setImageResource(R.drawable.ticker_symbol_sub_in);
+				txt_icon.setText("");
+				txt_headline.setText(res.getString(R.string.substitution));
+			}
+			if (ticker_activity_id.equals(tactic_60_id)) {
 				icon.setImageResource(R.drawable.ticker_symbol_tactic);
 				txt_icon.setText("");
 				txt_headline.setText(res.getString(R.string.tactic));
-				home_or_away = sqlHelper.getTickerHomeOrAwayByID(ticker_id);
 			}
-			if (sqlHelper.getTickerActivityIDByID(ticker_id).equals(miss_id) || sqlHelper.getTickerActivityIDByID(ticker_id).equals(miss_7m_id) || sqlHelper.getTickerActivityIDByID(ticker_id).equals(miss_fb_id)) {
+			if (ticker_activity_id.equals(miss_id)) {
 				icon.setImageResource(R.drawable.ticker_symbol_miss);
 				txt_icon.setText("");
 				txt_headline.setText(res.getString(R.string.miss));
-				home_or_away = sqlHelper.getTickerHomeOrAwayByID(ticker_id);
 			}
-			if (sqlHelper.getTickerActivityIDByID(ticker_id).equals(goal_id) || sqlHelper.getTickerActivityIDByID(ticker_id).equals(goal_7m_id) ||	sqlHelper.getTickerActivityIDByID(ticker_id).equals(goal_fb_id)) {
+			if (ticker_activity_id.equals(goal_id)) {
 				icon.setImageResource(R.drawable.ticker_symbol_none);
-				txt_icon.setText(sqlHelper.getTickerResultByID(ticker_id));
+				txt_icon.setText(ticker_result);
 				txt_headline.setText(res.getString(R.string.goal));
-				home_or_away = sqlHelper.getTickerHomeOrAwayByID(ticker_id);
 			}
+			
 		}
 		
 		// Teamfarbe setzen

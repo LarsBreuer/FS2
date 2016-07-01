@@ -104,7 +104,7 @@ public class SmartGameList extends ListActivity {
 				break;
             
 			case 0:
-/** TODO -3- => Abfrage, ob kostenpflichtige App, ansonsten nur drei Spiele möglich */
+/** TODO -1- => Abfrage, ob kostenpflichtige App, ansonsten nur drei Spiele möglich */
 				// Füge ein neues Spiel ein
 				sqlHelper.insertGame();
 				game_id = sqlHelper.getLastGameID();

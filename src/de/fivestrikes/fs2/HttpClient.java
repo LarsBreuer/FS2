@@ -27,8 +27,8 @@ public class HttpClient {
                         HttpPost httpPostRequest = new HttpPost(URL);
 
                         StringEntity se = null;
-                        if (jsonObjSend!= null) se = new StringEntity(jsonObjSend.toString());
-                        if (jsonObjArray!= null) se = new StringEntity(jsonObjArray.toString());
+                        if (jsonObjSend!= null) se = new StringEntity(jsonObjSend.toString(), "UTF-8");
+                        if (jsonObjArray!= null) se = new StringEntity(jsonObjArray.toString(), "UTF-8");
                         Log.v("HttpClient.java String Entity", String.valueOf(se));
 
                         // Set HTTP parameters

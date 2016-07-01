@@ -142,6 +142,7 @@ public class HelperLayout {
 	String realtime=null;
 	String ticker_text = null;
 	String ticker_note = null;
+	String game_note = null;
 	String ticker_event_note = null;
 	String activity_string = null;
 	String activity_against_string = null;
@@ -294,6 +295,7 @@ public class HelperLayout {
 	private static final String TAG = "MainActivity";
 	private static final String URL_GAMES = "http://calm-waters-7359.herokuapp.com/games.json";
 	private static final String URL_TICKER = "http://calm-waters-7359.herokuapp.com/multiple_ticker_activities.json";
+	private static final String URL_TICKER_EVENT = "http://calm-waters-7359.herokuapp.com/multiple_ticker_events.json";
 	
 /*
  * 
@@ -992,7 +994,7 @@ public class HelperLayout {
 		edit_player_forename = (EditText) view.findViewById(R.id.player_forename);
 		edit_player_surename = (EditText) view.findViewById(R.id.player_surename);
 		edit_player_number = (EditText) view.findViewById(R.id.player_number);
-	    
+/** TODO -1- => Button Spieler auf Server hochladen einrichten */
 		Button btn_okay = (Button) view.findViewById(R.id.okay);
 		Button btn_choose_team = (Button) view.findViewById(R.id.btn_choose_team);
 		Button btn_synch = (Button) view.findViewById(R.id.synch);
@@ -1143,7 +1145,7 @@ public class HelperLayout {
 					fragmentTransaction.commit();
 					
 				} else {
-/** TODO -3- => Spieler verschieben funktiniert nicht */
+/** TODO -1- => Spieler verschieben funktiniert nicht */
 					Intent i = new Intent(ctxt, SmartTeamSelect.class);
 					i.putExtras(args);
 					((Activity)ctxt).startActivityForResult(i, GET_CODE);
@@ -1608,6 +1610,7 @@ public class HelperLayout {
 		
 		view = contentView;
 		ctxt = view.getContext();
+		res = ctxt.getResources(); 
 		fragmentManager = contentFragmentManager;
 		args = contentArgs;
 		
@@ -1640,6 +1643,9 @@ public class HelperLayout {
 		
 		if (game_id != null) {
 			
+			// sqlHelper.deleteGameServerID(game_id);
+			// sqlHelper.deleteTickerEventServerIDByGameID(game_id);
+			// sqlHelper.deleteTickerActivityServerIDByGameID(game_id);
 			game_halftime = sqlHelper.getGameDurationHalftimeByID(game_id);
 			server_game_id = sqlHelper.getServerGameID(game_id);
 			home_id = sqlHelper.getGameTeamHomeIDByID(game_id);
@@ -1652,6 +1658,7 @@ public class HelperLayout {
 				server_team_away_id = sqlHelper. getTeamServerTeamID(away_id);
 				club_away = sqlHelper.getClubNameByTeamID(away_id);
 			}
+			game_note = sqlHelper.getGameNote(game_id); 
 			str_game_date = sqlHelper.getGameDateByID(game_id);
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 			try
@@ -1662,6 +1669,7 @@ public class HelperLayout {
 				year = game_date.getYear()+1900;
 			}
 			catch (ParseException e) {}
+			
 			
 		}
 		
@@ -1680,17 +1688,17 @@ public class HelperLayout {
 		Button btn_synch = (Button) view.findViewById(R.id.synch);
 		Button btn_save = (Button) view.findViewById(R.id.save);
 		Button btn_delete = (Button) view.findViewById(R.id.delete);
-/** TODO -3- => Runde Button bei Spiel editieren einbauen */
+/** TODO -3- => Runde Button bei Spiel editieren einbauen */ 
 
 /* Button beschriften */
 	        
-		if(home_id != null){
+		if (home_id != null){
 			
 		    	btn_team_home.setText(sqlHelper.getTeamClubNameByID(home_id));
 		    	
 		}
 		
-		if(away_id != null){
+		if (away_id != null){
 			
 			btn_team_away.setText(sqlHelper.getTeamClubNameByID(away_id));
 
@@ -1701,6 +1709,8 @@ public class HelperLayout {
 					.append(day).append(".")
 					.append(month + 1).append(".")
 					.append(year));
+		
+		final String game_date_for_rails = year + "-" + (month + 1) + "-" + day + " 00:00:00";
 		    
 		edit_game_halftime.setText(String.valueOf(game_halftime));
 		
@@ -1849,22 +1859,23 @@ public class HelperLayout {
 					// Kontrollieren ob Spiel schon synchronisert wurde.
 					// Falls noch nicht, dann jetzt synchronisieren.
 					
-					if (server_game_id.equals(null)) {
+					if (server_game_id == null) {
 						
 						// JSON object to hold the information, which is sent to the server
 						JSONObject jsonObjSend = new JSONObject();
 						
 						try {
 
-			                        // Add key/value pairs
+			                        // Spieldaten auf den Rails-Server übertragen 
 			                        jsonObjSend.put("user_id", user_id);
 			                        jsonObjSend.put("team_home_id", server_team_home_id);
 			                        jsonObjSend.put("team_away_id", server_team_away_id);
 			                        jsonObjSend.put("club_home_name", club_home);
 			                        jsonObjSend.put("club_away_name", club_away);
 			                        jsonObjSend.put("duration_halftime", game_halftime);
-			                        jsonObjSend.put("game_date", game_date);
-destdr; // ToDo: In Rails-Projekt unter db > schema nachschauen, welche Daten übermittelt werden sollen. Insbesondere auf das Format des Datums achten. 
+			                        jsonObjSend.put("game_date", game_date_for_rails);
+			                        jsonObjSend.put("game_note", game_note);
+
 			                        // Add a nested JSONObject (e.g. for header information)
 			                        JSONObject header = new JSONObject();
 			                        header.put("deviceType","Android"); // Device type
@@ -1882,6 +1893,7 @@ destdr; // ToDo: In Rails-Projekt unter db > schema nachschauen, welche Daten ü
 						// Send the HttpPostRequest and receive a JSONObject in return
 						JSONObject jsonObjRecv = HttpClient.SendHttpPost(URL_GAMES, jsonObjSend, null);
 						try {
+							Log.v("jsonObjRecv Game", jsonObjRecv.toString());
 							Log.v("Die ID lautet: ", jsonObjRecv.get("id").toString());
 							server_game_id = jsonObjRecv.get("id").toString();
 							sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, server_game_id);
@@ -1904,32 +1916,80 @@ destdr; // ToDo: In Rails-Projekt unter db > schema nachschauen, welche Daten ü
 					 *  Die Ticker übertragen 
 					 * 
 					 */
-/** TODO -2- => Vor Übertragung des Tickers Mannschaftseinwechslungen (7 Spieler) abfragen und ersetzen durch Ein- bzw. Auswechslung - siehe count_ticker_player_time unter HelperSQL */
+
 					JSONArray tickerArray = new JSONArray();
+					Boolean player_sync = true;
 					
 					try {
 						
-						for(int i = 0; i < 3; i++) {
+						// Tickerdaten des Spiels auf den Server übertragen 
+						String[] args={String.valueOf(game_id)};
+						SQLiteDatabase db = sqlHelper.getWritableDatabase();
+						Cursor cTicker = db.rawQuery("SELECT * FROM ticker_activity WHERE game_id = ? ORDER BY time ASC", args);
+						cTicker.moveToFirst();
+						String ticker_id, ticker_player_id, ticker_realtime, ticker_goal_area, ticker_activity_note;
+						String ticker_player_server_id = null;
+						Integer activity_id, ticker_time, ticker_home_or_away, ticker_field_position_x, ticker_field_position_y, ticker_throwing_technique_id, mark;
+
+						// Alle Tickeraktivitäten abfragen und Daten in das Array eintragen eintragen
+						for (cTicker.moveToFirst(); !cTicker.isAfterLast(); cTicker.moveToNext()) {
+
+							ticker_id = sqlHelper.getTickerActivityID(cTicker);
 							
-							JSONObject jsonObjForArray = new JSONObject();
-							
-							jsonObjForArray.put("activity_id", "10100");
-							jsonObjForArray.put("player_id", i);
-							jsonObjForArray.put("time", i * 100 + i * 5);
-							jsonObjForArray.put("game_id", game_id);
-							jsonObjForArray.put("team_id", 1);
-							jsonObjForArray.put("realtime", null);
-							jsonObjForArray.put("home_or_away", 1);
-							jsonObjForArray.put("goal_area", "ML");
-							jsonObjForArray.put("field_position_x", 100);
-							jsonObjForArray.put("field_position_y", 50);
-							jsonObjForArray.put("throwing_technique_id", 10180);
-							jsonObjForArray.put("ticker_activity_note", "Das war ein schoenes Spiel");
-							jsonObjForArray.put("mark", 3);
-							
-							tickerArray.put(jsonObjForArray);
-							
+							// Tickeraktivität nur übertragen, falls sie noch nicht übertragen wurde
+							if (sqlHelper.getTickerServerTickerActivityByID(ticker_id) == null) {
+								
+								ticker_event_id = sqlHelper.getTickerEventIDByActivityID(ticker_id);
+								activity_id = sqlHelper.getTickerActivityIDByID(ticker_id);
+								ticker_player_id = sqlHelper.getTickerPlayerIDByID(ticker_id);
+								if (ticker_player_id != null) {
+									ticker_player_server_id = sqlHelper.getPlayerServerIDByID(ticker_player_id);
+								} else {
+									ticker_player_server_id = null;
+								}
+								// Falls die Server-ID des Spielers nicht vorhanden sein sollte, lehne die Synchronisation ab
+								if (ticker_player_id != null && ticker_player_server_id == null) {
+									player_sync = false;
+								}
+								ticker_time = sqlHelper.getTickerTimeByActivityID(ticker_id);
+								ticker_realtime = sqlHelper.getTickerRealtimeByActivityID(ticker_id);
+								ticker_home_or_away = sqlHelper.getTickerHomeOrAwayByID(ticker_id);
+								ticker_goal_area = sqlHelper.getTickerAreaByID(ticker_id);
+								ticker_field_position_x = sqlHelper.getTickerFieldPositionXByID(ticker_id);
+								ticker_field_position_y = sqlHelper.getTickerFieldPositionYByID(ticker_id);
+								ticker_throwing_technique_id = sqlHelper.getTickerThrowingTechniqueIDByID(ticker_id);
+								ticker_activity_note = sqlHelper.getTickerActivityNoteByID(ticker_id);
+								mark = sqlHelper.getTickerMarkByID(ticker_id);
+								
+								JSONObject jsonObjForArray = new JSONObject();
+								
+								jsonObjForArray.put("ticker_event_id_local", ticker_event_id);
+								jsonObjForArray.put("activity_id", activity_id);
+								jsonObjForArray.put("player_id", ticker_player_server_id);
+								jsonObjForArray.put("time", ticker_time);
+								jsonObjForArray.put("game_id", server_game_id);
+								jsonObjForArray.put("realtime", ticker_realtime);
+								jsonObjForArray.put("home_or_away", ticker_home_or_away);
+								if (ticker_home_or_away == 1) {
+									jsonObjForArray.put("team_id", server_team_home_id);
+								}
+								if (ticker_home_or_away == 0) {
+									jsonObjForArray.put("team_id", server_team_away_id);
+								}
+								jsonObjForArray.put("goal_area", ticker_goal_area);
+								jsonObjForArray.put("field_position_x", ticker_field_position_x);
+								jsonObjForArray.put("field_position_y", ticker_field_position_y);
+								jsonObjForArray.put("throwing_technique_id", ticker_throwing_technique_id);
+								jsonObjForArray.put("ticker_activity_note", ticker_activity_note);
+								jsonObjForArray.put("mark", mark);
+								
+								tickerArray.put(jsonObjForArray);
+								
+							}
 						}
+
+						cTicker.close();
+						
 /*
 		                        // Add a nested JSONObject (e.g. for header information)
 		                        JSONObject header = new JSONObject();
@@ -1939,25 +1999,192 @@ destdr; // ToDo: In Rails-Projekt unter db > schema nachschauen, welche Daten ü
 		                        tickerArray.put("header", header);
 */	                        
 		                        // Output the JSON object we're sending to Logcat:
+
 		                        Log.i(TAG, tickerArray.toString(2));
 		                        
 					} catch (JSONException e) {
 						e.printStackTrace(); 
 					}
 					
-					// Send the HttpPostRequest and receive a JSONObject in return
-					JSONObject jsonObjRecvArray = HttpClient.SendHttpPost(URL_TICKER, null, tickerArray);
+					JSONArray tickerEventArray = new JSONArray();
+					
 					try {
-						Log.v("Die ID lautet: ", jsonObjRecvArray.get("id").toString()); 
+						
+						// Tickerdaten des Spiels auf den Server übertragen 
+						String[] args={String.valueOf(game_id)};
+						SQLiteDatabase db = sqlHelper.getWritableDatabase();
+						Cursor cTicker = db.rawQuery("SELECT * FROM ticker_event WHERE game_id = ? ORDER BY time ASC", args);
+						cTicker.moveToFirst();
+						
+						String ticker_id, goals_home, goals_away, ticker_result;
+						Integer ticker_time;
+
+						// Alle Tickermeldungen abfragen und Daten in das Array eintragen eintragen
+						for (cTicker.moveToFirst(); !cTicker.isAfterLast(); cTicker.moveToNext()) {
+	
+							ticker_id = sqlHelper.getTickerEventID(cTicker);
+							
+							// Tickermeldungen nur übertragen, falls sie noch nicht übertragen wurde
+							if (sqlHelper.getTickerServerTickerEventByID(ticker_id) == null) {
+								
+								ticker_time = sqlHelper.getTickerEventTimeByID(ticker_id);
+								ticker_event_note = sqlHelper.getTickerEventNoteByID(ticker_id);
+								
+								goals_home = String.valueOf(sqlHelper.count_ticker_goals(game_id, null, 1, ticker_time));
+								goals_away = String.valueOf(sqlHelper.count_ticker_goals(game_id, null, 0, ticker_time));
+								ticker_result = goals_home + " : " + goals_away;
+								
+								JSONObject jsonObjForArray = new JSONObject();
+								
+								jsonObjForArray.put("ticker_event_id_local", ticker_id);
+								jsonObjForArray.put("game_id", server_game_id);
+								jsonObjForArray.put("time", ticker_time);
+								jsonObjForArray.put("ticker_event_note", ticker_event_note);
+								ArrayList<Integer> mainActivityList = sqlHelper.getTickerEventMainActivity(String.valueOf(ticker_id), res);
+Log.v("HelperLayout activity_id vorher", String.valueOf(mainActivityList.get(0)));
+Log.v("HelperLayout home_or_away vorher", String.valueOf(mainActivityList.get(1)));
+								activity_id = mainActivityList.get(0);
+								home_or_away = mainActivityList.get(1);
+Log.v("HelperLayout activity_id nachher", String.valueOf(activity_id));
+Log.v("HelperLayout home_or_away nachher", String.valueOf(home_or_away));
+								jsonObjForArray.put("activity_id", String.valueOf(activity_id));
+								jsonObjForArray.put("home_or_away", String.valueOf(home_or_away));
+								jsonObjForArray.put("ticker_result", ticker_result);
+								
+								tickerEventArray.put(jsonObjForArray);
+								
+							}
+						}
+
+						cTicker.close();
+						
+/*
+		                        // Add a nested JSONObject (e.g. for header information)
+		                        JSONObject header = new JSONObject();
+		                        header.put("deviceType","Android"); // Device type
+		                        header.put("deviceVersion","2.0"); // Device OS version
+		                        header.put("language", "es-es");        // Language of the Android client
+		                        tickerArray.put("header", header);
+*/	                        
+		                        // Output the JSON object we're sending to Logcat:
+		                        Log.i(TAG, tickerEventArray.toString(2));
+		                        
+					} catch (JSONException e) {
+						e.printStackTrace(); 
 					}
-					catch (JSONException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} 
+					
+					// Ticker-Array nur senden, wenn alle Spieler synchronisiert sind und das Array nicht leer ist
+// Abfrage, ob Array nicht leer ist;
+					if (player_sync == true) {
+						
+						// Send the HttpPostRequest and receive a JSONObject in return
+/** TODO -1- => Wenn Array leer, dann nicht übertragen */
+						JSONObject jsonObjRecvArray = HttpClient.SendHttpPost(URL_TICKER, null, tickerArray);
+						try {
+							
+							Log.v("Die ID lautet: ", jsonObjRecvArray.get("id").toString());
+							
+							// Alle Aktivititäten, die übertragen wurden, markieren, damit diese nicht noch einmal übertragen werden
+							String[] args={String.valueOf(game_id)};
+							SQLiteDatabase db = sqlHelper.getWritableDatabase();
+							Cursor cTicker = db.rawQuery("SELECT * FROM ticker_activity WHERE game_id = ? ORDER BY time ASC", args);
+							cTicker.moveToFirst();
+							String ticker_id;
+
+							// Alle Tickeraktivitäten abfragen und Daten in das Array eintragen eintragen
+							for (cTicker.moveToFirst(); !cTicker.isAfterLast(); cTicker.moveToNext()) {
+		
+								ticker_id = sqlHelper.getTickerActivityID(cTicker);
+								
+								// Tickeraktivität nur übertragen, falls sie noch nicht übertragen wurde
+								if (sqlHelper.getTickerServerTickerActivityByID(ticker_id) == null) {
+									
+									sqlHelper.updateTickerActivityServerID(ticker_id);
+									
+								}
+							}
+							
+							cTicker.close();
+							
+						}
+						catch (JSONException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} 
+						// Send the HttpPostRequest and receive a JSONObject in return
+						JSONObject jsonObjRecvEventArray = HttpClient.SendHttpPost(URL_TICKER_EVENT, null, tickerEventArray);
+						try {
+							
+							Log.v("Die ID lautet: ", jsonObjRecvEventArray.get("id").toString());
+							
+							// Alle Tickermeldungen, die übertragen wurden, markieren, damit diese nicht noch einmal übertragen werden müssen
+							String[] args={String.valueOf(game_id)};
+							SQLiteDatabase db = sqlHelper.getWritableDatabase();
+							Cursor cTicker = db.rawQuery("SELECT * FROM ticker_event WHERE game_id = ? ORDER BY time ASC", args);
+							cTicker.moveToFirst();
+							
+							String ticker_id;
+
+							// Alle Tickermeldungen abfragen und Daten in das Array eintragen eintragen
+							for (cTicker.moveToFirst(); !cTicker.isAfterLast(); cTicker.moveToNext()) {
+		
+								ticker_id = sqlHelper.getTickerEventID(cTicker);
+								
+								// Tickermeldungen nur übertragen, falls sie noch nicht übertragen wurde
+								if (sqlHelper.getTickerServerTickerEventByID(ticker_id) == null) {
+									
+									sqlHelper.updateTickerEventServerID(ticker_id);
+									
+								}	
+							}
+							
+							cTicker.close();
+							
+						}
+						catch (JSONException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+						Toast.makeText(((Activity)ctxt), ctxt.getString(R.string.transfer_finished), Toast.LENGTH_SHORT).show();
+						
+					} else {
+						
+						// Nachrichtenbox einrichten
+						final Dialog dialog = new Dialog(ctxt);
+						dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+						dialog.setContentView(R.layout.custom_dialog);
+
+						// Texte setzen
+						TextView title = (TextView) dialog.findViewById(R.id.title);
+						TextView text = (TextView) dialog.findViewById(R.id.text);
+						title.setText(R.string.synchro);
+						text.setText(R.string.text_synchro_game_failed);
+						
+						// Button definieren
+						LinearLayout lyt_button2 = (LinearLayout) dialog.findViewById(R.id.lyt_button2);
+						lyt_button2.removeAllViews();
+						LinearLayout lyt_button3 = (LinearLayout) dialog.findViewById(R.id.lyt_button3);
+						lyt_button3.removeAllViews();
+						
+						Button dialogButton1 = (Button) dialog.findViewById(R.id.button1);
+						dialogButton1.setText(R.string.okay);
+						
+						dialogButton1.setOnClickListener(new View.OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								dialog.dismiss();
+							}
+						});
+
+						dialog.show();
+						// Ende Nachrichtenbox
+						
+					}
 					
 /** TODO -0- => Async einrichten während laden. Am Ende Meldung, dass Synchronisation erfolgreich war */
 				} else {
-					
+										
 					// Nachrichtenbox einrichten
 					final Dialog dialog = new Dialog(ctxt);
 					dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -6610,8 +6837,6 @@ destdr; // ToDo: In Rails-Projekt unter db > schema nachschauen, welche Daten ü
 
 			if (strInput.equals("Defense")) {
 				
-				Log.v("HelperLayout", "Defense aufgerufen");
-				Log.v("HelperLayout getGameInputMark", String.valueOf(sqlHelper.getGameInputMark(game_id).equals(1)));
 				Integer ticker_home_or_away = sqlHelper.getTickerHomeOrAwayByID(String.valueOf(ticker_activity_id));
 				if (home_or_away.equals(ticker_home_or_away)) {
 					sqlHelper.updateTickerActivity(String.valueOf(ticker_defense_id), null, null, null, null, null, null, player_id, null, null, null, null, null, null, null, null);
@@ -7487,6 +7712,8 @@ destdr; // ToDo: In Rails-Projekt unter db > schema nachschauen, welche Daten ü
   					sqlHelper.updateTickerActivity(String.valueOf(ticker_id), null, null, (int) (long) elapsedTime, null, null, null, null, null, null, null, null, null, null, null, null);
   					
   				}
+  				
+  				cTicker.close();
 			
   				if (screenInch > 6) {
   					
@@ -7617,6 +7844,8 @@ destdr; // ToDo: In Rails-Projekt unter db > schema nachschauen, welche Daten ü
 					}
 				}
 			}
+			
+			cTicker.close();
  			
  		} else {
  			
@@ -7647,6 +7876,9 @@ destdr; // ToDo: In Rails-Projekt unter db > schema nachschauen, welche Daten ü
  							
  						}
  	 				}
+ 	 	 	 		
+ 	 	 	 		cTicker.close();
+ 	 	 	 		
  	 			}
  	 		} 	 		
  		}
@@ -12386,7 +12618,7 @@ destdr; // ToDo: In Rails-Projekt unter db > schema nachschauen, welche Daten ü
  */
 
 /* DatePicker für die Tablet-Version definieren */
-
+/** TODO -1- => Bei der Einstellung des Datums auch die Uhrzeit einstellen */
 	private void showDatePicker() {
 		
 		HelperDatePicker date = new HelperDatePicker();

@@ -32,7 +32,7 @@ public class MainActivity extends Activity {
 		super.onCreate(icicle);
 		
 /* Fehlermeldung bei JSON Ladevorgang verhindern */
-/** TODO -3- => Kostenpflichtige App einbauen */
+/** TODO -1- => Kostenpflichtige App einbauen */
 /** TODO -0- => AsyncTask einbauen - siehe meine Beschreibung in der ToDo Handball App */
 		
 		if (android.os.Build.VERSION.SDK_INT > 9) {

@@ -202,7 +202,7 @@ public class SmartListWithClickbox extends ListActivity {
 	@Override
 	public void onListItemClick(ListView list, View row, int position, long id) {
 
-/** TODO -3- => Auswahl bei kostenloser App bei manchen Einstellungen nicht möglich. */
+/** TODO -1- => Auswahl bei kostenloser App bei manchen Einstellungen nicht möglich. */
 		Context ctxt = list.getContext();
 		activityList = sqlHelper.getActivityListFromActivityString();
 		

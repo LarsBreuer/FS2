@@ -293,6 +293,7 @@
 	<string name="text_synchro_succeeded">Die Synchronisierung wurde erfolgreich durchgeführt.</string>
 	<string name="text_synchro_failed">Die Synchronisierung konnte nicht abgeschlossen werden, da die Daten auf dem Server nicht gefunden werden konnten.</string>
 	<string name="text_synchro_team_failed">Die Synchronisierung konnte nicht abgeschlossen werden, da die Mannschaftsdaten auf dem Server nicht gefunden werden konnte. Möchtest Du manuell nach der Mannschaft suchen und so die Mannschaftsdaten synchronisieren?</string>
+	<string name="text_synchro_game_failed">Die Synchronisierung des Spiels konnte nicht abgeschlossen werden, da nicht alle am Spiel beteiligten Spieler synchronisert sind. Schaue in der Mannschaftsaufstellung nach, welche Spieler noch nicht synchronisiert sind und synchronisiere diese.</string>
 	<string name="text_team_search">Vereinsnamen eingeben</string>
 	<string name="text_team_search_explain">Gib den Begriff ein, nach dem Du suchen möchtest und wähle nach Klick auf Suchen unter den passenden Mannschaften aus.</string>
 	<string name="text_player_search_explain">Du findest hier eine Liste der Spieler, die auf dem Server unter der ausgewählten Mannschaft gespeichert sind. Wähle einen Spieler aus, um diesen mit Deinem lokal angelegten Spieler zu synchronisieren.</string>
@@ -477,5 +478,6 @@
 	<string name="cancel">Abbrechen</string>
 	<string name="text_logout">Möchtest Du Dich wirklich ausloggen?</string>
 	<string name="text_logout_success">Dein Logout war erfolgreich.</string>
+	<string name="transfer_finished">Übertragung abgeschlossen</string>
 	
 </resources>

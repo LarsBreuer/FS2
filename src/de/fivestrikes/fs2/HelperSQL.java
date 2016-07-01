@@ -28,7 +28,7 @@ import java.text.SimpleDateFormat;
 class HelperSQL extends SQLiteOpenHelper {
 
 	private static final String DATABASE_NAME="fs2.db";
-	private static final int SCHEMA_VERSION=2;
+	private static final int SCHEMA_VERSION=3;
 	private String minutes,seconds;
 	private long secs,mins;
 	private String strResult=null;
@@ -150,7 +150,8 @@ class HelperSQL extends SQLiteOpenHelper {
 												"game_id INTEGER," +
 												"time INTEGER," +
 												"ticker_event_note TEXT, " +
-												"ticker_result STRING);");
+												"ticker_result STRING, " +
+												"server_ticker_event_id INTEGER);");
 		db.execSQL("CREATE TABLE ticker_activity (_id INTEGER PRIMARY KEY AUTOINCREMENT," +
 												"game_id INTEGER," +			// 1
 												"ticker_event_id INTEGER," +	// 2
@@ -166,17 +167,28 @@ class HelperSQL extends SQLiteOpenHelper {
 												"ticker_activity_note TEXT, " +	// 12
 												"activity_string STRING, " +		// 13
 												"ticker_result STRING," +		// 14
-												"mark INTEGER);");				// 15
+												"mark INTEGER, " +				// 15
+												"server_ticker_activity_id INTEGER);");	// 16
 		
 	}
 		
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		if (newVersion > oldVersion) {
-
+		
+		if (oldVersion<2) {
+			
 			db.execSQL("ALTER TABLE game ADD COLUMN server_game_id INTEGER");
 			db.execSQL("ALTER TABLE app ADD COLUMN user_name STRING");
 			db.execSQL("ALTER TABLE app ADD COLUMN server_user_id INTEGER");
+			db.execSQL("ALTER TABLE ticker_event ADD COLUMN server_ticker_event_id INTEGER");
+			db.execSQL("ALTER TABLE ticker_activity ADD COLUMN server_ticker_activity_id INTEGER");
+			
+		}
+		
+		if (oldVersion<3) {
+			
+			db.execSQL("ALTER TABLE ticker_event ADD COLUMN server_ticker_event_id INTEGER");
+			db.execSQL("ALTER TABLE ticker_activity ADD COLUMN server_ticker_activity_id INTEGER");
 			
 		}
 	}
@@ -1118,7 +1130,7 @@ class HelperSQL extends SQLiteOpenHelper {
 	    	cv.put("duration_halftime", 30);
 	    	cv.put("possession", 2);
 	    	cv.put("current_halftime", 0);
-/** TODO -3- => Bei kostenloser App andere Grundeinstellungen bei der Eingabetiefe machen */
+/** TODO -1- => Bei kostenloser App andere Grundeinstellungen bei der Eingabetiefe machen */
 	    	// Eingabetiefe einstellen
 	    	cv.put("input_player", 1);
 	    	cv.put("input_area", 1);
@@ -1176,7 +1188,102 @@ class HelperSQL extends SQLiteOpenHelper {
 		getWritableDatabase().update("game", cv, "_ID=?", args);
 			
 	}
+	
+	
+	
+	
+	
+	
+	
+	public void deleteGameServerID(String id) {
 		
+		ContentValues cv=new ContentValues();
+		String[] args={id};
+		
+		String server_game_id = null;
+		
+		cv.put("server_game_id", server_game_id);
+		
+		getWritableDatabase().update("game", cv, "_ID=?", args);
+		
+	}
+	
+	public void deleteTickerEventServerIDByGameID(String game_id) {
+		
+		String[] args={String.valueOf(game_id)};
+		SQLiteDatabase db = getWritableDatabase();
+		Cursor c = db.rawQuery("SELECT * FROM ticker_event WHERE game_id = ? ORDER BY time ASC", args);
+		c.moveToFirst();
+		
+		String ticker_id;
+
+		// Alle Tickermeldungen abfragen und Daten in das Array eintragen eintragen
+		for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+
+			ticker_id = getTickerEventID(c);
+			deleteTickerEventServerID(ticker_id);
+
+		}
+		
+		c.close();
+		
+	}
+	
+	public void deleteTickerActivityServerIDByGameID(String game_id) {
+		
+		String[] args={String.valueOf(game_id)};
+		SQLiteDatabase db = getWritableDatabase();
+		Cursor c = db.rawQuery("SELECT * FROM ticker_activity WHERE game_id = ? ORDER BY time ASC", args);
+		c.moveToFirst();
+		String ticker_id;
+
+		// Alle Tickeraktivitäten abfragen und Daten in das Array eintragen eintragen
+		for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+
+			ticker_id = getTickerActivityID(c);
+			deleteTickerActvitiyServerID(ticker_id);
+			
+		}
+		
+		c.close();
+		
+	}
+	
+	public void deleteTickerEventServerID(String ticker_id) {
+		
+		ContentValues cv=new ContentValues();
+		String[] args={ticker_id};
+		
+		Integer server_ticker_event_id = null;
+		
+		cv.put("server_ticker_event_id", server_ticker_event_id);
+		
+		getWritableDatabase().update("ticker_event", cv, "_ID=?", args);
+		
+	}
+	
+	public void deleteTickerActvitiyServerID(String ticker_id) {
+		
+		ContentValues cv=new ContentValues();
+		String[] args={ticker_id};
+		
+		Integer server_ticker_activity_id = null;
+		
+		cv.put("server_ticker_activity_id", server_ticker_activity_id);
+		
+		getWritableDatabase().update("ticker_activity", cv, "_ID=?", args);
+		
+	}
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
 	// Spieldaten abfragen
 	
 	/*
@@ -1538,6 +1645,28 @@ class HelperSQL extends SQLiteOpenHelper {
 		
 	}
 	
+	public void updateTickerActivityServerID(String id) {
+
+		ContentValues cv=new ContentValues();
+		String[] args={id};
+	  
+		cv.put("server_ticker_activity_id", 1);
+		
+		getWritableDatabase().update("ticker_activity", cv, "_ID=?", args);
+		
+	}
+	
+	public void updateTickerEventServerID(String id) {
+
+		ContentValues cv=new ContentValues();
+		String[] args={id};
+	  
+		cv.put("server_ticker_event_id", 1);
+		
+		getWritableDatabase().update("ticker_event", cv, "_ID=?", args);
+		
+	}
+	
 	public void deleteTickerActivity(String id) {
 		
 		String[] args={id};
@@ -1570,6 +1699,12 @@ class HelperSQL extends SQLiteOpenHelper {
 		return(result);
 	}
 	
+	public Integer getTickerServerTickerEventByID(String ticker_event_id) {
+		Integer intValue = null;
+		if (getTickerEventString(ticker_event_id, 5) != null) intValue = Integer.parseInt(getTickerEventString(ticker_event_id, 5));
+		return(intValue);
+	}
+	
 	public String getTickerEventString(String ticker_event_id, Integer number) {
 		
 		Cursor c = getTickerEventCursorByID(ticker_event_id);
@@ -1581,6 +1716,112 @@ class HelperSQL extends SQLiteOpenHelper {
 		}
 		c.close();
 		return(strResult);
+		
+	}
+	
+	public ArrayList getTickerEventMainActivity(String ticker_event_id, Resources res) {
+		
+		ArrayList<Integer> mainActivityList = new ArrayList<Integer>();
+		String ticker_id;
+		Integer activity_id = null;
+		Integer value = 0;
+		activityIDs(res);
+		Integer home_or_away = null;
+		
+		// Durch die Ticker-Aktivitäten des Events gehen
+		String[] tickerArgs={ticker_event_id};
+		SQLiteDatabase db = getWritableDatabase();
+		Cursor cTicker = db.rawQuery("SELECT * FROM ticker_activity WHERE ticker_event_id = ? ORDER BY time ASC", tickerArgs);
+		cTicker.moveToFirst();
+		
+		// Alle Tickermeldungen abfragen und Tickeraktivität ermitteln
+		for (cTicker.moveToFirst(); !cTicker.isAfterLast(); cTicker.moveToNext()) {
+
+			ticker_id = getTickerActivityID(cTicker);
+			
+			if (getTickerActivityIDByID(ticker_id).equals(defense_error_id) || getTickerActivityIDByID(ticker_id).equals(block_error_id) || 
+					getTickerActivityIDByID(ticker_id).equals(defense_success_id) || getTickerActivityIDByID(ticker_id).equals(block_success_id)) {
+				if (value < 1) {
+					activity_id = defense_error_id;
+					home_or_away = getTickerHomeOrAwayByID(ticker_id);
+					value = 1;
+				}
+			}
+			if (getTickerActivityIDByID(ticker_id).equals(tech_fault_id) || getTickerActivityIDByID(ticker_id).equals(fehlpass_id) || getTickerActivityIDByID(ticker_id).equals(steps_id) ||
+					getTickerActivityIDByID(ticker_id).equals(three_seconds_id) || getTickerActivityIDByID(ticker_id).equals(doppeldribbel_id) ||
+					getTickerActivityIDByID(ticker_id).equals(fuss_id) || getTickerActivityIDByID(ticker_id).equals(zeitspiel_id) ||
+					getTickerActivityIDByID(ticker_id).equals(kreis_id) || getTickerActivityIDByID(ticker_id).equals(stuermerfoul_id)) {
+				if (value < 2) {
+					activity_id = tech_fault_id;
+					home_or_away = getTickerHomeOrAwayByID(ticker_id);
+					value = 2;
+				}
+			}
+			if (getTickerActivityIDByID(ticker_id).equals(yellow_card_id)) {
+				if (value < 3) {
+					activity_id = yellow_card_id;
+					home_or_away = getTickerHomeOrAwayByID(ticker_id);
+					value = 3;
+				}
+			}
+			if (getTickerActivityIDByID(ticker_id).equals(two_minutes_id) || getTickerActivityIDByID(ticker_id).equals(twoplustwo_id)) {
+				if (value < 4) {
+					activity_id = two_minutes_id;
+					home_or_away = getTickerHomeOrAwayByID(ticker_id);
+					value = 4;
+				}
+			}
+			if (getTickerActivityIDByID(ticker_id).equals(red_card_id)) {
+				if (value < 5) {
+					activity_id = red_card_id;
+					home_or_away = getTickerHomeOrAwayByID(ticker_id);
+					value = 5;
+				}
+			}
+			if (getTickerActivityIDByID(ticker_id).equals(timeout_id)) {
+				if (value < 1) {
+					activity_id = timeout_id;
+					home_or_away = getTickerHomeOrAwayByID(ticker_id);
+					value = 1;
+				}
+			}
+			if (getTickerActivityIDByID(ticker_id).equals(sub_in_id) || getTickerActivityIDByID(ticker_id).equals(sub_out_id) || getTickerActivityIDByID(ticker_id).equals(two_in_id)) {
+				if (value < 1) {
+					activity_id = sub_in_id;
+					home_or_away = getTickerHomeOrAwayByID(ticker_id);
+					value = 1;
+				}
+			}
+			if (getTickerActivityIDByID(ticker_id).equals(tactic_60_id) || getTickerActivityIDByID(ticker_id).equals(tactic_51_id) || getTickerActivityIDByID(ticker_id).equals(tactic_42_id) ||
+					getTickerActivityIDByID(ticker_id).equals(tactic_321_id) || getTickerActivityIDByID(ticker_id).equals(tactic_guarding_id)) {
+				if (value < 1) {
+					activity_id = tactic_60_id;
+					home_or_away = getTickerHomeOrAwayByID(ticker_id);
+					value = 1;
+				}
+			}
+			if (getTickerActivityIDByID(ticker_id).equals(miss_id) || getTickerActivityIDByID(ticker_id).equals(miss_7m_id) || getTickerActivityIDByID(ticker_id).equals(miss_fb_id)) {
+				if (value < 6) {
+					activity_id = miss_id;
+					home_or_away = getTickerHomeOrAwayByID(ticker_id);
+					value = 6;
+				}
+			}
+			if (getTickerActivityIDByID(ticker_id).equals(goal_id) || getTickerActivityIDByID(ticker_id).equals(goal_7m_id) ||	getTickerActivityIDByID(ticker_id).equals(goal_fb_id)) {
+				if (value < 7) {
+					activity_id = goal_id;
+					home_or_away = getTickerHomeOrAwayByID(ticker_id);
+					value = 7;
+				}
+			}
+		}
+		
+		cTicker.close();
+		
+		mainActivityList.add(activity_id);
+		mainActivityList.add(home_or_away);
+		
+		return(mainActivityList);
 		
 	}
 	
@@ -1599,7 +1840,8 @@ class HelperSQL extends SQLiteOpenHelper {
 	"ticker_activity_note TEXT, " +	// 12
 	"activity_string STRING, " +		// 13
 	"ticker_result STRING," +		// 14
-	"mark INTEGER);");				// 15
+	"mark INTEGER, " +				// 15
+	"server_ticker_activity_id INTEGER);");	// 16);");
 	*/
 	
 	public String getTickerActivityID(Cursor c) {
@@ -1690,6 +1932,12 @@ class HelperSQL extends SQLiteOpenHelper {
 	public Integer getTickerMarkByID(String ticker_activity_id) {
 		Integer intValue = null;
 		if (getTickerActivityString(ticker_activity_id, 15) != null) intValue = Integer.parseInt(getTickerActivityString(ticker_activity_id, 15));
+		return(intValue);
+	}
+	
+	public Integer getTickerServerTickerActivityByID(String ticker_activity_id) {
+		Integer intValue = null;
+		if (getTickerActivityString(ticker_activity_id, 16) != null) intValue = Integer.parseInt(getTickerActivityString(ticker_activity_id, 16));
 		return(intValue);
 	}
 	
