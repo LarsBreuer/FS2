@@ -26,18 +26,21 @@ import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
-public class LoginActivity extends Activity {
+public class RegisterActivity extends Activity {
 
-	//private final static String LOGIN_API_ENDPOINT_URL = "http://calm-waters-7359.herokuapp.com/api/v1/sessions";
+	//private final static String REGISTER_API_ENDPOINT_URL = "http://calm-waters-7359.herokuapp.com/api/v1/registrations";
 	private SharedPreferences mPreferences;
 	private String mUserEmail;
+	private String mUserName;
 	private String mUserPassword;
+	private String mUserPasswordConfirmation;
 	HelperSQL sqlHelper = null;
 	HelperFunction fctHelper = null;
 	double screenInch = 0;
@@ -46,7 +49,7 @@ public class LoginActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.login);
+		setContentView(R.layout.register);
 		mPreferences = getSharedPreferences("CurrentUser", MODE_PRIVATE);
 		
 /* Helper generieren */
@@ -57,7 +60,7 @@ public class LoginActivity extends Activity {
 /* Bildschirmgröße ermitteln */
 
 		// Inch
-		screenInch=fctHelper.getScreenInch(LoginActivity.this);
+		screenInch=fctHelper.getScreenInch(RegisterActivity.this);
 		
 /* Bildschirm einrichten, abhängig von der Bildschirmgröße */
 		
@@ -68,18 +71,6 @@ public class LoginActivity extends Activity {
 		}
 		
 /* Button konfigurieren */
-		
-		Button btn_register = (Button) findViewById(R.id.register);
-		
-		btn_register.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				
-				startActivity(new Intent(getApplicationContext(), RegisterActivity.class));
-				finish();
-				
-			}
-		});
 		
 		Button btn_cancel = (Button) findViewById(R.id.cancel);
 		
@@ -92,6 +83,28 @@ public class LoginActivity extends Activity {
 			}
 		});
 		
+		Button btn_terms = (Button) findViewById(R.id.btn_terms);
+		
+		btn_terms.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				
+				startActivity(new Intent(getApplicationContext(), TermsActivity.class));
+				
+			}
+		});
+		
+		Button btn_privacy = (Button) findViewById(R.id.btn_privacy);
+		
+		btn_privacy.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				
+				startActivity(new Intent(getApplicationContext(), PrivacyActivity.class));
+				
+			}
+		});
+		
 /* Action Bar konfigurieren */
 		
 		ActionBar actionBar = getActionBar();
@@ -100,27 +113,34 @@ public class LoginActivity extends Activity {
 		
 	}
 	
-	public void btnSmartLoginClick (View view){
+	public void btnSmartRegisterClick(View view){
 
-		EditText user_email_field = (EditText) findViewById(R.id.user_email);
-		mUserEmail = user_email_field.getText().toString();
-		mUserEmail = "lars-breuer@gmx.de";
-		EditText user_password_field = (EditText) findViewById(R.id.user_password);
-		mUserPassword = user_password_field.getText().toString();
+		EditText userNameField = (EditText) findViewById(R.id.userName);
+		mUserName = userNameField.getText().toString();
+		EditText userEmailField = (EditText) findViewById(R.id.userEmail);
+		mUserEmail = userEmailField.getText().toString();
+		mUserEmail = "info@fivestrikes.de";
+		EditText userPasswordField = (EditText) findViewById(R.id.userPassword);
+		mUserPassword = userPasswordField.getText().toString();
+		EditText userPasswordConfirmationField = (EditText) findViewById(R.id.userPasswordConfirmation);
+		mUserPasswordConfirmation = userPasswordConfirmationField.getText().toString();
+		
+		CheckBox checkbox_terms = (CheckBox) findViewById(R.id.checkbox_terms);
+		CheckBox checkbox_privacy = (CheckBox) findViewById(R.id.checkbox_privacy);
 
-		if (mUserEmail.length() == 0 || mUserPassword.length() == 0) {
+		if (mUserEmail.length() == 0 || mUserName.length() == 0 || mUserPassword.length() == 0 || mUserPasswordConfirmation.length() == 0) {
 			
 			// Eingabefelder sind leer
 			// DialogBox einrichten
-			final Dialog dialog = new Dialog(LoginActivity.this);
+			final Dialog dialog = new Dialog(RegisterActivity.this);
 			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-			dialog.setContentView(R.layout.custom_dialog);
+			dialog.setContentView(R.layout.custom_dialog); 
 
 			// Texte setzen
 			TextView title = (TextView) dialog.findViewById(R.id.title);
 			TextView text = (TextView) dialog.findViewById(R.id.text);
-			title.setText(R.string.text_login_empty_title);
-			text.setText(R.string.text_login_empty);
+			title.setText(R.string.text_register_empty_title);
+			text.setText(R.string.text_register_empty);
 			
 			// Button definieren
 			LinearLayout lyt_button2 = (LinearLayout) dialog.findViewById(R.id.lyt_button2);
@@ -145,18 +165,89 @@ public class LoginActivity extends Activity {
 			
 		} else {
 			
-			LoginTask loginTask = new LoginTask(LoginActivity.this);
-			loginTask.setMessageLoading("Logging in...");
-			//loginTask.execute(LOGIN_API_ENDPOINT_URL);
-			String login_url =  getResources().getString(R.string.url) + "api/v1/sessions";
-			loginTask.execute(login_url);
-			
+			if (!mUserPassword.equals(mUserPasswordConfirmation)) {
+				
+				// Passwort stimmt nicht mit dem bestätigten Passwort überein
+				// Dialogbix einrichten
+				final Dialog dialog = new Dialog(RegisterActivity.this);
+				dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+				dialog.setContentView(R.layout.custom_dialog);
+
+				// Texte setzen
+				TextView title = (TextView) dialog.findViewById(R.id.title);
+				TextView text = (TextView) dialog.findViewById(R.id.text);
+				title.setText(R.string.password);
+				text.setText(R.string.text_password_confirmation);
+				
+				// Button definieren
+				LinearLayout lyt_button2 = (LinearLayout) dialog.findViewById(R.id.lyt_button2);
+				lyt_button2.removeAllViews();
+				LinearLayout lyt_button3 = (LinearLayout) dialog.findViewById(R.id.lyt_button3);
+				lyt_button3.removeAllViews();
+				
+				Button dialogButton1 = (Button) dialog.findViewById(R.id.button1);
+				dialogButton1.setText(R.string.okay);
+				
+				dialogButton1.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						dialog.dismiss();
+					}
+				});
+
+				dialog.show();
+				// Ende Nachrichtenbox
+				
+			} else {
+				
+				if (!checkbox_terms.isChecked() || !checkbox_privacy.isChecked()) {
+					
+					// Nutzungsbedingungen bzw. Datenschutzbestimmungen wurden nicht bestätigt
+					// Dialogbox einrichten
+					final Dialog dialog = new Dialog(RegisterActivity.this);
+					dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+					dialog.setContentView(R.layout.custom_dialog);
+
+					// Texte setzen
+					TextView title = (TextView) dialog.findViewById(R.id.title);
+					TextView text = (TextView) dialog.findViewById(R.id.text);
+					title.setText(R.string.terms);
+					text.setText(R.string.text_terms_notice);
+					
+					// Button definieren
+					LinearLayout lyt_button2 = (LinearLayout) dialog.findViewById(R.id.lyt_button2);
+					lyt_button2.removeAllViews();
+					LinearLayout lyt_button3 = (LinearLayout) dialog.findViewById(R.id.lyt_button3);
+					lyt_button3.removeAllViews();
+					
+					Button dialogButton1 = (Button) dialog.findViewById(R.id.button1);
+					dialogButton1.setText(R.string.okay);
+					
+					dialogButton1.setOnClickListener(new View.OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							dialog.dismiss();
+						}
+					});
+					
+					dialog.show();
+					// Ende Nachrichtenbox
+					
+				} else {
+					
+					RegisterTask registerTask = new RegisterTask(RegisterActivity.this);
+			            registerTask.setMessageLoading(getString(R.string.text_registering_new_account));
+			            String register_url =  getResources().getString(R.string.url) + "api/v1/registrations";
+			            registerTask.execute(register_url);
+					
+				}
+			}
 		}
 	}
 		
-	private class LoginTask extends HelperOnlineUrlJsonAsyncTask {
+	private class RegisterTask extends HelperOnlineUrlJsonAsyncTask {
 		
-		public LoginTask(Context context) {
+		public RegisterTask(Context context) {
 			super(context);
 		}
 
@@ -173,20 +264,21 @@ public class LoginActivity extends Activity {
 			try {
 				try {
 					
-					// setup the returned values in case something goes wrong
 					json.put("success", false);
-					json.put("info", R.string.text_login_failed);
-					// add the user email and password to the params
+					json.put("info", getString(R.string.text_register_failed));
+					// add the users's info to the post params
 					userObj.put("email", mUserEmail);
+					userObj.put("name", mUserName);
 					userObj.put("password", mUserPassword);
+					userObj.put("password_confirmation", mUserPasswordConfirmation);
 					holder.put("user", userObj);
 					StringEntity se = new StringEntity(holder.toString());
 					post.setEntity(se);
-
+					
 					// setup the request headers
 					post.setHeader("Accept", "application/json");
 					post.setHeader("Content-Type", "application/json");
-
+					
 					ResponseHandler<String> responseHandler = new BasicResponseHandler();
 					response = client.execute(post, responseHandler);
 					json = new JSONObject(response);
@@ -195,7 +287,6 @@ public class LoginActivity extends Activity {
 					
 					e.printStackTrace();
 					Log.e("ClientProtocol", "" + e);
-					json.put("info", R.string.text_email_invalid);
 					
 				} catch (IOException e) {
 					

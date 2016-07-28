@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent"
+  android:background="@color/blue"
+>
+
+<LinearLayout
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:orientation="vertical"
+	android:gravity="center"
+>
+
+    <TextView 
+	    android:text="@string/user_name" 
+        android:layout_width="300dp"
+        android:layout_height="36dp"
+        android:gravity="left|bottom"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:textSize="18dip" 
+	/>
+  		
+	<EditText
+	    android:id="@+id/userName"	    
+	    android:layout_width="300dp"
+        android:layout_height="36dp"
+        android:textSize="18dp" 
+        android:background="@android:color/white"
+        android:textColor="@color/grey_dark"
+        android:inputType="text" >
+	    <requestFocus />
+	</EditText>
+	
+	<TextView 
+	    android:text="@string/email_address" 
+        android:layout_width="300dp"
+        android:layout_height="36dp"
+        android:gravity="left|bottom"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:textSize="18dip" 
+	/>
+  		
+	<EditText
+	    android:id="@+id/userEmail"	    
+	    android:layout_width="300dp"
+        android:layout_height="36dp"
+        android:textSize="18dp" 
+        android:background="@android:color/white"
+        android:textColor="@color/grey_dark"
+        android:inputType="textEmailAddress" >
+	</EditText>
+
+	<TextView 
+	    android:text="@string/password" 
+        android:layout_width="300dp"
+        android:layout_height="36dp"
+        android:gravity="left|bottom"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:textSize="18dip" 
+	/>
+
+	<EditText
+	    android:id="@+id/userPassword"
+	    android:layout_width="300dp"
+        android:layout_height="36dp"
+        android:textSize="18dp" 
+        android:background="@android:color/white"
+        android:textColor="@color/grey_dark"
+        android:inputType="textPassword"
+	/>
+	
+	<TextView 
+	    android:text="@string/confirm_password" 
+        android:layout_width="300dp"
+        android:layout_height="36dp"
+        android:gravity="left|bottom"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:textSize="18dip" 
+	/>
+
+	<EditText
+	    android:id="@+id/userPasswordConfirmation"
+	    android:layout_width="300dp"
+        android:layout_height="36dp"
+        android:textSize="18dp" 
+        android:background="@android:color/white"
+        android:textColor="@color/grey_dark"
+        android:inputType="textPassword"
+        android:layout_marginBottom="72dp"
+	/>
+	
+	<LinearLayout
+  		android:layout_width="fill_parent"
+  		android:layout_height="wrap_content"
+  		android:orientation="horizontal"
+  		android:gravity="center"
+  	>
+	    
+	    <CheckBox
+        	android:id="@+id/checkbox_terms"
+        	android:layout_width="36dp"
+        	android:layout_height="fill_parent"
+        	android:gravity="left|center"  >
+    	</CheckBox>
+    	
+	    <TextView 
+	    	android:text="@string/text_notice_terms" 
+        	android:layout_width="219dp"
+        	android:layout_height="wrap_content"
+        	android:textColor="@android:color/white"
+        	android:textSize="18dip"
+        	android:gravity="left|center"
+		/>
+	    
+	    <Button 
+        	android:id="@+id/btn_terms"
+        	android:background="@drawable/btn_next"
+        	android:layout_width="45dp"
+        	android:layout_height="36dp"
+        	android:textSize="18dip"
+    	/>
+	    
+	</LinearLayout>
+	
+	<LinearLayout
+  		android:layout_width="fill_parent"
+  		android:layout_height="wrap_content"
+  		android:orientation="horizontal"
+  		android:gravity="center"
+  		android:layout_marginTop="18dp"
+  	>
+	    
+	    <CheckBox
+        	android:id="@+id/checkbox_privacy"
+        	android:layout_width="36dp"
+        	android:layout_height="fill_parent"
+        	android:gravity="left|center"  >
+    	</CheckBox>
+    	
+	    <TextView 
+	    	android:text="@string/text_notice_privacy" 
+        	android:layout_width="219dp"
+        	android:layout_height="wrap_content"
+        	android:textColor="@android:color/white"
+        	android:textSize="18dip"
+        	android:gravity="left|center"
+		/>
+	    
+	    <Button 
+        	android:id="@+id/btn_privacy"
+        	android:background="@drawable/btn_next"
+        	android:layout_width="45dp"
+        	android:layout_height="36dp"
+        	android:textSize="18dip"
+    	/>
+	    
+	</LinearLayout>
+	
+	<Button 
+		android:background="@color/orange"
+		android:layout_width="300dp"
+		android:layout_height="36dp"
+		android:text="@string/register"
+		android:textColor="@android:color/white"
+		android:textSize="18dip"
+		android:onClick="btnSmartRegisterClick"
+		android:layout_marginTop="18dp"
+	/>
+	
+	<Button 
+	    android:id="@+id/cancel"
+		android:background="@color/grey_dark"
+		android:layout_width="300dp"
+		android:layout_height="36dp"
+		android:text="@string/cancel"
+		android:textColor="@android:color/white"
+		android:textSize="18dip" 
+		android:layout_marginTop="18dp"
+		android:layout_marginBottom="18dp"
+	/>
+
+</LinearLayout>
+</ScrollView>

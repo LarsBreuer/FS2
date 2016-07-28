@@ -247,85 +247,8 @@ public class MainTabActivity extends Activity {
 
 		if (auth_token.equals("")) {
 			
-			// Dialogbox einrichten
-			final Dialog dialog = new Dialog(this);
-			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-			dialog.setContentView(R.layout.custom_login_dialog);
-			
-			// Button definieren
-			Button btn_login = (Button) dialog.findViewById(R.id.btn_login);
-			
-			btn_login.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-/** TODO -0- => Programm stürzt ab, nachdem man eingeloggt ist */
-					dialog.dismiss();
+			startActivity(new Intent(getApplicationContext(), LoginActivity.class));
 
-					EditText user_email_field = (EditText) dialog.findViewById(R.id.user_email);
-					mUserEmail = user_email_field.getText().toString();
-					mUserEmail = "lars-breuer@gmx.de";
-					EditText user_password_field = (EditText) dialog.findViewById(R.id.user_password);
-					mUserPassword = user_password_field.getText().toString();
-
-					if (mUserEmail.length() == 0 || mUserPassword.length() == 0) {
-						
-						// Dialogbox einrichten
-						final Dialog dialog = new Dialog(MainTabActivity.this);
-						dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-						dialog.setContentView(R.layout.custom_dialog);
-
-						// Texte setzen
-						TextView title = (TextView) dialog.findViewById(R.id.title);
-						TextView text = (TextView) dialog.findViewById(R.id.text);
-						title.setText(R.string.text_login_empty_title);
-						text.setText(R.string.text_login_empty);
-						
-						// Button definieren
-						LinearLayout lyt_button2 = (LinearLayout) dialog.findViewById(R.id.lyt_button2);
-						lyt_button2.removeAllViews();
-						LinearLayout lyt_button3 = (LinearLayout) dialog.findViewById(R.id.lyt_button3);
-						lyt_button3.removeAllViews();
-
-						Button dialogButton1 = (Button) dialog.findViewById(R.id.button1);
-						dialogButton1.setText(R.string.okay);
-						
-						dialogButton1.setOnClickListener(new View.OnClickListener() {
-							@Override
-							public void onClick(View v) {
-								
-								dialog.dismiss();
-								
-							}
-						});
-						
-					} else {
-						
-						dialog.dismiss();
-						
-						LoginTask loginTask = new LoginTask(MainTabActivity.this);
-						loginTask.setMessageLoading("Logging in...");
-						//loginTask.execute(LOGIN_API_ENDPOINT_URL);
-						String login_url =  getResources().getString(R.string.url) + "api/v1/sessions";
-						loginTask.execute(login_url);
-
-					}
-					
-				}
-			});
-			
-			Button btn_cancel = (Button) dialog.findViewById(R.id.btn_cancel);
-			
-			btn_cancel.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					
-					dialog.dismiss();
-					
-				}
-			});
-
-			dialog.show();
-			
 		} else {
 			
 			// DialogBox einrichten
@@ -371,7 +294,7 @@ public class MainTabActivity extends Activity {
 			dialogButton2.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					
+/** TODO -0- => Programm stürzt ab, nachdem man eingeloggt ist */
 					dialog.dismiss();
 					
 				}
@@ -471,6 +394,27 @@ public class MainTabActivity extends Activity {
 				super.onPostExecute(json);
 			}
 		}
+	}
+	
+	@Override
+	public void onResume() {
+
+		super.onResume();
+		
+/* Userdaten abfragen */
+		
+		mPreferences = getSharedPreferences("CurrentUser", MODE_PRIVATE);
+		auth_token = mPreferences.getString("AuthToken", "");
+		if (auth_token.equals("")) {
+			login_or_logout = getResources().getString(R.string.login);
+		} else {
+			login_or_logout = getResources().getString(R.string.logout) + " " + sqlHelper.getUserName();
+		}
+		
+/* Buttontext setzen */
+
+		btn_login.setText(login_or_logout);
+
 	}
 	    
 }

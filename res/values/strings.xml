@@ -244,7 +244,13 @@
 <string name="text_game_save">Das Spiel wurde gespeichert.</string>
 <string name="text_player_save">Spielerdaten wurden gespeichert.</string>
 <string name="text_fast_game_created">Ein neues Spiel wurde angelegt. Die Torhüter beider Mannschaften wurden eingewechselt.</string>
-    
+<string name="text_registering_new_account">Neuen Account registrieren...</string>
+<string name="text_login_failed">Die Anmeldung ist fehlgeschlagen.</string>
+<string name="text_register_failed">Registrierung fehlgeschlagen. Wahrscheinlich sind der Benutzername oder die E-Mail-Adresse schon vergeben.</string>
+<string name="text_email_invalid">E-Mail und/oder Passwort sind ungültig. Bitte versuche es noch einmal mit anderen Daten.</string>
+<string name="text_notice_terms">Die Nutzungsbedingungen habe ich zur Kenntnis genommen.</string>
+<string name="text_notice_privacy">Die Bestimmungen zum Datenschutz habe ich zur Kenntnis genommen.</string>
+
 	<string-array name="array_male_female">
         <item>Männlich</item>
         <item>Weiblich</item>
@@ -290,6 +296,9 @@
 	<string name="text_team_save">Du musst die Mannschaft erst abspeichern bevor Du sie synchronisieren kannst.</string>
 	<string name="text_login_empty_title">Login</string>
 	<string name="text_login_empty">Bitte fülle alle Felder mit den Logindaten aus.</string>
+	<string name="text_register_empty_title">Registrieren</string>
+	<string name="text_register_empty">Bitte fülle alle Felder mit Deinen Daten aus.</string>
+	<string name="text_password_confirmation">Das Passwort stimmt nicht mit der Passwortbestätigung überein. Bitte versuche es noch einmal.</string>
 	<string name="text_synchro_succeeded">Die Synchronisierung wurde erfolgreich durchgeführt.</string>
 	<string name="text_synchro_failed">Die Synchronisierung konnte nicht abgeschlossen werden, da die Daten auf dem Server nicht gefunden werden konnten.</string>
 	<string name="text_synchro_team_failed">Die Synchronisierung konnte nicht abgeschlossen werden, da die Mannschaftsdaten auf dem Server nicht gefunden werden konnte. Möchtest Du manuell nach der Mannschaft suchen und so die Mannschaftsdaten synchronisieren?</string>
@@ -476,8 +485,14 @@
 	<string name="Server">Server</string>
 	<string name="team_short_string">M</string>
 	<string name="cancel">Abbrechen</string>
+	<string name="register">Registrieren</string>
 	<string name="text_logout">Möchtest Du Dich wirklich ausloggen?</string>
 	<string name="text_logout_success">Dein Logout war erfolgreich.</string>
 	<string name="transfer_finished">Übertragung abgeschlossen</string>
+	<string name="user_name">Username</string>
+	<string name="confirm_password">Passwort bestätigen</string>
+	<string name="terms">Nutzungsbedingungen</string>
+	<string name="privacy_policy">Datenschutzbestimmungen</string>
+	<string name="text_terms_notice">Du musst die Nutzungsbedingungen und die Datenschutzbestimmungen bestätigen, um Dich registrieren zu können.</string>
 	
 </resources>

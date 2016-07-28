@@ -473,4 +473,24 @@ public class HelperText {
 		return(strText);
 		
 	}
+	
+	public String terms() {
+		
+		String terms = " Bedingungen\n\n" +
+				"Dies ist ein Test um zusehen, ob es funktioniert.\n\n" +
+				"Hier muss die Frage erlaubt sein, warum man den mühsamen Weg über die Gerichte einschlägt, um sich dann doch am Ende – in welcher Form auch immer – zu einigen. Bei einer Verfahrensdauer von mindestens vier Monate und im schlimmsten Fall mehreren Jahren und Verfahrenskosten, die sehr schnell im fünfstelligen Bereich liegen können, ist der Gang zum Gericht auch aus ökonomischer Sicht in vielen Fällen unergiebig. Selbst bei einem positiven Ende wird sich – im Nachhinein betrachtet – der Gang zum Gericht nur selten auszahlen.";
+		
+		return(terms);
+	
+	}
+	
+	public String privacy() {
+		
+		String terms = " Bedingungen\n\n" +
+				"Dies ist ein Test um zusehen, ob es funktioniert.\n\n" +
+				"Hier muss die Frage erlaubt sein, warum man den mühsamen Weg über die Gerichte einschlägt, um sich dann doch am Ende – in welcher Form auch immer – zu einigen. Bei einer Verfahrensdauer von mindestens vier Monate und im schlimmsten Fall mehreren Jahren und Verfahrenskosten, die sehr schnell im fünfstelligen Bereich liegen können, ist der Gang zum Gericht auch aus ökonomischer Sicht in vielen Fällen unergiebig. Selbst bei einem positiven Ende wird sich – im Nachhinein betrachtet – der Gang zum Gericht nur selten auszahlen.";
+		
+		return(terms);
+	
+	}
 }
