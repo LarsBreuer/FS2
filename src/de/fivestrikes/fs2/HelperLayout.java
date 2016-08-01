@@ -82,6 +82,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemSelectedListener;
+import android.os.AsyncTask;
+import android.os.Message;
+import android.app.ProgressDialog;
 
 public class HelperLayout {
 	
@@ -296,6 +299,30 @@ public class HelperLayout {
 	private static final String URL_GAMES = "http://calm-waters-7359.herokuapp.com/games.json";
 	private static final String URL_TICKER = "http://calm-waters-7359.herokuapp.com/multiple_ticker_activities.json";
 	private static final String URL_TICKER_EVENT = "http://calm-waters-7359.herokuapp.com/multiple_ticker_events.json";
+	
+	protected ProgressDialog progressDialog;
+	
+	public void dismissProgressDialog() {
+		if (progressDialog != null && progressDialog.isShowing()) {
+			progressDialog.dismiss();
+		}
+	}
+	
+	final Handler syncDoneHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			dismissProgressDialog();
+			// TODO show success message
+		}
+	};
+	
+	final Handler syncFailedHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			dismissProgressDialog();
+			// TODO show failure message
+		}
+	};
 	
 /*
  * 
@@ -1840,12 +1867,8 @@ public class HelperLayout {
 	            }
 		});
 		
-		/* Synchronisieren */
-		btn_synch.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				
+		final class GameSyncTask extends AsyncTask<String, Void, Void> {
+			protected Void doInBackground(final String... cargs) {
 				if (server_team_home_id != null && server_team_away_id != null) {
 					
 					/* 
@@ -1865,7 +1888,6 @@ public class HelperLayout {
 						JSONObject jsonObjSend = new JSONObject();
 						
 						try {
-
 			                        // Spieldaten auf den Rails-Server übertragen 
 			                        jsonObjSend.put("user_id", user_id);
 			                        jsonObjSend.put("team_home_id", server_team_home_id);
@@ -2216,6 +2238,20 @@ Log.v("HelperLayout home_or_away nachher", String.valueOf(home_or_away));
 					// Ende Nachrichtenbox
 					
 				}
+				
+				// TODO: Ausstiegspunkte finden / im Erfolgsfall syncDoneHandler aufrufen, im Fehlerfall syncFailedHandler
+				syncDoneHandler.sendEmptyMessage(0);
+				
+				return null;
+			}
+		}
+				
+		/* Synchronisieren */
+		btn_synch.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				progressDialog = ProgressDialog.show(ctxt, null, "Spiel wird synchronisiert...", true);
+				new GameSyncTask().execute();
 			}
 		});
 		
