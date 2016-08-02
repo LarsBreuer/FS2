@@ -14,26 +14,21 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.lang.Math;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+
+import android.app.Activity;
+import android.app.ActivityGroup;
+import android.app.AlertDialog;
+import android.app.DatePickerDialog.OnDateSetListener;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.app.Activity;
-import android.app.ActivityGroup;
-import android.app.AlertDialog;
-import android.app.DatePickerDialog;
-import android.app.Dialog;
-import android.app.ListActivity;
-import android.app.DatePickerDialog.OnDateSetListener;
-import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -48,31 +43,30 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.Window;
 import android.view.View.OnLongClickListener;
-import android.view.View.OnTouchListener;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.view.MotionEvent;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
@@ -81,10 +75,6 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.os.AsyncTask;
-import android.os.Message;
-import android.app.ProgressDialog;
 
 public class HelperLayout {
 	
@@ -311,19 +301,73 @@ public class HelperLayout {
 	final Handler syncDoneHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
-			dismissProgressDialog();
-			// TODO show success message
+			((Activity)ctxt).runOnUiThread(new Thread(new Runnable() { 
+		         public void run() {
+		        	 dismissProgressDialog();
+		        	 Toast.makeText(((Activity)ctxt), ctxt.getString(R.string.transfer_finished), Toast.LENGTH_SHORT).show();
+		         }
+		    }));
 		}
 	};
 	
-	final Handler syncFailedHandler = new Handler() {
+	final Handler messageBoxHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
-			dismissProgressDialog();
-			// TODO show failure message
+			((Activity)ctxt).runOnUiThread(new Thread(new Runnable() { 
+		         public void run() {
+		        	 dismissProgressDialog();
+		        	 displayDialog(ctxt.getString(R.string.synchro),
+		        			 ctxt.getString(R.string.text_synchro_game_failed));
+		         }
+		    }));
 		}
 	};
 	
+	final Handler messageBoxHandler2 = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			((Activity)ctxt).runOnUiThread(new Thread(new Runnable() { 
+		         public void run() {
+		        	 dismissProgressDialog();
+		        	 displayDialog(ctxt.getString(R.string.synchro),
+		        			 ctxt.getString(R.string.text_synchro_game_not_possible));
+		         }
+		    }));
+		}
+	};
+	
+	public void displayDialog(String titleStr, String message) {
+		// Nachrichtenbox einrichten
+		final Dialog dialog = new Dialog(ctxt);
+		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		dialog.setContentView(R.layout.custom_dialog);
+
+		// Texte setzen
+		TextView title = (TextView) dialog.findViewById(R.id.title);
+		TextView text = (TextView) dialog.findViewById(R.id.text);
+		title.setText(titleStr);
+		text.setText(message);
+		
+		// Button definieren
+		LinearLayout lyt_button2 = (LinearLayout) dialog.findViewById(R.id.lyt_button2);
+		lyt_button2.removeAllViews();
+		LinearLayout lyt_button3 = (LinearLayout) dialog.findViewById(R.id.lyt_button3);
+		lyt_button3.removeAllViews();
+		
+		Button dialogButton1 = (Button) dialog.findViewById(R.id.button1);
+		dialogButton1.setText(R.string.okay);
+		
+		dialogButton1.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				dialog.dismiss();
+			}
+		});
+
+		dialog.show();
+	}
+	
+
 /*
  * 
  * Imagegröße einrichten 
@@ -1869,284 +1913,179 @@ public class HelperLayout {
 		
 		final class GameSyncTask extends AsyncTask<String, Void, Void> {
 			protected Void doInBackground(final String... cargs) {
-				if (server_team_home_id != null && server_team_away_id != null) {
-					
-					/* 
-					 * 
-					 *  Das Spiel synchronisieren 
-					 * 
-					 */
-					
-					String user_id = sqlHelper.getUserID();
-					
-					// Kontrollieren ob Spiel schon synchronisert wurde.
-					// Falls noch nicht, dann jetzt synchronisieren.
-					
-					if (server_game_id == null) {
+				try {
+					if (server_team_home_id != null && server_team_away_id != null) {
 						
-						// JSON object to hold the information, which is sent to the server
-						JSONObject jsonObjSend = new JSONObject();
-						
-						try {
-			                        // Spieldaten auf den Rails-Server übertragen 
-			                        jsonObjSend.put("user_id", user_id);
-			                        jsonObjSend.put("team_home_id", server_team_home_id);
-			                        jsonObjSend.put("team_away_id", server_team_away_id);
-			                        jsonObjSend.put("club_home_name", club_home);
-			                        jsonObjSend.put("club_away_name", club_away);
-			                        jsonObjSend.put("duration_halftime", game_halftime);
-			                        jsonObjSend.put("game_date", game_date_for_rails);
-			                        jsonObjSend.put("game_note", game_note);
-
-			                        // Add a nested JSONObject (e.g. for header information)
-			                        JSONObject header = new JSONObject();
-			                        header.put("deviceType","Android"); // Device type
-			                        header.put("deviceVersion","2.0"); // Device OS version
-			                        header.put("language", "es-es");        // Language of the Android client
-			                        jsonObjSend.put("header", header);
-			                        
-			                        // Output the JSON object we're sending to Logcat:
-			                        Log.i(TAG, jsonObjSend.toString(2));
-			                        
-						} catch (JSONException e) {
-							e.printStackTrace();
-						}
-						
-						// Send the HttpPostRequest and receive a JSONObject in return
-						JSONObject jsonObjRecv = HttpClient.SendHttpPost(URL_GAMES, jsonObjSend, null);
-						try {
-							Log.v("jsonObjRecv Game", jsonObjRecv.toString());
-							Log.v("Die ID lautet: ", jsonObjRecv.get("id").toString());
-							server_game_id = jsonObjRecv.get("id").toString();
-							sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, server_game_id);
-						}
-						catch (JSONException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						/*
-						 *  From here on do whatever you want with your JSONObject, e.g.
-						 *  1) Get the value for a key: jsonObjRecv.get("key");
-						 *  2) Get a nested JSONObject: jsonObjRecv.getJSONObject("key")
-						 *  3) Get a nested JSONArray: jsonObjRecv.getJSONArray("key") 
+						/* 
+						 * 
+						 *  Das Spiel synchronisieren 
+						 * 
 						 */
 						
-					}					
-					
-					/* 
-					 * 
-					 *  Die Ticker übertragen 
-					 * 
-					 */
-
-					JSONArray tickerArray = new JSONArray();
-					Boolean player_sync = true;
-					
-					try {
+						String user_id = sqlHelper.getUserID();
 						
-						// Tickerdaten des Spiels auf den Server übertragen 
-						String[] args={String.valueOf(game_id)};
-						SQLiteDatabase db = sqlHelper.getWritableDatabase();
-						Cursor cTicker = db.rawQuery("SELECT * FROM ticker_activity WHERE game_id = ? ORDER BY time ASC", args);
-						cTicker.moveToFirst();
-						String ticker_id, ticker_player_id, ticker_realtime, ticker_goal_area, ticker_activity_note;
-						String ticker_player_server_id = null;
-						Integer activity_id, ticker_time, ticker_home_or_away, ticker_field_position_x, ticker_field_position_y, ticker_throwing_technique_id, mark;
-
-						// Alle Tickeraktivitäten abfragen und Daten in das Array eintragen eintragen
-						for (cTicker.moveToFirst(); !cTicker.isAfterLast(); cTicker.moveToNext()) {
-
-							ticker_id = sqlHelper.getTickerActivityID(cTicker);
+						// Kontrollieren ob Spiel schon synchronisert wurde.
+						// Falls noch nicht, dann jetzt synchronisieren.
+						
+						if (server_game_id == null) {
 							
-							// Tickeraktivität nur übertragen, falls sie noch nicht übertragen wurde
-							if (sqlHelper.getTickerServerTickerActivityByID(ticker_id) == null) {
-								
-								ticker_event_id = sqlHelper.getTickerEventIDByActivityID(ticker_id);
-								activity_id = sqlHelper.getTickerActivityIDByID(ticker_id);
-								ticker_player_id = sqlHelper.getTickerPlayerIDByID(ticker_id);
-								if (ticker_player_id != null) {
-									ticker_player_server_id = sqlHelper.getPlayerServerIDByID(ticker_player_id);
-								} else {
-									ticker_player_server_id = null;
-								}
-								// Falls die Server-ID des Spielers nicht vorhanden sein sollte, lehne die Synchronisation ab
-								if (ticker_player_id != null && ticker_player_server_id == null) {
-									player_sync = false;
-								}
-								ticker_time = sqlHelper.getTickerTimeByActivityID(ticker_id);
-								ticker_realtime = sqlHelper.getTickerRealtimeByActivityID(ticker_id);
-								ticker_home_or_away = sqlHelper.getTickerHomeOrAwayByID(ticker_id);
-								ticker_goal_area = sqlHelper.getTickerAreaByID(ticker_id);
-								ticker_field_position_x = sqlHelper.getTickerFieldPositionXByID(ticker_id);
-								ticker_field_position_y = sqlHelper.getTickerFieldPositionYByID(ticker_id);
-								ticker_throwing_technique_id = sqlHelper.getTickerThrowingTechniqueIDByID(ticker_id);
-								ticker_activity_note = sqlHelper.getTickerActivityNoteByID(ticker_id);
-								mark = sqlHelper.getTickerMarkByID(ticker_id);
-								
-								JSONObject jsonObjForArray = new JSONObject();
-								
-								jsonObjForArray.put("ticker_event_id_local", ticker_event_id);
-								jsonObjForArray.put("activity_id", activity_id);
-								jsonObjForArray.put("player_id", ticker_player_server_id);
-								jsonObjForArray.put("time", ticker_time);
-								jsonObjForArray.put("game_id", server_game_id);
-								jsonObjForArray.put("realtime", ticker_realtime);
-								jsonObjForArray.put("home_or_away", ticker_home_or_away);
-								if (ticker_home_or_away == 1) {
-									jsonObjForArray.put("team_id", server_team_home_id);
-								}
-								if (ticker_home_or_away == 0) {
-									jsonObjForArray.put("team_id", server_team_away_id);
-								}
-								jsonObjForArray.put("goal_area", ticker_goal_area);
-								jsonObjForArray.put("field_position_x", ticker_field_position_x);
-								jsonObjForArray.put("field_position_y", ticker_field_position_y);
-								jsonObjForArray.put("throwing_technique_id", ticker_throwing_technique_id);
-								jsonObjForArray.put("ticker_activity_note", ticker_activity_note);
-								jsonObjForArray.put("mark", mark);
-								
-								tickerArray.put(jsonObjForArray);
-								
-							}
-						}
-
-						cTicker.close();
-						
-/*
-		                        // Add a nested JSONObject (e.g. for header information)
-		                        JSONObject header = new JSONObject();
-		                        header.put("deviceType","Android"); // Device type
-		                        header.put("deviceVersion","2.0"); // Device OS version
-		                        header.put("language", "es-es");        // Language of the Android client
-		                        tickerArray.put("header", header);
-*/	                        
-		                        // Output the JSON object we're sending to Logcat:
-
-		                        Log.i(TAG, tickerArray.toString(2));
-		                        
-					} catch (JSONException e) {
-						e.printStackTrace(); 
-					}
-					
-					JSONArray tickerEventArray = new JSONArray();
-					
-					try {
-						
-						// Tickerdaten des Spiels auf den Server übertragen 
-						String[] args={String.valueOf(game_id)};
-						SQLiteDatabase db = sqlHelper.getWritableDatabase();
-						Cursor cTicker = db.rawQuery("SELECT * FROM ticker_event WHERE game_id = ? ORDER BY time ASC", args);
-						cTicker.moveToFirst();
-						
-						String ticker_id, goals_home, goals_away, ticker_result;
-						Integer ticker_time;
-
-						// Alle Tickermeldungen abfragen und Daten in das Array eintragen eintragen
-						for (cTicker.moveToFirst(); !cTicker.isAfterLast(); cTicker.moveToNext()) {
+							// JSON object to hold the information, which is sent to the server
+							JSONObject jsonObjSend = new JSONObject();
+							
+							try {
+				                        // Spieldaten auf den Rails-Server übertragen 
+				                        jsonObjSend.put("user_id", user_id);
+				                        jsonObjSend.put("team_home_id", server_team_home_id);
+				                        jsonObjSend.put("team_away_id", server_team_away_id);
+				                        jsonObjSend.put("club_home_name", club_home);
+				                        jsonObjSend.put("club_away_name", club_away);
+				                        jsonObjSend.put("duration_halftime", game_halftime);
+				                        jsonObjSend.put("game_date", game_date_for_rails);
+				                        jsonObjSend.put("game_note", game_note);
 	
-							ticker_id = sqlHelper.getTickerEventID(cTicker);
-							
-							// Tickermeldungen nur übertragen, falls sie noch nicht übertragen wurde
-							if (sqlHelper.getTickerServerTickerEventByID(ticker_id) == null) {
-								
-								ticker_time = sqlHelper.getTickerEventTimeByID(ticker_id);
-								ticker_event_note = sqlHelper.getTickerEventNoteByID(ticker_id);
-								
-								goals_home = String.valueOf(sqlHelper.count_ticker_goals(game_id, null, 1, ticker_time));
-								goals_away = String.valueOf(sqlHelper.count_ticker_goals(game_id, null, 0, ticker_time));
-								ticker_result = goals_home + " : " + goals_away;
-								
-								JSONObject jsonObjForArray = new JSONObject();
-								
-								jsonObjForArray.put("ticker_event_id_local", ticker_id);
-								jsonObjForArray.put("game_id", server_game_id);
-								jsonObjForArray.put("time", ticker_time);
-								jsonObjForArray.put("ticker_event_note", ticker_event_note);
-								ArrayList<Integer> mainActivityList = sqlHelper.getTickerEventMainActivity(String.valueOf(ticker_id), res);
-Log.v("HelperLayout activity_id vorher", String.valueOf(mainActivityList.get(0)));
-Log.v("HelperLayout home_or_away vorher", String.valueOf(mainActivityList.get(1)));
-								activity_id = mainActivityList.get(0);
-								home_or_away = mainActivityList.get(1);
-Log.v("HelperLayout activity_id nachher", String.valueOf(activity_id));
-Log.v("HelperLayout home_or_away nachher", String.valueOf(home_or_away));
-								jsonObjForArray.put("activity_id", String.valueOf(activity_id));
-								jsonObjForArray.put("home_or_away", String.valueOf(home_or_away));
-								jsonObjForArray.put("ticker_result", ticker_result);
-								
-								tickerEventArray.put(jsonObjForArray);
-								
+				                        // Add a nested JSONObject (e.g. for header information)
+				                        JSONObject header = new JSONObject();
+				                        header.put("deviceType","Android"); // Device type
+				                        header.put("deviceVersion","2.0"); // Device OS version
+				                        header.put("language", "es-es");        // Language of the Android client
+				                        jsonObjSend.put("header", header);
+				                        
+				                        // Output the JSON object we're sending to Logcat:
+				                        Log.i(TAG, jsonObjSend.toString(2));
+				                        
+							} catch (JSONException e) {
+								e.printStackTrace();
 							}
-						}
-
-						cTicker.close();
+							
+							// Send the HttpPostRequest and receive a JSONObject in return
+							JSONObject jsonObjRecv = HttpClient.SendHttpPost(URL_GAMES, jsonObjSend, null);
+							try {
+								Log.v("jsonObjRecv Game", jsonObjRecv.toString());
+								Log.v("Die ID lautet: ", jsonObjRecv.get("id").toString());
+								server_game_id = jsonObjRecv.get("id").toString();
+								sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, server_game_id);
+							}
+							catch (JSONException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							/*
+							 *  From here on do whatever you want with your JSONObject, e.g.
+							 *  1) Get the value for a key: jsonObjRecv.get("key");
+							 *  2) Get a nested JSONObject: jsonObjRecv.getJSONObject("key")
+							 *  3) Get a nested JSONArray: jsonObjRecv.getJSONArray("key") 
+							 */
+							
+						}					
 						
-/*
-		                        // Add a nested JSONObject (e.g. for header information)
-		                        JSONObject header = new JSONObject();
-		                        header.put("deviceType","Android"); // Device type
-		                        header.put("deviceVersion","2.0"); // Device OS version
-		                        header.put("language", "es-es");        // Language of the Android client
-		                        tickerArray.put("header", header);
-*/	                        
-		                        // Output the JSON object we're sending to Logcat:
-		                        Log.i(TAG, tickerEventArray.toString(2));
-		                        
-					} catch (JSONException e) {
-						e.printStackTrace(); 
-					}
-					
-					// Ticker-Array nur senden, wenn alle Spieler synchronisiert sind und das Array nicht leer ist
-// Abfrage, ob Array nicht leer ist;
-					if (player_sync == true) {
+						/* 
+						 * 
+						 *  Die Ticker übertragen 
+						 * 
+						 */
+	
+						JSONArray tickerArray = new JSONArray();
+						Boolean player_sync = true;
 						
-						// Send the HttpPostRequest and receive a JSONObject in return
-/** TODO -1- => Wenn Array leer, dann nicht übertragen */
-						JSONObject jsonObjRecvArray = HttpClient.SendHttpPost(URL_TICKER, null, tickerArray);
 						try {
 							
-							Log.v("Die ID lautet: ", jsonObjRecvArray.get("id").toString());
-							
-							// Alle Aktivititäten, die übertragen wurden, markieren, damit diese nicht noch einmal übertragen werden
+							// Tickerdaten des Spiels auf den Server übertragen 
 							String[] args={String.valueOf(game_id)};
 							SQLiteDatabase db = sqlHelper.getWritableDatabase();
 							Cursor cTicker = db.rawQuery("SELECT * FROM ticker_activity WHERE game_id = ? ORDER BY time ASC", args);
 							cTicker.moveToFirst();
-							String ticker_id;
-
+							String ticker_id, ticker_player_id, ticker_realtime, ticker_goal_area, ticker_activity_note;
+							String ticker_player_server_id = null;
+							Integer activity_id, ticker_time, ticker_home_or_away, ticker_field_position_x, ticker_field_position_y, ticker_throwing_technique_id, mark;
+	
 							// Alle Tickeraktivitäten abfragen und Daten in das Array eintragen eintragen
 							for (cTicker.moveToFirst(); !cTicker.isAfterLast(); cTicker.moveToNext()) {
-		
+	
 								ticker_id = sqlHelper.getTickerActivityID(cTicker);
 								
 								// Tickeraktivität nur übertragen, falls sie noch nicht übertragen wurde
 								if (sqlHelper.getTickerServerTickerActivityByID(ticker_id) == null) {
 									
-									sqlHelper.updateTickerActivityServerID(ticker_id);
+									ticker_event_id = sqlHelper.getTickerEventIDByActivityID(ticker_id);
+									activity_id = sqlHelper.getTickerActivityIDByID(ticker_id);
+									ticker_player_id = sqlHelper.getTickerPlayerIDByID(ticker_id);
+									if (ticker_player_id != null) {
+										ticker_player_server_id = sqlHelper.getPlayerServerIDByID(ticker_player_id);
+									} else {
+										ticker_player_server_id = null;
+									}
+									// Falls die Server-ID des Spielers nicht vorhanden sein sollte, lehne die Synchronisation ab
+									if (ticker_player_id != null && ticker_player_server_id == null) {
+										player_sync = false;
+									}
+									ticker_time = sqlHelper.getTickerTimeByActivityID(ticker_id);
+									ticker_realtime = sqlHelper.getTickerRealtimeByActivityID(ticker_id);
+									ticker_home_or_away = sqlHelper.getTickerHomeOrAwayByID(ticker_id);
+									ticker_goal_area = sqlHelper.getTickerAreaByID(ticker_id);
+									ticker_field_position_x = sqlHelper.getTickerFieldPositionXByID(ticker_id);
+									ticker_field_position_y = sqlHelper.getTickerFieldPositionYByID(ticker_id);
+									ticker_throwing_technique_id = sqlHelper.getTickerThrowingTechniqueIDByID(ticker_id);
+									ticker_activity_note = sqlHelper.getTickerActivityNoteByID(ticker_id);
+									mark = sqlHelper.getTickerMarkByID(ticker_id);
+									
+									JSONObject jsonObjForArray = new JSONObject();
+									
+									jsonObjForArray.put("ticker_event_id_local", ticker_event_id);
+									jsonObjForArray.put("activity_id", activity_id);
+									jsonObjForArray.put("player_id", ticker_player_server_id);
+									jsonObjForArray.put("time", ticker_time);
+									jsonObjForArray.put("game_id", server_game_id);
+									jsonObjForArray.put("realtime", ticker_realtime);
+									jsonObjForArray.put("home_or_away", ticker_home_or_away);
+									if (ticker_home_or_away == 1) {
+										jsonObjForArray.put("team_id", server_team_home_id);
+									}
+									if (ticker_home_or_away == 0) {
+										jsonObjForArray.put("team_id", server_team_away_id);
+									}
+									jsonObjForArray.put("goal_area", ticker_goal_area);
+									jsonObjForArray.put("field_position_x", ticker_field_position_x);
+									jsonObjForArray.put("field_position_y", ticker_field_position_y);
+									jsonObjForArray.put("throwing_technique_id", ticker_throwing_technique_id);
+									jsonObjForArray.put("ticker_activity_note", ticker_activity_note);
+									jsonObjForArray.put("mark", mark);
+									
+									tickerArray.put(jsonObjForArray);
 									
 								}
 							}
-							
+	
 							cTicker.close();
 							
+	/*
+			                        // Add a nested JSONObject (e.g. for header information)
+			                        JSONObject header = new JSONObject();
+			                        header.put("deviceType","Android"); // Device type
+			                        header.put("deviceVersion","2.0"); // Device OS version
+			                        header.put("language", "es-es");        // Language of the Android client
+			                        tickerArray.put("header", header);
+	*/	                        
+			                        // Output the JSON object we're sending to Logcat:
+	
+			                        Log.i(TAG, tickerArray.toString(2));
+			                        
+						} catch (JSONException e) {
+							e.printStackTrace(); 
 						}
-						catch (JSONException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} 
-						// Send the HttpPostRequest and receive a JSONObject in return
-						JSONObject jsonObjRecvEventArray = HttpClient.SendHttpPost(URL_TICKER_EVENT, null, tickerEventArray);
+						
+						JSONArray tickerEventArray = new JSONArray();
+						
 						try {
 							
-							Log.v("Die ID lautet: ", jsonObjRecvEventArray.get("id").toString());
-							
-							// Alle Tickermeldungen, die übertragen wurden, markieren, damit diese nicht noch einmal übertragen werden müssen
+							// Tickerdaten des Spiels auf den Server übertragen 
 							String[] args={String.valueOf(game_id)};
 							SQLiteDatabase db = sqlHelper.getWritableDatabase();
 							Cursor cTicker = db.rawQuery("SELECT * FROM ticker_event WHERE game_id = ? ORDER BY time ASC", args);
 							cTicker.moveToFirst();
 							
-							String ticker_id;
-
+							String ticker_id, goals_home, goals_away, ticker_result;
+							Integer ticker_time;
+	
 							// Alle Tickermeldungen abfragen und Daten in das Array eintragen eintragen
 							for (cTicker.moveToFirst(); !cTicker.isAfterLast(); cTicker.moveToNext()) {
 		
@@ -2155,92 +2094,139 @@ Log.v("HelperLayout home_or_away nachher", String.valueOf(home_or_away));
 								// Tickermeldungen nur übertragen, falls sie noch nicht übertragen wurde
 								if (sqlHelper.getTickerServerTickerEventByID(ticker_id) == null) {
 									
-									sqlHelper.updateTickerEventServerID(ticker_id);
+									ticker_time = sqlHelper.getTickerEventTimeByID(ticker_id);
+									ticker_event_note = sqlHelper.getTickerEventNoteByID(ticker_id);
 									
-								}	
+									goals_home = String.valueOf(sqlHelper.count_ticker_goals(game_id, null, 1, ticker_time));
+									goals_away = String.valueOf(sqlHelper.count_ticker_goals(game_id, null, 0, ticker_time));
+									ticker_result = goals_home + " : " + goals_away;
+									
+									JSONObject jsonObjForArray = new JSONObject();
+									
+									jsonObjForArray.put("ticker_event_id_local", ticker_id);
+									jsonObjForArray.put("game_id", server_game_id);
+									jsonObjForArray.put("time", ticker_time);
+									jsonObjForArray.put("ticker_event_note", ticker_event_note);
+									ArrayList<Integer> mainActivityList = sqlHelper.getTickerEventMainActivity(String.valueOf(ticker_id), res);
+	Log.v("HelperLayout activity_id vorher", String.valueOf(mainActivityList.get(0)));
+	Log.v("HelperLayout home_or_away vorher", String.valueOf(mainActivityList.get(1)));
+									activity_id = mainActivityList.get(0);
+									home_or_away = mainActivityList.get(1);
+	Log.v("HelperLayout activity_id nachher", String.valueOf(activity_id));
+	Log.v("HelperLayout home_or_away nachher", String.valueOf(home_or_away));
+									jsonObjForArray.put("activity_id", String.valueOf(activity_id));
+									jsonObjForArray.put("home_or_away", String.valueOf(home_or_away));
+									jsonObjForArray.put("ticker_result", ticker_result);
+									
+									tickerEventArray.put(jsonObjForArray);
+									
+								}
 							}
-							
+	
 							cTicker.close();
 							
+	/*
+			                        // Add a nested JSONObject (e.g. for header information)
+			                        JSONObject header = new JSONObject();
+			                        header.put("deviceType","Android"); // Device type
+			                        header.put("deviceVersion","2.0"); // Device OS version
+			                        header.put("language", "es-es");        // Language of the Android client
+			                        tickerArray.put("header", header);
+	*/	                        
+			                        // Output the JSON object we're sending to Logcat:
+			                        Log.i(TAG, tickerEventArray.toString(2));
+			                        
+						} catch (JSONException e) {
+							e.printStackTrace(); 
 						}
-						catch (JSONException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
 						
-						Toast.makeText(((Activity)ctxt), ctxt.getString(R.string.transfer_finished), Toast.LENGTH_SHORT).show();
-						
-					} else {
-						
-						// Nachrichtenbox einrichten
-						final Dialog dialog = new Dialog(ctxt);
-						dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-						dialog.setContentView(R.layout.custom_dialog);
-
-						// Texte setzen
-						TextView title = (TextView) dialog.findViewById(R.id.title);
-						TextView text = (TextView) dialog.findViewById(R.id.text);
-						title.setText(R.string.synchro);
-						text.setText(R.string.text_synchro_game_failed);
-						
-						// Button definieren
-						LinearLayout lyt_button2 = (LinearLayout) dialog.findViewById(R.id.lyt_button2);
-						lyt_button2.removeAllViews();
-						LinearLayout lyt_button3 = (LinearLayout) dialog.findViewById(R.id.lyt_button3);
-						lyt_button3.removeAllViews();
-						
-						Button dialogButton1 = (Button) dialog.findViewById(R.id.button1);
-						dialogButton1.setText(R.string.okay);
-						
-						dialogButton1.setOnClickListener(new View.OnClickListener() {
-							@Override
-							public void onClick(View v) {
-								dialog.dismiss();
-							}
-						});
-
-						dialog.show();
-						// Ende Nachrichtenbox
-						
-					}
-					
-/** TODO -0- => Async einrichten während laden. Am Ende Meldung, dass Synchronisation erfolgreich war */
-				} else {
+						// Ticker-Array nur senden, wenn alle Spieler synchronisiert sind und das Array nicht leer ist
+	// Abfrage, ob Array nicht leer ist;
+						if (player_sync == true) {
+							
+							// Send the HttpPostRequest and receive a JSONObject in return
+	/** TODO -1- => Wenn Array leer, dann nicht übertragen */
+							JSONObject jsonObjRecvArray = HttpClient.SendHttpPost(URL_TICKER, null, tickerArray);
+							try {
+								
+								Log.v("Die ID lautet: ", jsonObjRecvArray.get("id").toString());
+								
+								// Alle Aktivititäten, die übertragen wurden, markieren, damit diese nicht noch einmal übertragen werden
+								String[] args={String.valueOf(game_id)};
+								SQLiteDatabase db = sqlHelper.getWritableDatabase();
+								Cursor cTicker = db.rawQuery("SELECT * FROM ticker_activity WHERE game_id = ? ORDER BY time ASC", args);
+								cTicker.moveToFirst();
+								String ticker_id;
+	
+								// Alle Tickeraktivitäten abfragen und Daten in das Array eintragen eintragen
+								for (cTicker.moveToFirst(); !cTicker.isAfterLast(); cTicker.moveToNext()) {
+			
+									ticker_id = sqlHelper.getTickerActivityID(cTicker);
+									
+									// Tickeraktivität nur übertragen, falls sie noch nicht übertragen wurde
+									if (sqlHelper.getTickerServerTickerActivityByID(ticker_id) == null) {
 										
-					// Nachrichtenbox einrichten
-					final Dialog dialog = new Dialog(ctxt);
-					dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-					dialog.setContentView(R.layout.custom_dialog);
-
-					// Texte setzen
-					TextView title = (TextView) dialog.findViewById(R.id.title);
-					TextView text = (TextView) dialog.findViewById(R.id.text);
-					title.setText(R.string.synchro);
-					text.setText(R.string.text_synchro_game_not_possible);
-					
-					// Button definieren
-					LinearLayout lyt_button2 = (LinearLayout) dialog.findViewById(R.id.lyt_button2);
-					lyt_button2.removeAllViews();
-					LinearLayout lyt_button3 = (LinearLayout) dialog.findViewById(R.id.lyt_button3);
-					lyt_button3.removeAllViews();
-					
-					Button dialogButton1 = (Button) dialog.findViewById(R.id.button1);
-					dialogButton1.setText(R.string.okay);
-					
-					dialogButton1.setOnClickListener(new View.OnClickListener() {
-						@Override
-						public void onClick(View v) {
-							dialog.dismiss();
+										sqlHelper.updateTickerActivityServerID(ticker_id);
+										
+									}
+								}
+								
+								cTicker.close();
+								
+							}
+							catch (JSONException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} 
+							// Send the HttpPostRequest and receive a JSONObject in return
+							JSONObject jsonObjRecvEventArray = HttpClient.SendHttpPost(URL_TICKER_EVENT, null, tickerEventArray);
+							try {
+								
+								Log.v("Die ID lautet: ", jsonObjRecvEventArray.get("id").toString());
+								
+								// Alle Tickermeldungen, die übertragen wurden, markieren, damit diese nicht noch einmal übertragen werden müssen
+								String[] args={String.valueOf(game_id)};
+								SQLiteDatabase db = sqlHelper.getWritableDatabase();
+								Cursor cTicker = db.rawQuery("SELECT * FROM ticker_event WHERE game_id = ? ORDER BY time ASC", args);
+								cTicker.moveToFirst();
+								
+								String ticker_id;
+	
+								// Alle Tickermeldungen abfragen und Daten in das Array eintragen eintragen
+								for (cTicker.moveToFirst(); !cTicker.isAfterLast(); cTicker.moveToNext()) {
+			
+									ticker_id = sqlHelper.getTickerEventID(cTicker);
+									
+									// Tickermeldungen nur übertragen, falls sie noch nicht übertragen wurde
+									if (sqlHelper.getTickerServerTickerEventByID(ticker_id) == null) {
+										
+										sqlHelper.updateTickerEventServerID(ticker_id);
+										
+									}	
+								}
+								
+								cTicker.close();
+								
+							}
+							catch (JSONException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+													
+							syncDoneHandler.sendEmptyMessage(0);
+						} else {
+							messageBoxHandler.sendEmptyMessage(0);						
 						}
-					});
-
-					dialog.show();
-					// Ende Nachrichtenbox
-					
-				}
+						
+	/** TODO -0- => Async einrichten während laden. Am Ende Meldung, dass Synchronisation erfolgreich war */
+					} else {
+						messageBoxHandler2.sendEmptyMessage(0);					
+					}
 				
-				// TODO: Ausstiegspunkte finden / im Erfolgsfall syncDoneHandler aufrufen, im Fehlerfall syncFailedHandler
-				syncDoneHandler.sendEmptyMessage(0);
+				} catch(RuntimeException re) {
+					re.printStackTrace();
+					messageBoxHandler2.sendEmptyMessage(0);
+				}
 				
 				return null;
 			}
@@ -2250,8 +2236,14 @@ Log.v("HelperLayout home_or_away nachher", String.valueOf(home_or_away));
 		btn_synch.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				progressDialog = ProgressDialog.show(ctxt, null, "Spiel wird synchronisiert...", true);
-				new GameSyncTask().execute();
+				progressDialog = ProgressDialog.show(ctxt, null, ctxt.getString(R.string.game_sync), true);
+				try {
+					new GameSyncTask().execute();
+				} catch (RuntimeException re) {
+					re.printStackTrace();
+					Log.e(TAG, "Exception: " + re.getMessage());
+					progressDialog.dismiss();
+				}
 			}
 		});
 		
