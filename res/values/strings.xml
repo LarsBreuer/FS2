@@ -493,4 +493,6 @@
     <string name="privacy_policy">Datenschutzbestimmungen</string>
     <string name="text_terms_notice">Du musst die Nutzungsbedingungen und die Datenschutzbestimmungen bestätigen, um Dich registrieren zu können.</string>
     <string name="game_sync">Spiel wird übertragen...</string>
+    <string name="team_sync">Mannschaft wird synchronisiert...</string>
+    <string name="club_sync">Verein wird synchronisiert...</string>
 </resources>

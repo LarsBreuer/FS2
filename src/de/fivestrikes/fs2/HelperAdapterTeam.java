@@ -2,33 +2,24 @@ package de.fivestrikes.fs2;
 
 import java.util.ArrayList;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.app.Activity;
 import android.app.Dialog;
-import android.content.res.Configuration;
+import android.app.ProgressDialog;
 import android.database.Cursor;
-import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.util.DisplayMetrics;
-import android.util.Log;
+import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Message;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.CursorAdapter;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class HelperAdapterTeam extends CursorAdapter {
 	
@@ -47,6 +38,7 @@ public class HelperAdapterTeam extends CursorAdapter {
 	Context ctxt = null;
 	ArrayList<String> listClubData = new ArrayList<String>();
 	ArrayList<String> listTeamData = new ArrayList<String>();
+	ProgressDialog progressDialog;
 	
 	public HelperAdapterTeam(Context context, Cursor c, String id) {
 		
@@ -111,148 +103,175 @@ public class HelperAdapterTeam extends CursorAdapter {
 				String auth_token = mPreferences.getString("AuthToken", "");
 				
 				if (auth_token.equals("")) {
-					
-					// Nachrichtenbox einrichten
-					final Dialog dialog = new Dialog(ctxt);
-					dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-					dialog.setContentView(R.layout.custom_dialog);
-
-					// Texte setzen
-					TextView title = (TextView) dialog.findViewById(R.id.title);
-					TextView text = (TextView) dialog.findViewById(R.id.text);
-					title.setText(R.string.synchro);
-					text.setText(R.string.text_login_not_possible);
-					
-					// Button definieren
-					LinearLayout lyt_button2 = (LinearLayout) dialog.findViewById(R.id.lyt_button2);
-					lyt_button2.removeAllViews();
-					LinearLayout lyt_button3 = (LinearLayout) dialog.findViewById(R.id.lyt_button3);
-					lyt_button3.removeAllViews();
-					
-					Button dialogButton1 = (Button) dialog.findViewById(R.id.button1);
-					dialogButton1.setText(R.string.okay);
-					
-					dialogButton1.setOnClickListener(new View.OnClickListener() {
-						@Override
-						public void onClick(View v) {
-							dialog.dismiss();
-						}
-					});
-
-					dialog.show();
-					// Ende Nachrichtenbox
-				
+					messageBoxHandler1.sendEmptyMessage(0);
 				} else {
-					
-					if (server_club_id==null) {
-						
-						// Wenn Server-ID fehlt => ID vom Server laden und abspeichern
-						listClubData = getJsonHelper.getClubArray(null, sqlHelper.getClubNameByTeamID(team_id), v.getContext());
-						
-						if (listClubData.size() > 0) {
-							
-							server_club_id = listClubData.get(0);
-							sqlHelper.updateTeam(team_id, server_team_id, club_id, server_club_id, team_type_id);
-							
-						}
-						
-					}
-					
-					if (server_club_id!=null) {
-						if (server_team_id==null) {
-							
-							// Wenn die Server-ID der Mannschaft fehlt => ID vom Server laden und abspeichern
-							listTeamData = getJsonHelper.getTeamArray(server_club_id, team_type_id, v.getContext());
-							
-							if (listTeamData.size() > 0) {
-								
-								server_team_id = listTeamData.get(0);
-								sqlHelper.updateTeam(team_id, server_team_id, club_id, server_club_id, team_type_id);
-								
-							}
-							
-						}
-					}
-					
-					if(server_club_id!=null && server_team_id!=null) {
-						
-						// Spieler der Mannschaft vom Server übertragen
-						getJsonHelper.loadPlayerFromServer(team_id, server_team_id, v.getContext());
-
-						// Benachrichtigung, dass die Mannschaft synchronisiert wurde
-						// Nachrichtenbox einrichten
-						final Dialog dialog = new Dialog(ctxt);
-						dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-						dialog.setContentView(R.layout.custom_dialog);
-
-						// Texte setzen
-						TextView title = (TextView) dialog.findViewById(R.id.title);
-						TextView text = (TextView) dialog.findViewById(R.id.text);
-						title.setText(R.string.synchro);
-						text.setText(R.string.text_synchro_succeeded);
-						
-						// Button definieren
-						LinearLayout lyt_button2 = (LinearLayout) dialog.findViewById(R.id.lyt_button2);
-						lyt_button2.removeAllViews();
-						LinearLayout lyt_button3 = (LinearLayout) dialog.findViewById(R.id.lyt_button3);
-						lyt_button3.removeAllViews();
-						
-						Button dialogButton1 = (Button) dialog.findViewById(R.id.button1);
-						dialogButton1.setText(R.string.okay);
-						
-						dialogButton1.setOnClickListener(new View.OnClickListener() {
-							@Override
-							public void onClick(View v) {
-								dialog.dismiss();
-								ctxt.startActivity(new Intent(ctxt, SmartTeamList.class));
-							}
-						});
-
-						dialog.show();
-						// Ende Nachrichtenbox
-						
-					} else {
-						
-						// Benachrichtigung, dass die Mannschaft nicht synchronisiert werden konnte, da diese auf dem Server nicht gefunden wurde
-						// Nachrichtenbox einrichten
-						final Dialog dialog = new Dialog(ctxt);
-						dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-						dialog.setContentView(R.layout.custom_dialog);
-
-						// Texte setzen
-						TextView title = (TextView) dialog.findViewById(R.id.title);
-						TextView text = (TextView) dialog.findViewById(R.id.text);
-						title.setText(R.string.synchro);
-						text.setText(R.string.text_synchro_failed);
-						
-						// Button definieren
-						LinearLayout lyt_button2 = (LinearLayout) dialog.findViewById(R.id.lyt_button2);
-						lyt_button2.removeAllViews();
-						LinearLayout lyt_button3 = (LinearLayout) dialog.findViewById(R.id.lyt_button3);
-						lyt_button3.removeAllViews();
-						
-						Button dialogButton1 = (Button) dialog.findViewById(R.id.button1);
-						dialogButton1.setText(R.string.okay);
-						
-						dialogButton1.setOnClickListener(new View.OnClickListener() {
-							@Override
-							public void onClick(View v) {
-								dialog.dismiss();
-							}
-						});
-
-						dialog.show();
-						// Ende Nachrichtenbox
-						
-					}
+					progressDialog = ProgressDialog.show(ctxt, null, ctxt.getString(R.string.team_sync), true);
+					new SingleTeamSyncTask().execute();
 				}
 			}
 		});
 		
 		return view;
-		
 	}
-		
+	
+	final class SingleTeamSyncTask extends AsyncTask<Context, Void, Void> {
+		protected Void doInBackground(final Context... args) {
+			if (server_club_id == null) {
+				// Wenn Server-ID fehlt => ID vom Server laden und abspeichern
+				listClubData = getJsonHelper.getClubArray(null, sqlHelper.getClubNameByTeamID(team_id), ctxt);
+				
+				if (!listClubData.isEmpty()) {
+					
+					server_club_id = listClubData.get(0);
+					sqlHelper.updateTeam(team_id, server_team_id, club_id, server_club_id, team_type_id);
+					
+				}
+			}
+			
+			if (server_club_id != null) {
+				if (server_team_id == null) {
+					// Wenn die Server-ID der Mannschaft fehlt => ID vom Server laden und abspeichern
+					listTeamData = getJsonHelper.getTeamArray(server_club_id, team_type_id, ctxt);
+					
+					if (!listTeamData.isEmpty()) {
+						
+						server_team_id = listTeamData.get(0);
+						sqlHelper.updateTeam(team_id, server_team_id, club_id, server_club_id, team_type_id);
+						
+					}
+				}
+			}
+			
+			if(server_club_id != null && server_team_id != null) {
+				// Spieler der Mannschaft vom Server übertragen
+				getJsonHelper.loadPlayerFromServer(team_id, server_team_id, ctxt);
+				syncDoneHandler.sendEmptyMessage(0);
+			} else {
+				messageBoxHandler2.sendEmptyMessage(0);
+			}
+			return null;
+		}
+	}
+
+	final Handler messageBoxHandler1 = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			dismissProgressDialog();
+			
+			// Nachrichtenbox einrichten
+			final Dialog dialog = new Dialog(ctxt);
+			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+			dialog.setContentView(R.layout.custom_dialog);
+
+			// Texte setzen
+			TextView title = (TextView) dialog.findViewById(R.id.title);
+			TextView text = (TextView) dialog.findViewById(R.id.text);
+			title.setText(R.string.synchro);
+			text.setText(R.string.text_login_not_possible);
+			
+			// Button definieren
+			LinearLayout lyt_button2 = (LinearLayout) dialog.findViewById(R.id.lyt_button2);
+			lyt_button2.removeAllViews();
+			LinearLayout lyt_button3 = (LinearLayout) dialog.findViewById(R.id.lyt_button3);
+			lyt_button3.removeAllViews();
+			
+			Button dialogButton1 = (Button) dialog.findViewById(R.id.button1);
+			dialogButton1.setText(R.string.okay);
+			
+			dialogButton1.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					dialog.dismiss();
+				}
+			});
+
+			dialog.show();
+			// Ende Nachrichtenbox
+		}
+	};
+	
+	final Handler messageBoxHandler2 = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			dismissProgressDialog();
+			
+			// Benachrichtigung, dass die Mannschaft nicht synchronisiert werden konnte, da diese auf dem Server nicht gefunden wurde
+			// Nachrichtenbox einrichten
+			final Dialog dialog = new Dialog(ctxt);
+			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+			dialog.setContentView(R.layout.custom_dialog);
+
+			// Texte setzen
+			TextView title = (TextView) dialog.findViewById(R.id.title);
+			TextView text = (TextView) dialog.findViewById(R.id.text);
+			title.setText(R.string.synchro);
+			text.setText(R.string.text_synchro_failed);
+			
+			// Button definieren
+			LinearLayout lyt_button2 = (LinearLayout) dialog.findViewById(R.id.lyt_button2);
+			lyt_button2.removeAllViews();
+			LinearLayout lyt_button3 = (LinearLayout) dialog.findViewById(R.id.lyt_button3);
+			lyt_button3.removeAllViews();
+			
+			Button dialogButton1 = (Button) dialog.findViewById(R.id.button1);
+			dialogButton1.setText(R.string.okay);
+			
+			dialogButton1.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					dialog.dismiss();
+				}
+			});
+
+			dialog.show();
+			// Ende Nachrichtenbox
+		}
+	};
+	
+	final Handler syncDoneHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			dismissProgressDialog();
+			
+			// Benachrichtigung, dass die Mannschaft synchronisiert wurde
+			// Nachrichtenbox einrichten
+			final Dialog dialog = new Dialog(ctxt);
+			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+			dialog.setContentView(R.layout.custom_dialog);
+
+			// Texte setzen
+			TextView title = (TextView) dialog.findViewById(R.id.title);
+			TextView text = (TextView) dialog.findViewById(R.id.text);
+			title.setText(R.string.synchro);
+			text.setText(R.string.text_synchro_succeeded);
+			
+			// Button definieren
+			LinearLayout lyt_button2 = (LinearLayout) dialog.findViewById(R.id.lyt_button2);
+			lyt_button2.removeAllViews();
+			LinearLayout lyt_button3 = (LinearLayout) dialog.findViewById(R.id.lyt_button3);
+			lyt_button3.removeAllViews();
+			
+			Button dialogButton1 = (Button) dialog.findViewById(R.id.button1);
+			dialogButton1.setText(R.string.okay);
+			
+			dialogButton1.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					dialog.dismiss();
+					ctxt.startActivity(new Intent(ctxt, SmartTeamList.class));
+				}
+			});
+
+			dialog.show();
+			// Ende Nachrichtenbox
+		}
+	};
+	
+	public void dismissProgressDialog() {
+		if (progressDialog != null && progressDialog.isShowing()) {
+			progressDialog.dismiss();
+		}
+	}
 }
 
 class TeamHolder {
