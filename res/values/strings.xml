@@ -247,8 +247,8 @@
     <string name="text_login_failed">Die Anmeldung ist fehlgeschlagen.</string>
     <string name="text_register_failed">Registrierung fehlgeschlagen. Wahrscheinlich sind der Benutzername oder die E-Mail-Adresse schon vergeben.</string>
     <string name="text_email_invalid">E-Mail und/oder Passwort sind ungültig. Bitte versuche es noch einmal mit anderen Daten.</string>
-    <string name="text_notice_terms">Die Nutzungsbedingungen habe ich zur Kenntnis genommen.</string>
-    <string name="text_notice_privacy">Die Bestimmungen zum Datenschutz habe ich zur Kenntnis genommen.</string>
+    <string name="text_notice_terms">Die Nutzungsbedingungen habe ich gelesen und erkläre mich mit ihnen einverstanden.</string>
+    <string name="text_notice_privacy">Die Bestimmungen zum Datenschutz habe ich gelesen und erkläre mich mit ihnen einverstanden.</string>
     <string-array name="array_male_female">
         <item>Männlich</item>
         <item>Weiblich</item>

@@ -2460,6 +2460,7 @@ containing a value of this type.
         public static final int game_history=0x7f0a00ae;
         public static final int game_settings=0x7f0a01d4;
         public static final int game_statistic=0x7f0a004a;
+        public static final int game_sync=0x7f0a01e4;
         public static final int games=0x7f0a0046;
         public static final int gents=0x7f0a0138;
         public static final int gk_save=0x7f0a0078;
