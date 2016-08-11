@@ -133,50 +133,12 @@ public class HelperAdapterTeam extends HelperBaseAdapter {
 				getJsonHelper.loadPlayerFromServer(team_id, server_team_id, getCtxt());
 				syncDoneHandler.sendEmptyMessage(0);
 			} else {
-				messageBoxHandler2.sendEmptyMessage(0);
+				syncFailedHandler.sendEmptyMessage(0);
 			}
 			return null;
 		}
 	}
 
-	final Handler messageBoxHandler2 = new Handler() {
-		@Override
-		public void handleMessage(Message msg) {
-			dismissProgressDialog();
-			
-			// Benachrichtigung, dass die Mannschaft nicht synchronisiert werden konnte, da diese auf dem Server nicht gefunden wurde
-			// Nachrichtenbox einrichten
-			final Dialog dialog = new Dialog(getCtxt());
-			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-			dialog.setContentView(R.layout.custom_dialog);
-
-			// Texte setzen
-			TextView title = (TextView) dialog.findViewById(R.id.title);
-			TextView text = (TextView) dialog.findViewById(R.id.text);
-			title.setText(R.string.synchro);
-			text.setText(R.string.text_synchro_failed);
-			
-			// Button definieren
-			LinearLayout lyt_button2 = (LinearLayout) dialog.findViewById(R.id.lyt_button2);
-			lyt_button2.removeAllViews();
-			LinearLayout lyt_button3 = (LinearLayout) dialog.findViewById(R.id.lyt_button3);
-			lyt_button3.removeAllViews();
-			
-			Button dialogButton1 = (Button) dialog.findViewById(R.id.button1);
-			dialogButton1.setText(R.string.okay);
-			
-			dialogButton1.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					dialog.dismiss();
-				}
-			});
-
-			dialog.show();
-			// Ende Nachrichtenbox
-		}
-	};
-	
 	final Handler syncDoneHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {

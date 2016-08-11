@@ -113,44 +113,41 @@ public class HelperAdapterPlayer extends HelperBaseAdapter {
 		
 		return view;
 	}
-	
-	final Handler syncFailedHandler = new Handler() {
-		@Override
-		public void handleMessage(Message msg) {
-			dismissProgressDialog();
 
-			// Nachrichtenbox einrichten
-			final Dialog dialog = new Dialog(getCtxt());
-			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-			dialog.setContentView(R.layout.custom_dialog);
-
-			// Texte setzen
-			TextView title = (TextView) dialog.findViewById(R.id.title);
-			TextView text = (TextView) dialog.findViewById(R.id.text);
-			title.setText(R.string.synchro);
-			text.setText(R.string.text_synchro_failed);
-			
-			// Button definieren
-			LinearLayout lyt_button2 = (LinearLayout) dialog.findViewById(R.id.lyt_button2);
-			lyt_button2.removeAllViews();
-			LinearLayout lyt_button3 = (LinearLayout) dialog.findViewById(R.id.lyt_button3);
-			lyt_button3.removeAllViews();
-			
-			Button dialogButton1 = (Button) dialog.findViewById(R.id.button1);
-			dialogButton1.setText(R.string.okay);
-			
-			dialogButton1.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					dialog.dismiss();
+	final class SinglePlayerSyncTask extends AsyncTask<Context, Void, Void> {
+		protected Void doInBackground(final Context... args) {
+			if (server_team_id != null) {
+				// Wenn Server-ID fehlt => ID vom Server laden und abspeichern
+				listPlayerData = getJsonHelper.getPlayerArray(server_team_id, player_forename, player_surename, getCtxt());
+				
+				if (!listPlayerData.isEmpty()) {
+					server_player_id = listPlayerData.get(0);
+					server_team_id = listPlayerData.get(1);
+					player_number = listPlayerData.get(2);
+					player_forename = listPlayerData.get(3);
+					player_surename = listPlayerData.get(4);
+					player_position_first = listPlayerData.get(5);
+					player_position_second = listPlayerData.get(6);
+					player_position_third = listPlayerData.get(7);
+					
+					// Spieler mit Daten vom Server updaten
+					sqlHelper.updatePlayer(player_id, server_player_id, team_id, server_team_id, player_number, player_forename, player_surename, player_position_first, player_position_second, player_position_third);
+					
+					// Benachrichtigung, dass der Spieler synchronisiert wurde
+					syncDoneHandler.sendEmptyMessage(0);
+				} else {
+					// Benachrichtigung, dass der Spieler nicht synchronisiert werden konnte
+					syncFailedHandler.sendEmptyMessage(0);
 				}
-			});
-
-			dialog.show();
-			// Ende Nachrichtenbox
+			} else {
+				// Benachrichtigung, dass der Spieler nicht synchronisiert werden konnte
+				syncFailedHandler.sendEmptyMessage(0);
+			}
+			
+			return null;
 		}
 	};
-	
+
 	final Handler syncDoneHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
@@ -188,40 +185,6 @@ public class HelperAdapterPlayer extends HelperBaseAdapter {
 
 			dialog.show();
 			// Ende Nachrichtenbox
-		}
-	};
-		
-	final class SinglePlayerSyncTask extends AsyncTask<Context, Void, Void> {
-		protected Void doInBackground(final Context... args) {
-			if (server_team_id != null) {
-				// Wenn Server-ID fehlt => ID vom Server laden und abspeichern
-				listPlayerData = getJsonHelper.getPlayerArray(server_team_id, player_forename, player_surename, getCtxt());
-				
-				if (!listPlayerData.isEmpty()) {
-					server_player_id = listPlayerData.get(0);
-					server_team_id = listPlayerData.get(1);
-					player_number = listPlayerData.get(2);
-					player_forename = listPlayerData.get(3);
-					player_surename = listPlayerData.get(4);
-					player_position_first = listPlayerData.get(5);
-					player_position_second = listPlayerData.get(6);
-					player_position_third = listPlayerData.get(7);
-					
-					// Spieler mit Daten vom Server updaten
-					sqlHelper.updatePlayer(player_id, server_player_id, team_id, server_team_id, player_number, player_forename, player_surename, player_position_first, player_position_second, player_position_third);
-					
-					// Benachrichtigung, dass der Spieler synchronisiert wurde
-					syncDoneHandler.sendEmptyMessage(0);
-				} else {
-					// Benachrichtigung, dass der Spieler nicht synchronisiert werden konnte
-					syncFailedHandler.sendEmptyMessage(0);
-				}
-			} else {
-				// Benachrichtigung, dass der Spieler nicht synchronisiert werden konnte
-				syncFailedHandler.sendEmptyMessage(0);
-			}
-			
-			return null;
 		}
 	};
 }
