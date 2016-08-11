@@ -496,4 +496,5 @@
     <string name="team_sync">Mannschaft wird synchronisiert...</string>
     <string name="club_sync">Verein wird synchronisiert...</string>
     <string name="player_sync">Spieler wird synchronisiert...</string>
+    <string name="players_sync">Spieler werden synchronisiert...</string>
 </resources>

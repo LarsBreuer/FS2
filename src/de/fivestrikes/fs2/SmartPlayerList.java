@@ -4,7 +4,11 @@ import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
+import android.app.ProgressDialog;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
@@ -27,7 +31,7 @@ import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 
 public class SmartPlayerList extends ListActivity {
-
+	private ProgressDialog progressDialog;
 	private SharedPreferences mPreferences;
 	HelperSQL sqlHelper=null;
 	HelperOnlineGetJSON getJsonHelper=null;
@@ -175,59 +179,55 @@ public class SmartPlayerList extends ListActivity {
 				startActivity(i);
 				return true;
 
-		        case 1:
-		      	  	
-		  		// Synchronisiere Spieler der Mannschaft
-		      	  
-		      	  	mPreferences = getSharedPreferences("CurrentUser", MODE_PRIVATE);
-				String auth_token = mPreferences.getString("AuthToken", "");
-				
-				if (auth_token.equals("")) {
+		     case 1:		      	  	
+			  		// Synchronisiere Spieler der Mannschaft
+			      	  
+			      	mPreferences = getSharedPreferences("CurrentUser", MODE_PRIVATE);
+					String auth_token = mPreferences.getString("AuthToken", "");
 					
-					// DialogBox einrichten
-					final Dialog dialog = new Dialog(SmartPlayerList.this);
-					dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-					dialog.setContentView(R.layout.custom_dialog);
-
-					// Texte setzen
-					TextView title = (TextView) dialog.findViewById(R.id.title);
-					TextView text = (TextView) dialog.findViewById(R.id.text);
-					title.setText(R.string.synchro);
-					text.setText(R.string.text_login_not_possible);
+					if (auth_token.equals("")) {
+						
+						// DialogBox einrichten
+						final Dialog dialog = new Dialog(SmartPlayerList.this);
+						dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+						dialog.setContentView(R.layout.custom_dialog);
+	
+						// Texte setzen
+						TextView title = (TextView) dialog.findViewById(R.id.title);
+						TextView text = (TextView) dialog.findViewById(R.id.text);
+						title.setText(R.string.synchro);
+						text.setText(R.string.text_login_not_possible);
+						
+						// Button definieren
+						LinearLayout lyt_button2 = (LinearLayout) dialog.findViewById(R.id.lyt_button2);
+						lyt_button2.removeAllViews();
+						LinearLayout lyt_button3 = (LinearLayout) dialog.findViewById(R.id.lyt_button3);
+						lyt_button3.removeAllViews();
+						
+						Button dialogButton1 = (Button) dialog.findViewById(R.id.button1);
+						dialogButton1.setText(R.string.okay);
+						
+						dialogButton1.setOnClickListener(new View.OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								dialog.dismiss();
+							}
+						});
+	
+						dialog.show();
+						// Ende Nachrichtenbox
 					
-					// Button definieren
-					LinearLayout lyt_button2 = (LinearLayout) dialog.findViewById(R.id.lyt_button2);
-					lyt_button2.removeAllViews();
-					LinearLayout lyt_button3 = (LinearLayout) dialog.findViewById(R.id.lyt_button3);
-					lyt_button3.removeAllViews();
-					
-					Button dialogButton1 = (Button) dialog.findViewById(R.id.button1);
-					dialogButton1.setText(R.string.okay);
-					
-					dialogButton1.setOnClickListener(new View.OnClickListener() {
-						@Override
-						public void onClick(View v) {
-							dialog.dismiss();
-						}
-					});
-
-					dialog.show();
-					// Ende Nachrichtenbox
-				
-				} else {
-					
-					if (server_team_id != null) {
-		      	  		
-		      	  			getJsonHelper.loadPlayerFromServer(team_id, server_team_id, getApplicationContext());
-		      	  			refreshContent(team_id);
-		      	  		
-		      	  		} else {
-		      	  		
+					} else {
+						
+						if (server_team_id != null) {
+							setProgressDialog(ProgressDialog.show(this, null, getString(R.string.players_sync), true));
+							new PlayersSyncTask().execute();
+			      	  	} else {	      	  		
 		      	  			// DialogBox einrichten
 		      				final Dialog dialog = new Dialog(SmartPlayerList.this);
 		      				dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		      				dialog.setContentView(R.layout.custom_dialog);
-
+	
 		      				// Texte setzen
 		      				TextView title = (TextView) dialog.findViewById(R.id.title);
 		      				TextView text = (TextView) dialog.findViewById(R.id.text);
@@ -252,23 +252,35 @@ public class SmartPlayerList extends ListActivity {
 		      						startActivity(i);
 		      					}
 		      				});
-
+	
 		      				dialog.show();
 		      				// Ende Nachrichtenbox
-		      	  		
 		      	  		}
-				}
+					}  	
+		      	return true;
 		      	  	
-		      	  	return true;
-		      	  	
-		        default:
-		      	  	return super.onOptionsItemSelected(item);
+	        default:
+	      	  	return super.onOptionsItemSelected(item);
 		
 		}
-
 		return true;
-        
 	}
+	
+	final class PlayersSyncTask extends AsyncTask<Context, Void, Void> {
+		protected Void doInBackground(final Context... args) {
+	  		getJsonHelper.loadPlayerFromServer(team_id, server_team_id, getApplicationContext());
+	  		syncDoneHandler.sendEmptyMessage(0);
+			return null;
+		}
+	};
+	
+	final Handler syncDoneHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			dismissProgressDialog();
+			refreshContent(team_id);
+		}
+	};
 	
 	private void CreateMenu(Menu menu) {
 	
@@ -285,5 +297,19 @@ public class SmartPlayerList extends ListActivity {
 			mnu2.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 			
 		}
+	}
+	
+	public void dismissProgressDialog() {
+		if (getProgressDialog() != null && getProgressDialog().isShowing()) {
+			getProgressDialog().dismiss();
+		}
+	}
+
+	public ProgressDialog getProgressDialog() {
+		return progressDialog;
+	}
+
+	public void setProgressDialog(ProgressDialog progressDialog) {
+		this.progressDialog = progressDialog;
 	}
 }
