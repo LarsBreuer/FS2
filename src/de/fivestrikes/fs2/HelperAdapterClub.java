@@ -13,11 +13,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.CursorAdapter;
 import android.widget.TextView;
 
-public class HelperAdapterClub extends CursorAdapter {
-	
+public class HelperAdapterClub extends HelperBaseAdapter {
 	HelperSQL sqlHelper=null;
 	HelperOnlineGetJSON getJsonHelper=null;
 	HelperLayout lytHelper = null;
@@ -28,10 +26,8 @@ public class HelperAdapterClub extends CursorAdapter {
 	String club_id=null;
 	String server_club_id=null;
 	ArrayList<String> listClubData = new ArrayList<String>();
-	ProgressDialog progressDialog;
-	
+
 	public HelperAdapterClub(Context context, Cursor c) {
-		
 		super(context, c);
 		sqlHelper=new HelperSQL(context);
 		clubHelper= new SmartClubChoose();
@@ -39,7 +35,6 @@ public class HelperAdapterClub extends CursorAdapter {
 		getJsonHelper = new HelperOnlineGetJSON();
 		fctHelper=new HelperFunction();
 		screenDensity=fctHelper.getScreenDensity(context);
-		
 	}
 
 	@Override
@@ -48,7 +43,6 @@ public class HelperAdapterClub extends CursorAdapter {
 		
 		ClubHolder holder=(ClubHolder)row.getTag();
 		holder.populateFrom(c, sqlHelper);
-		
 	}
 	
 	@Override
@@ -59,15 +53,13 @@ public class HelperAdapterClub extends CursorAdapter {
 		View row=inflater.inflate(R.layout.row_club, parent, false);
 		ClubHolder holder=new ClubHolder(row);
 		row.setTag(holder);
-		return(row);
-		
+		return row;
 	}
 	
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		
 		View view = super.getView(position, convertView, parent);  
-		Context ctxt = parent.getContext();
+		setCtxt(parent.getContext());
 		
 		// Synchronisationsbutton einrichten
 		Button btn_synch=(Button) view.findViewById(R.id.btn_synch);
@@ -80,7 +72,7 @@ public class HelperAdapterClub extends CursorAdapter {
 				server_club_id=sqlHelper.getClubServerIDByID(club_id);
 				
 				if (server_club_id == null) {
-					progressDialog = ProgressDialog.show(v.getContext(), null, v.getContext().getString(R.string.club_sync), true);
+					setProgressDialog(ProgressDialog.show(v.getContext(), null, v.getContext().getString(R.string.club_sync), true));
 					new SingleClubSyncTask().execute(v.getContext());
 				}
 			}
@@ -108,31 +100,17 @@ public class HelperAdapterClub extends CursorAdapter {
 			clubHelper.refreshContent();
 		}
 	};
-	
-	public void dismissProgressDialog() {
-		if (progressDialog != null && progressDialog.isShowing()) {
-			progressDialog.dismiss();
-		}
-	}
 }
 
 class ClubHolder {
-
 	private TextView club=null;
     
 	ClubHolder(View row) {
-      
 		club = (TextView)row.findViewById(R.id.rowClubName);
-    	
 	}
     
 	void populateFrom(Cursor c, HelperSQL helper) {
-
 		String club_name=helper.getClubName(c);
 		club.setText(club_name);
-  
 	}
-	
 }
-
-

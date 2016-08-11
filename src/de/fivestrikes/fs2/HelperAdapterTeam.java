@@ -16,13 +16,11 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class HelperAdapterTeam extends CursorAdapter {
-	
+public class HelperAdapterTeam extends HelperBaseAdapter {
 	private SharedPreferences mPreferences;
 	HelperSQL sqlHelper=null;
 	HelperOnlineGetJSON getJsonHelper=null;
@@ -35,13 +33,10 @@ public class HelperAdapterTeam extends CursorAdapter {
 	String club_id=null;
 	String server_club_id=null;
 	String team_type_id=null;
-	Context ctxt = null;
 	ArrayList<String> listClubData = new ArrayList<String>();
 	ArrayList<String> listTeamData = new ArrayList<String>();
-	ProgressDialog progressDialog;
-	
+
 	public HelperAdapterTeam(Context context, Cursor c, String id) {
-		
 		super(context, c);
 		team_id = id;
 		sqlHelper=new HelperSQL(context);
@@ -49,7 +44,6 @@ public class HelperAdapterTeam extends CursorAdapter {
 		fctHelper=new HelperFunction();
 		screenDensity=fctHelper.getScreenDensity(context);
 		lytHelper=new HelperLayout();
-		
 	}
 
 	@Override
@@ -58,7 +52,6 @@ public class HelperAdapterTeam extends CursorAdapter {
 		
 		TeamHolder holder=(TeamHolder)row.getTag();
 		holder.populateFrom(c, sqlHelper);
-		
 	}
 	
 	@Override
@@ -69,18 +62,16 @@ public class HelperAdapterTeam extends CursorAdapter {
 		TeamHolder holder=new TeamHolder(row, ctxt);
 		row.setTag(holder);
 		return(row);
-		
 	}
 	
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		
 		View view = super.getView(position, convertView, parent);  
-		ctxt = parent.getContext();
+		setCtxt(parent.getContext());
 		Cursor c = (Cursor) getItem(position);
 		if(team_id != null){
 			if(team_id.equals(sqlHelper.getTeamID(c))){
-				view.setBackgroundColor(ctxt.getResources().getColor(R.color.green));
+				view.setBackgroundColor(getCtxt().getResources().getColor(R.color.green));
 			} 
 		}
 		
@@ -91,7 +82,6 @@ public class HelperAdapterTeam extends CursorAdapter {
 		// Falls Synchro-Button geklickt wird => Mannschaft mit der Server-Mannschaft synchronisieren
 		btn_synch.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				
 				long id = (Long) v.getTag();
 				team_id = String.valueOf(id);
 				server_team_id = sqlHelper.getTeamServerTeamID(team_id);
@@ -99,13 +89,13 @@ public class HelperAdapterTeam extends CursorAdapter {
 				server_club_id = sqlHelper.getTeamServerClubID(team_id);
 				team_type_id = sqlHelper.getTeamTypeID(team_id);
 				// Zunächst überprüfen, ob Nutzer eingeloggt ist
-				mPreferences = ctxt.getSharedPreferences("CurrentUser", ctxt.MODE_PRIVATE);
+				mPreferences = getCtxt().getSharedPreferences("CurrentUser", getCtxt().MODE_PRIVATE);
 				String auth_token = mPreferences.getString("AuthToken", "");
 				
 				if (auth_token.equals("")) {
-					messageBoxHandler1.sendEmptyMessage(0);
+					loginNotPossibleHandler.sendEmptyMessage(0);
 				} else {
-					progressDialog = ProgressDialog.show(ctxt, null, ctxt.getString(R.string.team_sync), true);
+					setProgressDialog(ProgressDialog.show(getCtxt(), null, getCtxt().getString(R.string.team_sync), true));
 					new SingleTeamSyncTask().execute();
 				}
 			}
@@ -118,33 +108,29 @@ public class HelperAdapterTeam extends CursorAdapter {
 		protected Void doInBackground(final Context... args) {
 			if (server_club_id == null) {
 				// Wenn Server-ID fehlt => ID vom Server laden und abspeichern
-				listClubData = getJsonHelper.getClubArray(null, sqlHelper.getClubNameByTeamID(team_id), ctxt);
+				listClubData = getJsonHelper.getClubArray(null, sqlHelper.getClubNameByTeamID(team_id), getCtxt());
 				
 				if (!listClubData.isEmpty()) {
-					
 					server_club_id = listClubData.get(0);
 					sqlHelper.updateTeam(team_id, server_team_id, club_id, server_club_id, team_type_id);
-					
 				}
 			}
 			
 			if (server_club_id != null) {
 				if (server_team_id == null) {
 					// Wenn die Server-ID der Mannschaft fehlt => ID vom Server laden und abspeichern
-					listTeamData = getJsonHelper.getTeamArray(server_club_id, team_type_id, ctxt);
+					listTeamData = getJsonHelper.getTeamArray(server_club_id, team_type_id, getCtxt());
 					
 					if (!listTeamData.isEmpty()) {
-						
 						server_team_id = listTeamData.get(0);
 						sqlHelper.updateTeam(team_id, server_team_id, club_id, server_club_id, team_type_id);
-						
 					}
 				}
 			}
 			
 			if(server_club_id != null && server_team_id != null) {
 				// Spieler der Mannschaft vom Server übertragen
-				getJsonHelper.loadPlayerFromServer(team_id, server_team_id, ctxt);
+				getJsonHelper.loadPlayerFromServer(team_id, server_team_id, getCtxt());
 				syncDoneHandler.sendEmptyMessage(0);
 			} else {
 				messageBoxHandler2.sendEmptyMessage(0);
@@ -153,43 +139,6 @@ public class HelperAdapterTeam extends CursorAdapter {
 		}
 	}
 
-	final Handler messageBoxHandler1 = new Handler() {
-		@Override
-		public void handleMessage(Message msg) {
-			dismissProgressDialog();
-			
-			// Nachrichtenbox einrichten
-			final Dialog dialog = new Dialog(ctxt);
-			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-			dialog.setContentView(R.layout.custom_dialog);
-
-			// Texte setzen
-			TextView title = (TextView) dialog.findViewById(R.id.title);
-			TextView text = (TextView) dialog.findViewById(R.id.text);
-			title.setText(R.string.synchro);
-			text.setText(R.string.text_login_not_possible);
-			
-			// Button definieren
-			LinearLayout lyt_button2 = (LinearLayout) dialog.findViewById(R.id.lyt_button2);
-			lyt_button2.removeAllViews();
-			LinearLayout lyt_button3 = (LinearLayout) dialog.findViewById(R.id.lyt_button3);
-			lyt_button3.removeAllViews();
-			
-			Button dialogButton1 = (Button) dialog.findViewById(R.id.button1);
-			dialogButton1.setText(R.string.okay);
-			
-			dialogButton1.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					dialog.dismiss();
-				}
-			});
-
-			dialog.show();
-			// Ende Nachrichtenbox
-		}
-	};
-	
 	final Handler messageBoxHandler2 = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
@@ -197,7 +146,7 @@ public class HelperAdapterTeam extends CursorAdapter {
 			
 			// Benachrichtigung, dass die Mannschaft nicht synchronisiert werden konnte, da diese auf dem Server nicht gefunden wurde
 			// Nachrichtenbox einrichten
-			final Dialog dialog = new Dialog(ctxt);
+			final Dialog dialog = new Dialog(getCtxt());
 			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 			dialog.setContentView(R.layout.custom_dialog);
 
@@ -235,7 +184,7 @@ public class HelperAdapterTeam extends CursorAdapter {
 			
 			// Benachrichtigung, dass die Mannschaft synchronisiert wurde
 			// Nachrichtenbox einrichten
-			final Dialog dialog = new Dialog(ctxt);
+			final Dialog dialog = new Dialog(getCtxt());
 			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 			dialog.setContentView(R.layout.custom_dialog);
 
@@ -258,7 +207,7 @@ public class HelperAdapterTeam extends CursorAdapter {
 				@Override
 				public void onClick(View v) {
 					dialog.dismiss();
-					ctxt.startActivity(new Intent(ctxt, SmartTeamList.class));
+					getCtxt().startActivity(new Intent(getCtxt(), SmartTeamList.class));
 				}
 			});
 
@@ -266,32 +215,22 @@ public class HelperAdapterTeam extends CursorAdapter {
 			// Ende Nachrichtenbox
 		}
 	};
-	
-	public void dismissProgressDialog() {
-		if (progressDialog != null && progressDialog.isShowing()) {
-			progressDialog.dismiss();
-		}
-	}
 }
 
 class TeamHolder {
-
 	private TextView club=null;
 	private TextView team=null;
 	private ImageView img_synch=null;
 	Context ctxt=null;
     
 	TeamHolder(View row, Context context) {
-      
 		club = (TextView)row.findViewById(R.id.rowClubName);
 		team = (TextView)row.findViewById(R.id.rowTeamType);
 		img_synch = (ImageView)row.findViewById(R.id.logo_synch);
 		ctxt = context;
-    	
 	}
     
 	void populateFrom(Cursor c, HelperSQL helper) {
-		
 		Integer int_synch=0;
 		String team_id = helper.getTeamID(c);
 		String club_name=helper.getClubNameByTeamID(team_id);
@@ -335,8 +274,5 @@ class TeamHolder {
 		
 		club.setText(club_name);
 		team.setText(team_type_name);
-  
 	}
 }
-
-
