@@ -1,6 +1,9 @@
 package de.fivestrikes.fs2;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -8,21 +11,17 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.util.Log;
 import android.app.ActionBar;
-import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
-import android.content.Intent;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
-import android.widget.Toast;
-
 
 public class TabPlayerActivity extends FragmentActivity {
-
+	private ProgressDialog progressDialog;
 	private SharedPreferences mPreferences;
 	HelperSQL sqlHelper = null;
 	HelperOnlineGetJSON getJsonHelper=null;
@@ -157,27 +156,15 @@ public class TabPlayerActivity extends FragmentActivity {
 				} else {
 					
 					// Synchronisiere Spieler der Mannschaft
-		      	  		if (server_team_id != null) {
-		      	  		
-		      	  			// Lade Spieler vom Server
-		      	  			getJsonHelper.loadPlayerFromServer(team_id, server_team_id, getApplicationContext());
-		      	  		
-		      	  			// Aktualisiere die Spielerliste
-		      	  			fragPlayerList = (TabFragPlayerList) getSupportFragmentManager().findFragmentById(R.id.frag_player_list);
-		      	  		
-		      	  			// Neutralisiere das Editierfenster
-		      	  			args.putString("Activity", "Player");
-		      	  			fragPlayerList.refreshContent(team_id, null, args);
-		      			
-		      	  			TabFragEmpty secondFragment = new TabFragEmpty();
-		      	  			secondFragment.setArguments(args);
-		      	  			getSupportFragmentManager().beginTransaction()
-		                  			.add(R.id.frag_player_edit, secondFragment).commit();
-		      	  		
-		      	  		} else {
-		      	  		
-		      	  			// DialogBox einrichten
-		      	  			final Dialog dialog = new Dialog(this);
+	      	  		if (server_team_id != null) {
+	      	  		
+	      	  			setProgressDialog(ProgressDialog.show(this, null, getString(R.string.player_sync), true));
+	      	  			new PlayerSyncTask().execute();
+	      	  		
+	      	  		} else {
+	      	  		
+	      	  			// DialogBox einrichten
+	      	  			final Dialog dialog = new Dialog(this);
 						dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 						dialog.setContentView(R.layout.custom_dialog);
 
@@ -207,9 +194,9 @@ public class TabPlayerActivity extends FragmentActivity {
 		      	  			// Ende Nachrichtenbox
 		      	  		
 		      	  		}
-				}
+					}
 		      	  	
-		      	  	return true;
+		      	 return true;
 
 			default:
 				return super.onOptionsItemSelected(item);
@@ -217,22 +204,59 @@ public class TabPlayerActivity extends FragmentActivity {
 		}
 		return true;
 	}
+
+	final class PlayerSyncTask extends AsyncTask<Context, Void, Void> {
+		protected Void doInBackground(final Context... args) {
+	  		// Lade Spieler vom Server
+	  		getJsonHelper.loadPlayerFromServer(team_id, server_team_id, getApplicationContext());
+	  		syncDoneHandler.sendEmptyMessage(0);
+			return null;
+		}
+	};
+	
+	final Handler syncDoneHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			dismissProgressDialog();
+			
+  			// Aktualisiere die Spielerliste
+  			fragPlayerList = (TabFragPlayerList) getSupportFragmentManager().findFragmentById(R.id.frag_player_list);
+  		
+  			// Neutralisiere das Editierfenster
+  			args.putString("Activity", "Player");
+  			fragPlayerList.refreshContent(team_id, null, args);
+		
+  			TabFragEmpty secondFragment = new TabFragEmpty();
+  			secondFragment.setArguments(args);
+  			getSupportFragmentManager().beginTransaction()
+      			.add(R.id.frag_player_edit, secondFragment).commit();
+		}
+	};
 	
 	private void CreateMenu(Menu menu) {
-	
 		MenuItem mnu1 = menu.add(0, 0, 0, "Add"); {
-
 			mnu1.setIcon(R.drawable.add);
 			mnu1.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-			
 		}
 		
 		MenuItem mnu2 = menu.add(0, 1, 0, "Synch"); {
-
 			mnu2.setIcon(R.drawable.cloud_sync_white);
 			mnu2.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-			
 		}
+	}
+	
+	public void dismissProgressDialog() {
+		if (getProgressDialog() != null && getProgressDialog().isShowing()) {
+			getProgressDialog().dismiss();
+		}
+	}
+
+	public ProgressDialog getProgressDialog() {
+		return progressDialog;
+	}
+
+	public void setProgressDialog(ProgressDialog progressDialog) {
+		this.progressDialog = progressDialog;
 	}
 }
 		

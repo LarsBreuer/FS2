@@ -1,29 +1,22 @@
 package de.fivestrikes.fs2;
 
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
+import android.os.Message;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
+import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
-import android.content.pm.ActivityInfo;
-import android.database.Cursor;
 
 public class TabFragTeamOnline extends ListFragment {
-
+	private ProgressDialog progressDialog;
 	private static Context context;
 	String strTeamName=null;
 	HelperOnlineGetJSON getJsonHelper=null;
@@ -54,27 +47,49 @@ public class TabFragTeamOnline extends ListFragment {
 		// Suche nach Mannschaftsnamen auf dem Server
 		btn_team_search.setOnClickListener(new View.OnClickListener() {
 			@Override
-	            public void onClick(View v) {
-
-/** TODO -0- => ProgressDialog bzw. Animated Gif mit Ladesymbol einbauen - siehe meine Beschreibung  in der ToDo Handball App */
-				
-				getJsonHelper = new HelperOnlineGetJSON();
-				edit_team_search = (EditText) view.findViewById(R.id.team_search);
-				strTeamName = edit_team_search.getText().toString();
-				FragmentManager fragmentManager = getFragmentManager();
-				getJsonHelper.synchTeam(strTeamName, context, null, fragmentManager, args);
-			
+            public void onClick(View v) {
+				searchTeams();
 			}
 		});
 		
 		return view;
-		
 	}
 	
-	@Override
-	public void onResume() {
+	public void searchTeams() {
+		getJsonHelper = new HelperOnlineGetJSON();
+		edit_team_search = (EditText) view.findViewById(R.id.team_search);
+		strTeamName = edit_team_search.getText().toString();
+		setProgressDialog(ProgressDialog.show(getActivity(), null, getString(R.string.team_search), true));
+		new SearchTeamsTask().execute();
+	}
+	
+	final class SearchTeamsTask extends AsyncTask<Context, Void, Void> {
+		protected Void doInBackground(final Context... cargs) {
+			FragmentManager fragmentManager = getFragmentManager();
+			getJsonHelper.synchTeam(strTeamName, context, null, fragmentManager, args);
+			syncDoneHandler.sendEmptyMessage(0);
+			return null;
+		}
+	};
+	
+	final Handler syncDoneHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			dismissProgressDialog();
+		}
+	};
+	
+	public void dismissProgressDialog() {
+		if (getProgressDialog() != null && getProgressDialog().isShowing()) {
+			getProgressDialog().dismiss();
+		}
+	}
 
-		super.onResume();
-	    	
+	public ProgressDialog getProgressDialog() {
+		return progressDialog;
+	}
+
+	public void setProgressDialog(ProgressDialog progressDialog) {
+		this.progressDialog = progressDialog;
 	}
 }

@@ -1,37 +1,22 @@
 package de.fivestrikes.fs2;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import android.app.ActionBar;
 import android.app.ListActivity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
+import android.os.Message;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.AdapterView.OnItemClickListener;
 
 public class SmartTeamOnline extends ListActivity {
-	
+	private ProgressDialog progressDialog;
 	private static Context context;
 	String strTeamName=null;
 	String team_type_name=null;
@@ -73,12 +58,8 @@ public class SmartTeamOnline extends ListActivity {
 		// Suche nach Mannschaftsnamen auf dem Server
 		btn_team_search.setOnClickListener(new View.OnClickListener() {
 			@Override
-	            public void onClick(View view) {
-/** TODO -0- => ProgressDialog bzw. Animated Gif mit Ladesymbol einbauen - siehe meine Beschreibung  in der ToDo Handball App */
-				edit_team_search = (EditText) findViewById(R.id.team_search);
-				strTeamName = edit_team_search.getText().toString();
-				getJsonHelper.synchTeam(strTeamName, context, team_id, null, null);
-			
+            public void onClick(View view) {
+				searchTeams();
 			}
 		});
 		
@@ -87,8 +68,29 @@ public class SmartTeamOnline extends ListActivity {
 		ActionBar actionBar = getActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);
 		actionBar.show();
-		
 	}
+	
+	public void searchTeams() {
+		edit_team_search = (EditText) findViewById(R.id.team_search);
+		strTeamName = edit_team_search.getText().toString();
+		setProgressDialog(ProgressDialog.show(this, null, getString(R.string.team_search), true));
+		new SearchTeamsTask().execute();
+	}
+	
+	final class SearchTeamsTask extends AsyncTask<Context, Void, Void> {
+		protected Void doInBackground(final Context... cargs) {
+			getJsonHelper.synchTeam(strTeamName, context, team_id, null, null);
+			syncDoneHandler.sendEmptyMessage(0);
+			return null;
+		}
+	};
+	
+	final Handler syncDoneHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			dismissProgressDialog();
+		}
+	};
 	
 /* Action Bar einrichten */
 	
@@ -119,8 +121,20 @@ public class SmartTeamOnline extends ListActivity {
         
 	}
 	
-	private void CreateMenu(Menu menu) {
-		
+	private void CreateMenu(Menu menu) {	
 	}
 
+	public void dismissProgressDialog() {
+		if (getProgressDialog() != null && getProgressDialog().isShowing()) {
+			getProgressDialog().dismiss();
+		}
+	}
+
+	public ProgressDialog getProgressDialog() {
+		return progressDialog;
+	}
+
+	public void setProgressDialog(ProgressDialog progressDialog) {
+		this.progressDialog = progressDialog;
+	}
 }

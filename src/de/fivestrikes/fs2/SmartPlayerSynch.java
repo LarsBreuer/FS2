@@ -1,37 +1,22 @@
 package de.fivestrikes.fs2;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import android.app.ActionBar;
 import android.app.ListActivity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
+import android.os.Message;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.AdapterView.OnItemClickListener;
 
 public class SmartPlayerSynch extends ListActivity {
-	
+	private ProgressDialog progressDialog;
 	private static Context context;
 	String strPlayerName=null;
 	String url=null;
@@ -98,12 +83,31 @@ public class SmartPlayerSynch extends ListActivity {
 		ActionBar actionBar = getActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);
 		actionBar.show();
-		
-/* Spielerliste einrichten */
-		
-		getJsonHelper.synchPlayer(server_team_id, context, null, null);
-
 	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		/* Spielerliste einrichten */
+		setProgressDialog(ProgressDialog.show(this, null, getString(R.string.player_sync), true));
+		new PlayerSyncTask().execute();
+	}
+	
+	final class PlayerSyncTask extends AsyncTask<Context, Void, Void> {
+		protected Void doInBackground(final Context... args) {
+	  		// Lade Spieler vom Server
+			getJsonHelper.synchPlayer(server_team_id, context, null, null);
+			syncDoneHandler.sendEmptyMessage(0);
+			return null;
+		}
+	};
+	
+	final Handler syncDoneHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			dismissProgressDialog();
+		}
+	};
 	
 /* Action Bar einrichten */
 	
@@ -135,7 +139,19 @@ public class SmartPlayerSynch extends ListActivity {
 	}
 	
 	private void CreateMenu(Menu menu) {
-		
+	}
+	
+	public void dismissProgressDialog() {
+		if (getProgressDialog() != null && getProgressDialog().isShowing()) {
+			getProgressDialog().dismiss();
+		}
 	}
 
+	public ProgressDialog getProgressDialog() {
+		return progressDialog;
+	}
+
+	public void setProgressDialog(ProgressDialog progressDialog) {
+		this.progressDialog = progressDialog;
+	}
 }

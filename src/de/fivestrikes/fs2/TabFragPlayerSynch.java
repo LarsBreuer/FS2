@@ -1,30 +1,22 @@
 package de.fivestrikes.fs2;
 
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
+import android.os.Message;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
+import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
-import android.content.pm.ActivityInfo;
-import android.database.Cursor;
 
 public class TabFragPlayerSynch extends ListFragment {
-
+	private ProgressDialog progressDialog;
 	private static Context context;
 	String strTeamName=null;
 	HelperOnlineGetJSON getJsonHelper=null;
@@ -54,17 +46,44 @@ public class TabFragPlayerSynch extends ListFragment {
 		text.setText(getResources().getString(R.string.text_player_search_explain));
 		LinearLayout lyt_button_all = (LinearLayout) view.findViewById(R.id.lyt_button_all);
 		lyt_button_all.removeAllViews();
-		FragmentManager fragmentManager = getFragmentManager();
-		getJsonHelper.synchPlayer(null, context, fragmentManager, args);
 		
 		return view;
-		
 	}
 	
 	@Override
 	public void onResume() {
-
 		super.onResume();
-	    	
+		setProgressDialog(ProgressDialog.show(getActivity(), null, getString(R.string.player_sync), true));
+		new PlayerSyncTask().execute();
+	}
+	
+	final class PlayerSyncTask extends AsyncTask<Context, Void, Void> {
+		protected Void doInBackground(final Context... cargs) {
+			FragmentManager fragmentManager = getFragmentManager();
+			getJsonHelper.synchPlayer(null, context, fragmentManager, args);
+			syncDoneHandler.sendEmptyMessage(0);
+			return null;
+		}
+	};
+	
+	final Handler syncDoneHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			dismissProgressDialog();
+		}
+	};
+	
+	public void dismissProgressDialog() {
+		if (getProgressDialog() != null && getProgressDialog().isShowing()) {
+			getProgressDialog().dismiss();
+		}
+	}
+
+	public ProgressDialog getProgressDialog() {
+		return progressDialog;
+	}
+
+	public void setProgressDialog(ProgressDialog progressDialog) {
+		this.progressDialog = progressDialog;
 	}
 }
