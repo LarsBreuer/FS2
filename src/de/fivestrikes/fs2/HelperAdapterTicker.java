@@ -100,8 +100,7 @@ public class HelperAdapterTicker extends CursorAdapter {
 	}
 	
 	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
-		
+	public View getView(int position, View convertView, ViewGroup parent) {		
 		View view = super.getView(position, convertView, parent);
 		ctxt = parent.getContext();
 		res = ctxt.getResources();
@@ -110,30 +109,28 @@ public class HelperAdapterTicker extends CursorAdapter {
 		ticker_activity_id = sqlHelper.getTickerActivityID(c);
 		ticker_event_id = sqlHelper.getTickerEventIDByActivityID(ticker_activity_id);
 
-/** TODO -0- => Abstände verändern sich beim Scrollen durch den Ticker. */
+		RelativeLayout row_ticker = (RelativeLayout) view.findViewById(R.id.row_ticker);
+		LayoutParams params = row_ticker.getLayoutParams();
+		int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, res.getDisplayMetrics());
+		params.height = height; // Standardhöhe setzen, da die Reihe widerverwendet wird und ggfs. schon in der Höhe manipuliert wurde
 		
 		// Falls sich das Ticker Event geändert hat, füge eine größere Lücke ein
 		if (position + 1 < ticker_size) {
 			if (ticker.get(position + 1) != null) {
 				if (!ticker.get(position + 1).equals(ticker.get(position))) {
-				
-					// Höhe des Tickers ändern
-					RelativeLayout row_ticker = (RelativeLayout) view.findViewById(R.id.row_ticker);
-					LayoutParams params = row_ticker.getLayoutParams();
-					int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 68, res.getDisplayMetrics());
+					// Höhe des Tickers vergrößern
+					height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 68, res.getDisplayMetrics());
 					params.height = height;
-
 				} 
 			}
 		}
 		
 		return view;
-		
 	}
-	
+
 	private static class ViewHolder {
 		View view;
-	}  
+	}
 }
 
 class TickerHolder {
