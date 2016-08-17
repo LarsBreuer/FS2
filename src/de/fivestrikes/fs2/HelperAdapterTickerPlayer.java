@@ -1,32 +1,17 @@
 package de.fivestrikes.fs2;
 
-import java.util.ArrayList;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.View.OnClickListener;
 import android.widget.CursorAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class HelperAdapterTickerPlayer extends CursorAdapter {
 	
@@ -89,7 +74,6 @@ public class HelperAdapterTickerPlayer extends CursorAdapter {
 	
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-/** TODO -0- => Symbole für Einwechslung und Strafen verändern sich beim scrollen */
 		View view = super.getView(position, convertView, parent);  
 		ctxt = parent.getContext();
 		res = ctxt.getResources();
@@ -134,11 +118,12 @@ public class HelperAdapterTickerPlayer extends CursorAdapter {
 		}
 		cTicker.close();
 		
+		img_player_active.setImageResource(0); // Bild zurücksetzen
 		if (player_in == true) {
-/** TODO -1- => Logo für Spieler eingewechselt einsetzen */
 			img_player_active.setImageResource(R.drawable.cloud_green);
 		}
 		
+		img_penalty.setImageResource(0); // Bild zurücksetzen
 		// Welche Strafen hat der Spieler
 		if (sqlHelper.count_ticker_activity(game_id, null, player_id, red_card_id, null, null) > 0) {				// Rote Karte eintragen
 			
@@ -182,7 +167,6 @@ public class HelperAdapterTickerPlayer extends CursorAdapter {
 	    	}
 
 		return view;
-		
 	}
 }
 
