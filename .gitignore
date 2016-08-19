@@ -1,2 +1,7 @@
 bin
+<<<<<<< Updated upstream
 gen
+=======
+
+src/de/fivestrikes/fs2/MainTabActivity.java
+>>>>>>> Stashed changes

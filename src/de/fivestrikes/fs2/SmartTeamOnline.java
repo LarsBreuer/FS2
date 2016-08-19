@@ -58,7 +58,7 @@ public class SmartTeamOnline extends ListActivity {
 		// Suche nach Mannschaftsnamen auf dem Server
 		btn_team_search.setOnClickListener(new View.OnClickListener() {
 			@Override
-            public void onClick(View view) {
+			public void onClick(View view) {
 				searchTeams();
 			}
 		});

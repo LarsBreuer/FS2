@@ -461,6 +461,7 @@ public class HelperLayout {
 		if (args != null) {
 			
 			team_id = args.getString("TeamID");
+			// sqlHelper.deleteTeamServerIDTeamID(team_id);
 			server_team_id = args.getString("ServerTeamID");
 			club_id = args.getString("ClubID");
 			server_club_id = args.getString("ServerClubID");
@@ -1740,7 +1741,6 @@ public class HelperLayout {
 				year = game_date.getYear()+1900;
 			}
 			catch (ParseException e) {}
-			
 			
 		}
 		

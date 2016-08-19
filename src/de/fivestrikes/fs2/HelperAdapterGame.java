@@ -110,6 +110,8 @@ class GameHolder {
 		Integer int_strikes = helper.count_ticker_activity(game_id, null, null, null, null, null);
 		String team_home = helper.getGameTeamHomeByID(game_id);
 		String team_away = helper.getGameTeamAwayByID(game_id);
+		String team_home_id = helper.getGameTeamHomeIDByID(game_id);
+		String team_away_id = helper.getGameTeamAwayIDByID(game_id);
 		
 		// Datum einrichten
 		int year = 0;
@@ -155,7 +157,7 @@ class GameHolder {
 			.append(day).append(".")
 			.append(month + 1).append(".")
 			.append(year));
-		game_fixture.setText(team_home + " - " + team_away);
+		game_fixture.setText(team_home +  " - " + team_away);
   
 	}
 }

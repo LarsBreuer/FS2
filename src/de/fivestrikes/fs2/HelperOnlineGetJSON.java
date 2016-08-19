@@ -610,7 +610,7 @@ public class HelperOnlineGetJSON {
 		
 		// Leerzeichen in dem url-String bearbeiten
 		url = fctHelper.revise(url);
-
+Log.v("HelperOnlineGetJSON url", String.valueOf(url));
 		// getting JSON string from URL
 		JSONObject json = jsonHelper.getJSONFromUrl(url);
 	 
@@ -621,11 +621,11 @@ public class HelperOnlineGetJSON {
 	            	server_club_id = c.getString(TAG_ID);
 	            	club_name = c.getString(TAG_CLUB_NAME);
 	            	club_name_short = c.getString(TAG_CLUB_SHORT);
-	            	listClubData.add(club_id);
 	            	
+	            	listClubData.add(server_club_id);
 	            	listClubData.add(club_name);
 	            	listClubData.add(club_name_short);
-	            		
+Log.v("HelperOnlineGetJSON listClubData", String.valueOf(listClubData));
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}

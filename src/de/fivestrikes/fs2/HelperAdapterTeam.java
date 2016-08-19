@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -106,6 +107,7 @@ public class HelperAdapterTeam extends HelperBaseAdapter {
 	
 	final class SingleTeamSyncTask extends AsyncTask<Context, Void, Void> {
 		protected Void doInBackground(final Context... args) {
+Log.v("HelperAdapterTeam server_club_id", String.valueOf(server_club_id));
 			if (server_club_id == null) {
 				// Wenn Server-ID fehlt => ID vom Server laden und abspeichern
 				listClubData = getJsonHelper.getClubArray(null, sqlHelper.getClubNameByTeamID(team_id), getCtxt());

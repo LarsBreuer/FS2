@@ -294,7 +294,7 @@ public class MainTabActivity extends Activity {
 			dialogButton2.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-/** TODO -0- => Programm stürzt ab, nachdem man eingeloggt ist */
+					
 					dialog.dismiss();
 					
 				}

@@ -366,6 +366,19 @@ class HelperSQL extends SQLiteOpenHelper {
 		  
 	}
 	
+	public void deleteClubServerID(String club_id) {
+		
+		ContentValues cv=new ContentValues();
+		String[] args={club_id};
+		
+		Integer server_club_id = null;
+		
+		cv.put("server_club_id", server_club_id);
+		
+		getWritableDatabase().update("club", cv, "_ID=?", args);
+		
+	}
+	
 	// Clubdaten aktualisiseren
 	
 	public void updateClub(String id, Integer server_club_id, String club_name, String club_name_short) {
@@ -550,6 +563,51 @@ class HelperSQL extends SQLiteOpenHelper {
 		 String[] args={id};
 		 getWritableDatabase().delete("team", "_ID=?", args);
 		  
+	}
+	
+	public void deleteTeamServerIDTeamID(String team_id) {
+		
+		String[] args={String.valueOf(team_id)};
+		
+		// Server Team ID löschen
+		deleteTeamServerID(team_id);
+		
+		// Server Club ID löschen
+		String club_id = getTeamClubIDByTeamID(team_id);
+		deleteClubServerID(club_id);
+		
+		// Server Player IDs löschen
+		SQLiteDatabase db = getWritableDatabase();
+		Cursor c = db.rawQuery("SELECT * FROM player WHERE team_id = ?", args);
+		c.moveToFirst();
+		
+		String player_id;
+
+		// Alle Tickermeldungen abfragen und Daten in das Array eintragen eintragen
+		for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+
+			player_id = getPlayerID(c);
+			deletePlayerServerID(player_id);
+
+		}
+		
+		c.close();
+		
+	}
+	
+	public void deleteTeamServerID(String team_id) {
+		
+		ContentValues cv=new ContentValues();
+		String[] args={team_id};
+		
+		Integer server_team_id = null;
+		Integer server_club_id = null;
+		
+		cv.put("server_team_id", server_team_id);
+		cv.put("server_club_id", server_club_id);
+		
+		getWritableDatabase().update("team", cv, "_ID=?", args);
+		
 	}
 	
 	// Mannschaftsdaten aktualisiseren
@@ -958,6 +1016,19 @@ class HelperSQL extends SQLiteOpenHelper {
 		 String[] args={id};
 		 getWritableDatabase().delete("player", "_ID=?", args);
 		  
+	}
+	
+	public void deletePlayerServerID(String player_id) {
+		
+		ContentValues cv=new ContentValues();
+		String[] args={player_id};
+		
+		Integer server_player_id = null;
+		
+		cv.put("server_player_id", server_player_id);
+		
+		getWritableDatabase().update("player", cv, "_ID=?", args);
+		
 	}
 	
 	// Spielerdaten abfragen

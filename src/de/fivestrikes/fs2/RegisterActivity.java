@@ -119,7 +119,7 @@ public class RegisterActivity extends Activity {
 		mUserName = userNameField.getText().toString();
 		EditText userEmailField = (EditText) findViewById(R.id.userEmail);
 		mUserEmail = userEmailField.getText().toString();
-		mUserEmail = "info@fivestrikes.de";
+		// mUserEmail = "info@fivestrikes.de";
 		EditText userPasswordField = (EditText) findViewById(R.id.userPassword);
 		mUserPassword = userPasswordField.getText().toString();
 		EditText userPasswordConfirmationField = (EditText) findViewById(R.id.userPasswordConfirmation);
