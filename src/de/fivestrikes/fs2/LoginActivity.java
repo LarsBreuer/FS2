@@ -104,7 +104,7 @@ public class LoginActivity extends Activity {
 
 		EditText user_email_field = (EditText) findViewById(R.id.user_email);
 		mUserEmail = user_email_field.getText().toString();
-		// mUserEmail = "lars-breuer@gmx.de";
+		//mUserEmail = "lars-breuer@gmx.de";
 		EditText user_password_field = (EditText) findViewById(R.id.user_password);
 		mUserPassword = user_password_field.getText().toString();
 
