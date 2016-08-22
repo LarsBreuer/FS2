@@ -93,6 +93,18 @@ public class SmartPlayerSynch extends ListActivity {
 		new PlayerSyncTask().execute();
 	}
 	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		dismissProgressDialog();
+	}
+	
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		dismissProgressDialog();
+	}
+	
 	final class PlayerSyncTask extends AsyncTask<Context, Void, Void> {
 		protected Void doInBackground(final Context... args) {
 	  		// Lade Spieler vom Server

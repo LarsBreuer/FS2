@@ -77,6 +77,18 @@ public class SmartTeamOnline extends ListActivity {
 		new SearchTeamsTask().execute();
 	}
 	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		dismissProgressDialog();
+	}
+	
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		dismissProgressDialog();
+	}
+	
 	final class SearchTeamsTask extends AsyncTask<Context, Void, Void> {
 		protected Void doInBackground(final Context... cargs) {
 			getJsonHelper.synchTeam(strTeamName, context, team_id, null, null);
