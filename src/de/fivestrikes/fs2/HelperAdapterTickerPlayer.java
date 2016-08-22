@@ -119,11 +119,13 @@ public class HelperAdapterTickerPlayer extends CursorAdapter {
 		cTicker.close();
 		
 		img_player_active.setImageResource(0); // Bild zurücksetzen
+		img_player_active.setImageResource(android.R.color.transparent);
 		if (player_in == true) {
 			img_player_active.setImageResource(R.drawable.cloud_green);
 		}
 		
 		img_penalty.setImageResource(0); // Bild zurücksetzen
+		img_penalty.setImageResource(android.R.color.transparent);
 		// Welche Strafen hat der Spieler
 		if (sqlHelper.count_ticker_activity(game_id, null, player_id, red_card_id, null, null) > 0) {				// Rote Karte eintragen
 			
