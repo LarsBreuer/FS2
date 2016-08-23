@@ -187,7 +187,7 @@ public class HelperOnlineGetJSON {
 
 /* Erstellung der Mannschaftsliste und Auswahl einer Mannschaft definieren */
 		
-		ListAdapter adapter = new SimpleAdapter(context, teamList, R.layout.row_team_raw, 
+		final ListAdapter adapter = new SimpleAdapter(context, teamList, R.layout.row_team_raw, 
 				new String[] { TAG_TEAM_CLUB_NAME, TAG_TEAM_TYPE_NAME }, new int[] {
 	                        R.id.rowClubName, R.id.rowTeamType });
 		
@@ -200,8 +200,14 @@ public class HelperOnlineGetJSON {
 			
 		} else {
 			
-			((ListActivity) context).setListAdapter(adapter);
-			lv = ((ListActivity) context).getListView();
+			((ListActivity) context).runOnUiThread(
+					new Runnable() {
+						@Override
+						public void run() {
+							((ListActivity) context).setListAdapter(adapter);
+							lv = ((ListActivity) context).getListView();
+						}
+			});
 			
 		}
 		
