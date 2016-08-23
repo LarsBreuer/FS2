@@ -271,6 +271,8 @@ public class RegisterActivity extends Activity {
 					userObj.put("name", mUserName);
 					userObj.put("password", mUserPassword);
 					userObj.put("password_confirmation", mUserPasswordConfirmation);
+					userObj.put("terms", "1");
+					userObj.put("privacy", "1");
 					holder.put("user", userObj);
 					StringEntity se = new StringEntity(holder.toString());
 					post.setEntity(se);
