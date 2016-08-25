@@ -146,7 +146,7 @@ public class HelperOnlineGetJSON {
 		final ArrayList<HashMap<String, String>> teamList = new ArrayList<HashMap<String, String>>();
 
 		// getting JSON string from URL
-		Log.v("HelperOnlineGetJSON url", url);
+		Log.v("HelperOnlineGetJSON url 0", url);
 		JSONObject json = jsonHelper.getJSONFromUrl(url);
 	 
 		try {
@@ -178,7 +178,7 @@ public class HelperOnlineGetJSON {
 	            		
 	            		// adding HashList to ArrayList
 	            		teamList.add(map);
-	            		
+	            		Log.v("HelperOnlineGetJSON teamList", String.valueOf(teamList));
 	            }
 	            
 		} catch (JSONException e) {
@@ -206,24 +206,28 @@ public class HelperOnlineGetJSON {
 			});
 
 		} else {
-			
+Log.v("HelperOnlineGetJSON adapter", String.valueOf(adapter));
 			((ListActivity) context).runOnUiThread(
 					new Runnable() {
 						@Override
 						public void run() {
 							((ListActivity) context).setListAdapter(adapter);
 							lv = ((ListActivity) context).getListView();
+							Log.v("HelperOnlineGetJSON lv 1", String.valueOf(lv));
 						}
 			});
 			
 		}
 		
+Log.v("HelperOnlineGetJSON lv 2", String.valueOf(lv));
+		
 		if (lv != null) {
+			Log.v("HelperOnlineGetJSON lv 3", String.valueOf(lv));
 			lv.setOnItemClickListener(new OnItemClickListener() {
 				
 				@Override
 		            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-					
+Log.v("HelperOnlineGetJSON", "1 aufgerufen");
 					// getting values from selected ListItem
 					server_team_id = teamList.get(position).get(TAG_ID);
 					server_club_id = teamList.get(position).get(TAG_TEAM_CLUB_ID);
@@ -231,7 +235,7 @@ public class HelperOnlineGetJSON {
 					club_name = teamList.get(position).get(TAG_TEAM_CLUB_NAME);
 					club_id=sqlHelper.getClubIDByClubName(club_name);
 					listClubData = getClubArray(server_club_id, null, context.getApplicationContext());
-					
+Log.v("HelperOnlineGetJSON listClubData", String.valueOf(listClubData));
 					if (listClubData.size() > 0) {
 						
 						club_name = listClubData.get(1);
@@ -383,7 +387,6 @@ public class HelperOnlineGetJSON {
 				}
 			});			
 		}
-	
 	}
 
 /*
@@ -640,7 +643,7 @@ public class HelperOnlineGetJSON {
 		
 		// Leerzeichen in dem url-String bearbeiten
 		url = fctHelper.revise(url);
-Log.v("HelperOnlineGetJSON url", String.valueOf(url));
+Log.v("HelperOnlineGetJSON url 1", String.valueOf(url));
 		// getting JSON string from URL
 		JSONObject json = jsonHelper.getJSONFromUrl(url);
 	 
@@ -723,7 +726,7 @@ Log.v("HelperOnlineGetJSON listClubData", String.valueOf(listClubData));
 		// Leerzeichen in dem url-String bearbeiten
 		url = fctHelper.revise(url);
 		
-		Log.v("HelperOnlineGetJSON url", url);
+		Log.v("HelperOnlineGetJSON url 2", url);
 		JSONObject json = jsonHelper.getJSONFromUrl(url);
 		
 		try {
@@ -787,7 +790,7 @@ Log.v("HelperOnlineGetJSON listClubData", String.valueOf(listClubData));
 			}
 		}
 		
-		Log.v("HelperOnlineGetJSON url", url);
+		Log.v("HelperOnlineGetJSON url 3", url);
 		
 		// Leerzeichen in dem url-String bearbeiten
 		url = fctHelper.revise(url);
