@@ -18,6 +18,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -89,7 +90,8 @@ public class RegisterActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				
-				startActivity(new Intent(getApplicationContext(), TermsActivity.class));
+				Uri uri = Uri.parse( "http://www.fivesweb.de/terms.pdf" );
+				startActivity( new Intent( Intent.ACTION_VIEW, uri ) );
 				
 			}
 		});
@@ -100,7 +102,8 @@ public class RegisterActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				
-				startActivity(new Intent(getApplicationContext(), PrivacyActivity.class));
+				Uri uri = Uri.parse( "http://www.fivesweb.de/privacy.pdf" );
+				startActivity( new Intent( Intent.ACTION_VIEW, uri ) );
 				
 			}
 		});

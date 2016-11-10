@@ -39,6 +39,7 @@
         android:layout_marginLeft="9dp"
 		android:layout_marginRight="9dp"
         android:textColor="@color/grey_dark"
+        android:textCursorDrawable="@null"
         android:textSize="18dp" 
         android:background="@android:color/white"
 	/>

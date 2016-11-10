@@ -51,6 +51,7 @@
         	android:textColor="@color/grey_dark"
         	android:textSize="18dp" 
         	android:background="@android:color/white"
+        	android:textCursorDrawable="@null"
 		/>
 	
 		<TextView 

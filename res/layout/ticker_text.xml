@@ -35,6 +35,7 @@
         android:layout_height="96dp"
         android:background="@android:color/white"
         android:textColor="@color/grey_dark"
+        android:textCursorDrawable="@null"
         android:inputType="textMultiLine"
         android:textSize="14dip"
         android:gravity="left|top"

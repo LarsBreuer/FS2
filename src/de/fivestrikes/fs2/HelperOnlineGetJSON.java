@@ -148,7 +148,7 @@ public class HelperOnlineGetJSON {
 		// getting JSON string from URL
 		Log.v("HelperOnlineGetJSON url 0", url);
 		JSONObject json = jsonHelper.getJSONFromUrl(url);
-	 
+/** TODO -0- => Fehlermeldung, falls json null ist */
 		try {
 
 	            // Getting Array of Contacts
@@ -201,7 +201,7 @@ public class HelperOnlineGetJSON {
 						@Override
 						public void run() {
 							fragTeamOnline.setListAdapter(adapter);
-							lv = fragTeamOnline.getListView();
+							lv = fragTeamOnline.getListView(); 
 						}
 			});
 
@@ -251,7 +251,7 @@ Log.v("HelperOnlineGetJSON listClubData", String.valueOf(listClubData));
 						
 					} 
 
-	/* Überprüfen, ob Verein mit gleichem Namen bereits lokal vorhanden ist */
+/* Überprüfen, ob Verein mit gleichem Namen bereits lokal vorhanden ist */
 					
 					if (club_id != null) {														// Falls der Verein schon angelegt wurde
 						if (sqlHelper.getServerClubIDByClubName(club_name) == null) {		// Falls die Server ID noch nicht übertragen wurde...

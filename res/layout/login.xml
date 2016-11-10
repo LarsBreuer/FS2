@@ -29,6 +29,7 @@
         android:textSize="18dp" 
         android:background="@android:color/white"
         android:textColor="@color/grey_dark"
+        android:textCursorDrawable="@null"
         android:inputType="textEmailAddress" >
 	    <requestFocus />
 	</EditText>
@@ -50,6 +51,7 @@
         android:textSize="18dp" 
         android:background="@android:color/white"
         android:textColor="@color/grey_dark"
+        android:textCursorDrawable="@null"
         android:inputType="textPassword"
 	/>
 	

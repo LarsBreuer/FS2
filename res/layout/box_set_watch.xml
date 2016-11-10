@@ -42,7 +42,8 @@
         	android:layout_height="50dip"
         	android:layout_alignParentLeft="true"
         	android:background="@drawable/edit_text_style"
-        	android:gravity="center" >
+        	android:gravity="center"
+        	android:textCursorDrawable="@null" >
 
         	<requestFocus />
     	</EditText>
@@ -69,7 +70,8 @@
         	android:layout_height="50dip" 
         	android:layout_alignParentRight="true"
         	android:background="@drawable/edit_text_style"
-        	android:gravity="center"  >
+        	android:gravity="center"
+        	android:textCursorDrawable="@null"  >
 
 	    </EditText>
 	    
