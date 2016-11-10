@@ -202,6 +202,176 @@ public class HelperOnlineGetJSON {
 						public void run() {
 							fragTeamOnline.setListAdapter(adapter);
 							lv = fragTeamOnline.getListView(); 
+							
+/** TODO -1- => Testen, ob das auch bei Tablet funktioniert */
+/** TODO -0- => Gleicher Code bei Tablet und Smartphone. Kann man den ausgliedern? */
+							
+							if (lv != null) {
+								Log.v("HelperOnlineGetJSON lv 3", String.valueOf(lv));
+								lv.setOnItemClickListener(new OnItemClickListener() {
+									
+									@Override
+							            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+					Log.v("HelperOnlineGetJSON", "1 aufgerufen");
+										// getting values from selected ListItem
+										server_team_id = teamList.get(position).get(TAG_ID);
+										server_club_id = teamList.get(position).get(TAG_TEAM_CLUB_ID);
+										team_type_id = teamList.get(position).get(TAG_TEAM_TYPE_ID);
+										club_name = teamList.get(position).get(TAG_TEAM_CLUB_NAME);
+										club_id=sqlHelper.getClubIDByClubName(club_name);
+										listClubData = getClubArray(server_club_id, null, context.getApplicationContext());
+					Log.v("HelperOnlineGetJSON listClubData", String.valueOf(listClubData));
+										if (listClubData.size() > 0) {
+											
+											club_name = listClubData.get(1);
+											club_name_short = listClubData.get(2);
+											
+										}
+										
+										// Prüfen, ob anhand der club_id und der Mannschaftsart schon eine bestehende Mannschaft ausgewählt werden kann
+										if (team_id == null) {
+											
+											// ... nur die Server-Daten übertragen...
+											team_id = sqlHelper.getTeamIDByClubIDAndTeamTypeID(club_id, team_type_id);
+											
+										} 
+
+					/* Überprüfen, ob Verein mit gleichem Namen bereits lokal vorhanden ist */
+										
+										if (club_id != null) {														// Falls der Verein schon angelegt wurde
+											if (sqlHelper.getServerClubIDByClubName(club_name) == null) {		// Falls die Server ID noch nicht übertragen wurde...
+												
+												// ... Server ID auf den lokalen Verein übertragen
+												sqlHelper.updateClub(club_id, Integer.parseInt(server_club_id), club_name, club_name_short);
+												
+												// ... Server ID auf alle Mannschaften mit dem gleichen Vereinsnamen übertragen
+												sqlHelper.updateAllTeamsServerClubID(club_id, Integer.parseInt(server_club_id));
+																
+											}
+										} else {																	// Falls der Verein noch nicht angelegt wurde
+											Log.v("HelperOnlineGetJSON", "Verein anlegen");
+											sqlHelper.insertClub(club_name, club_name_short);					// Verein anlegen
+											club_id=sqlHelper.getLastClubID();
+															
+										}
+															
+						/* Teamdaten übertragen */
+															
+										if (club_id != null && team_id != null) {									// Falls die Mannschaft schon angelegt wurde
+
+											sqlHelper.updateTeam(team_id, server_team_id, club_id, server_club_id, team_type_id);		// ... Server Team ID auf die Mannschaft übertragen
+																
+										} else {																	// Falls noch keine Mannschaft existiert...
+															
+											sqlHelper.insertTeam(server_team_id, club_id, server_club_id, team_type_id);	// ... neue Mannschaft anlegen
+											team_id=sqlHelper.getLastTeamID();
+															
+										}
+															
+						/* Spielerdaten übertragen */
+										
+										// DialogBox einrichten
+								   		final Dialog dialog = new Dialog(context);
+								   		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+								   		dialog.setContentView(R.layout.custom_dialog);
+
+								   		// Texte setzen
+								   		TextView title = (TextView) dialog.findViewById(R.id.title);
+								   		TextView text = (TextView) dialog.findViewById(R.id.text);
+								   		title.setText(R.string.text_player_load_server_title);
+								   		text.setText(R.string.text_player_load_server);
+								   				
+								   		// Button definieren
+								   		LinearLayout lyt_button3 = (LinearLayout) dialog.findViewById(R.id.lyt_button3);
+								   		lyt_button3.removeAllViews();
+
+								   		Button dialogButton1 = (Button) dialog.findViewById(R.id.button1);
+								   		dialogButton1.setText(R.string.yes);
+								   	
+								   		dialogButton1.setOnClickListener(new View.OnClickListener() {
+								   		
+								   			@Override
+								   			public void onClick(View v) {
+								   			
+								   				dialog.dismiss();
+								   			
+								   				loadPlayerFromServer(team_id, server_team_id, context.getApplicationContext());
+												
+												if(screenInch > 6) {
+													
+													Toast.makeText(((FragmentActivity) context).getBaseContext(), context.getString(R.string.text_synch_complete), Toast.LENGTH_LONG).show();
+													Bundle args = new Bundle();
+													args.putString("TeamID", team_id);
+													args.putString("ServerTeamID", server_team_id);
+													args.putString("ClubID", club_id);
+													args.putString("ServerClubID", server_club_id);
+													args.putString("GenderID", gender_id);
+													args.putString("StageOfLifeID", stage_of_life_id);
+													args.putString("LevelID", level_id);
+													args.putString("ClubName", club_name);
+													args.putString("ClubNameShort", club_name_short);
+													
+													fragTeamList.refreshContent(team_id, args);
+													
+													FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+													TabFragTeamEdit fragment = new TabFragTeamEdit();
+													fragment.setArguments(args);
+													fragmentTransaction.replace(R.id.frag_team_edit, fragment);
+													fragmentTransaction.commit();
+													
+												} else {
+													
+													Toast.makeText(((ListActivity) context).getBaseContext(), context.getString(R.string.text_synch_complete), Toast.LENGTH_LONG).show();
+													((ListActivity) context).finish();
+													
+												}  	
+								   						
+								   			}
+								   		});
+								   				
+								   		Button dialogButton2 = (Button) dialog.findViewById(R.id.button2);
+								   		dialogButton2.setText(R.string.no);
+								   			
+								   		dialogButton2.setOnClickListener(new View.OnClickListener() {
+								   			@Override
+								   			public void onClick(View v) {
+								   			
+								   				dialog.dismiss();
+								   				
+								   				if(screenInch > 6) {
+													
+													Bundle args = new Bundle();
+													args.putString("TeamID", team_id);
+													args.putString("ServerTeamID", server_team_id);
+													args.putString("ClubID", club_id);
+													args.putString("ServerClubID", server_club_id);
+													args.putString("GenderID", gender_id);
+													args.putString("StageOfLifeID", stage_of_life_id);
+													args.putString("LevelID", level_id);
+													args.putString("ClubName", club_name);
+													args.putString("ClubNameShort", club_name_short);
+													
+													FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+													TabFragTeamEdit fragment = new TabFragTeamEdit();
+													fragment.setArguments(args);
+													fragmentTransaction.replace(R.id.frag_team_edit, fragment);
+													fragmentTransaction.commit();
+													
+												} else {
+													
+													((ListActivity) context).finish();
+													
+												}
+								   						
+								   			}
+								   		});
+
+								   		dialog.show();
+								   		// Ende Dialogbox einrichten
+											
+									}
+								});			
+							}
 						}
 			});
 
@@ -214,6 +384,173 @@ Log.v("HelperOnlineGetJSON adapter", String.valueOf(adapter));
 							((ListActivity) context).setListAdapter(adapter);
 							lv = ((ListActivity) context).getListView();
 							Log.v("HelperOnlineGetJSON lv 1", String.valueOf(lv));
+							
+							if (lv != null) {
+								Log.v("HelperOnlineGetJSON lv 3", String.valueOf(lv));
+								lv.setOnItemClickListener(new OnItemClickListener() {
+									
+									@Override
+							            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+					Log.v("HelperOnlineGetJSON", "1 aufgerufen");
+										// getting values from selected ListItem
+										server_team_id = teamList.get(position).get(TAG_ID);
+										server_club_id = teamList.get(position).get(TAG_TEAM_CLUB_ID);
+										team_type_id = teamList.get(position).get(TAG_TEAM_TYPE_ID);
+										club_name = teamList.get(position).get(TAG_TEAM_CLUB_NAME);
+										club_id=sqlHelper.getClubIDByClubName(club_name);
+										listClubData = getClubArray(server_club_id, null, context.getApplicationContext());
+					Log.v("HelperOnlineGetJSON listClubData", String.valueOf(listClubData));
+										if (listClubData.size() > 0) {
+											
+											club_name = listClubData.get(1);
+											club_name_short = listClubData.get(2);
+											
+										}
+										
+										// Prüfen, ob anhand der club_id und der Mannschaftsart schon eine bestehende Mannschaft ausgewählt werden kann
+										if (team_id == null) {
+											
+											// ... nur die Server-Daten übertragen...
+											team_id = sqlHelper.getTeamIDByClubIDAndTeamTypeID(club_id, team_type_id);
+											
+										} 
+
+					/* Überprüfen, ob Verein mit gleichem Namen bereits lokal vorhanden ist */
+										
+										if (club_id != null) {														// Falls der Verein schon angelegt wurde
+											if (sqlHelper.getServerClubIDByClubName(club_name) == null) {		// Falls die Server ID noch nicht übertragen wurde...
+												
+												// ... Server ID auf den lokalen Verein übertragen
+												sqlHelper.updateClub(club_id, Integer.parseInt(server_club_id), club_name, club_name_short);
+												
+												// ... Server ID auf alle Mannschaften mit dem gleichen Vereinsnamen übertragen
+												sqlHelper.updateAllTeamsServerClubID(club_id, Integer.parseInt(server_club_id));
+																
+											}
+										} else {																	// Falls der Verein noch nicht angelegt wurde
+											Log.v("HelperOnlineGetJSON", "Verein anlegen");
+											sqlHelper.insertClub(club_name, club_name_short);					// Verein anlegen
+											club_id=sqlHelper.getLastClubID();
+															
+										}
+															
+						/* Teamdaten übertragen */
+															
+										if (club_id != null && team_id != null) {									// Falls die Mannschaft schon angelegt wurde
+
+											sqlHelper.updateTeam(team_id, server_team_id, club_id, server_club_id, team_type_id);		// ... Server Team ID auf die Mannschaft übertragen
+																
+										} else {																	// Falls noch keine Mannschaft existiert...
+															
+											sqlHelper.insertTeam(server_team_id, club_id, server_club_id, team_type_id);	// ... neue Mannschaft anlegen
+											team_id=sqlHelper.getLastTeamID();
+															
+										}
+															
+						/* Spielerdaten übertragen */
+										
+										// DialogBox einrichten
+								   		final Dialog dialog = new Dialog(context);
+								   		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+								   		dialog.setContentView(R.layout.custom_dialog);
+
+								   		// Texte setzen
+								   		TextView title = (TextView) dialog.findViewById(R.id.title);
+								   		TextView text = (TextView) dialog.findViewById(R.id.text);
+								   		title.setText(R.string.text_player_load_server_title);
+								   		text.setText(R.string.text_player_load_server);
+								   				
+								   		// Button definieren
+								   		LinearLayout lyt_button3 = (LinearLayout) dialog.findViewById(R.id.lyt_button3);
+								   		lyt_button3.removeAllViews();
+
+								   		Button dialogButton1 = (Button) dialog.findViewById(R.id.button1);
+								   		dialogButton1.setText(R.string.yes);
+								   	
+								   		dialogButton1.setOnClickListener(new View.OnClickListener() {
+								   		
+								   			@Override
+								   			public void onClick(View v) {
+								   			
+								   				dialog.dismiss();
+								   			
+								   				loadPlayerFromServer(team_id, server_team_id, context.getApplicationContext());
+												
+												if(screenInch > 6) {
+													
+													Toast.makeText(((FragmentActivity) context).getBaseContext(), context.getString(R.string.text_synch_complete), Toast.LENGTH_LONG).show();
+													Bundle args = new Bundle();
+													args.putString("TeamID", team_id);
+													args.putString("ServerTeamID", server_team_id);
+													args.putString("ClubID", club_id);
+													args.putString("ServerClubID", server_club_id);
+													args.putString("GenderID", gender_id);
+													args.putString("StageOfLifeID", stage_of_life_id);
+													args.putString("LevelID", level_id);
+													args.putString("ClubName", club_name);
+													args.putString("ClubNameShort", club_name_short);
+													
+													fragTeamList.refreshContent(team_id, args);
+													
+													FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+													TabFragTeamEdit fragment = new TabFragTeamEdit();
+													fragment.setArguments(args);
+													fragmentTransaction.replace(R.id.frag_team_edit, fragment);
+													fragmentTransaction.commit();
+													
+												} else {
+													
+													Toast.makeText(((ListActivity) context).getBaseContext(), context.getString(R.string.text_synch_complete), Toast.LENGTH_LONG).show();
+													((ListActivity) context).finish();
+													
+												}  	
+								   						
+								   			}
+								   		});
+								   				
+								   		Button dialogButton2 = (Button) dialog.findViewById(R.id.button2);
+								   		dialogButton2.setText(R.string.no);
+								   			
+								   		dialogButton2.setOnClickListener(new View.OnClickListener() {
+								   			@Override
+								   			public void onClick(View v) {
+								   			
+								   				dialog.dismiss();
+								   				
+								   				if(screenInch > 6) {
+													
+													Bundle args = new Bundle();
+													args.putString("TeamID", team_id);
+													args.putString("ServerTeamID", server_team_id);
+													args.putString("ClubID", club_id);
+													args.putString("ServerClubID", server_club_id);
+													args.putString("GenderID", gender_id);
+													args.putString("StageOfLifeID", stage_of_life_id);
+													args.putString("LevelID", level_id);
+													args.putString("ClubName", club_name);
+													args.putString("ClubNameShort", club_name_short);
+													
+													FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+													TabFragTeamEdit fragment = new TabFragTeamEdit();
+													fragment.setArguments(args);
+													fragmentTransaction.replace(R.id.frag_team_edit, fragment);
+													fragmentTransaction.commit();
+													
+												} else {
+													
+													((ListActivity) context).finish();
+													
+												}
+								   						
+								   			}
+								   		});
+
+								   		dialog.show();
+								   		// Ende Dialogbox einrichten
+											
+									}
+								});			
+							}
 						}
 			});
 			
@@ -221,172 +558,7 @@ Log.v("HelperOnlineGetJSON adapter", String.valueOf(adapter));
 		
 Log.v("HelperOnlineGetJSON lv 2", String.valueOf(lv));
 		
-		if (lv != null) {
-			Log.v("HelperOnlineGetJSON lv 3", String.valueOf(lv));
-			lv.setOnItemClickListener(new OnItemClickListener() {
-				
-				@Override
-		            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-Log.v("HelperOnlineGetJSON", "1 aufgerufen");
-					// getting values from selected ListItem
-					server_team_id = teamList.get(position).get(TAG_ID);
-					server_club_id = teamList.get(position).get(TAG_TEAM_CLUB_ID);
-					team_type_id = teamList.get(position).get(TAG_TEAM_TYPE_ID);
-					club_name = teamList.get(position).get(TAG_TEAM_CLUB_NAME);
-					club_id=sqlHelper.getClubIDByClubName(club_name);
-					listClubData = getClubArray(server_club_id, null, context.getApplicationContext());
-Log.v("HelperOnlineGetJSON listClubData", String.valueOf(listClubData));
-					if (listClubData.size() > 0) {
-						
-						club_name = listClubData.get(1);
-						club_name_short = listClubData.get(2);
-						
-					}
-					
-					// Prüfen, ob anhand der club_id und der Mannschaftsart schon eine bestehende Mannschaft ausgewählt werden kann
-					if (team_id == null) {
-						
-						// ... nur die Server-Daten übertragen...
-						team_id = sqlHelper.getTeamIDByClubIDAndTeamTypeID(club_id, team_type_id);
-						
-					} 
-
-/* Überprüfen, ob Verein mit gleichem Namen bereits lokal vorhanden ist */
-					
-					if (club_id != null) {														// Falls der Verein schon angelegt wurde
-						if (sqlHelper.getServerClubIDByClubName(club_name) == null) {		// Falls die Server ID noch nicht übertragen wurde...
-							
-							// ... Server ID auf den lokalen Verein übertragen
-							sqlHelper.updateClub(club_id, Integer.parseInt(server_club_id), club_name, club_name_short);
-							
-							// ... Server ID auf alle Mannschaften mit dem gleichen Vereinsnamen übertragen
-							sqlHelper.updateAllTeamsServerClubID(club_id, Integer.parseInt(server_club_id));
-											
-						}
-					} else {																	// Falls der Verein noch nicht angelegt wurde
-						Log.v("HelperOnlineGetJSON", "Verein anlegen");
-						sqlHelper.insertClub(club_name, club_name_short);					// Verein anlegen
-						club_id=sqlHelper.getLastClubID();
-										
-					}
-										
-	/* Teamdaten übertragen */
-										
-					if (club_id != null && team_id != null) {									// Falls die Mannschaft schon angelegt wurde
-
-						sqlHelper.updateTeam(team_id, server_team_id, club_id, server_club_id, team_type_id);		// ... Server Team ID auf die Mannschaft übertragen
-											
-					} else {																	// Falls noch keine Mannschaft existiert...
-										
-						sqlHelper.insertTeam(server_team_id, club_id, server_club_id, team_type_id);	// ... neue Mannschaft anlegen
-						team_id=sqlHelper.getLastTeamID();
-										
-					}
-										
-	/* Spielerdaten übertragen */
-					
-					// DialogBox einrichten
-			   		final Dialog dialog = new Dialog(context);
-			   		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-			   		dialog.setContentView(R.layout.custom_dialog);
-
-			   		// Texte setzen
-			   		TextView title = (TextView) dialog.findViewById(R.id.title);
-			   		TextView text = (TextView) dialog.findViewById(R.id.text);
-			   		title.setText(R.string.text_player_load_server_title);
-			   		text.setText(R.string.text_player_load_server);
-			   				
-			   		// Button definieren
-			   		LinearLayout lyt_button3 = (LinearLayout) dialog.findViewById(R.id.lyt_button3);
-			   		lyt_button3.removeAllViews();
-
-			   		Button dialogButton1 = (Button) dialog.findViewById(R.id.button1);
-			   		dialogButton1.setText(R.string.yes);
-			   	
-			   		dialogButton1.setOnClickListener(new View.OnClickListener() {
-			   		
-			   			@Override
-			   			public void onClick(View v) {
-			   			
-			   				dialog.dismiss();
-			   			
-			   				loadPlayerFromServer(team_id, server_team_id, context.getApplicationContext());
-							
-							if(screenInch > 6) {
-								
-								Toast.makeText(((FragmentActivity) context).getBaseContext(), context.getString(R.string.text_synch_complete), Toast.LENGTH_LONG).show();
-								Bundle args = new Bundle();
-								args.putString("TeamID", team_id);
-								args.putString("ServerTeamID", server_team_id);
-								args.putString("ClubID", club_id);
-								args.putString("ServerClubID", server_club_id);
-								args.putString("GenderID", gender_id);
-								args.putString("StageOfLifeID", stage_of_life_id);
-								args.putString("LevelID", level_id);
-								args.putString("ClubName", club_name);
-								args.putString("ClubNameShort", club_name_short);
-								
-								fragTeamList.refreshContent(team_id, args);
-								
-								FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-								TabFragTeamEdit fragment = new TabFragTeamEdit();
-								fragment.setArguments(args);
-								fragmentTransaction.replace(R.id.frag_team_edit, fragment);
-								fragmentTransaction.commit();
-								
-							} else {
-								
-								Toast.makeText(((ListActivity) context).getBaseContext(), context.getString(R.string.text_synch_complete), Toast.LENGTH_LONG).show();
-								((ListActivity) context).finish();
-								
-							}  	
-			   						
-			   			}
-			   		});
-			   				
-			   		Button dialogButton2 = (Button) dialog.findViewById(R.id.button2);
-			   		dialogButton2.setText(R.string.no);
-			   			
-			   		dialogButton2.setOnClickListener(new View.OnClickListener() {
-			   			@Override
-			   			public void onClick(View v) {
-			   			
-			   				dialog.dismiss();
-			   				
-			   				if(screenInch > 6) {
-								
-								Bundle args = new Bundle();
-								args.putString("TeamID", team_id);
-								args.putString("ServerTeamID", server_team_id);
-								args.putString("ClubID", club_id);
-								args.putString("ServerClubID", server_club_id);
-								args.putString("GenderID", gender_id);
-								args.putString("StageOfLifeID", stage_of_life_id);
-								args.putString("LevelID", level_id);
-								args.putString("ClubName", club_name);
-								args.putString("ClubNameShort", club_name_short);
-								
-								FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-								TabFragTeamEdit fragment = new TabFragTeamEdit();
-								fragment.setArguments(args);
-								fragmentTransaction.replace(R.id.frag_team_edit, fragment);
-								fragmentTransaction.commit();
-								
-							} else {
-								
-								((ListActivity) context).finish();
-								
-							}
-			   						
-			   			}
-			   		});
-
-			   		dialog.show();
-			   		// Ende Dialogbox einrichten
-						
-				}
-			});			
-		}
+		
 	}
 
 /*
