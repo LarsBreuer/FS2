@@ -176,12 +176,14 @@ class HelperSQL extends SQLiteOpenHelper {
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		
 		if (oldVersion<2) {
-			
+			Log.v("HelperSQL oldVersion", String.valueOf(oldVersion));
+			db.execSQL("CREATE TABLE app (	_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+					"stat_game_activities STRING," +
+					"first_time_tutorial INTEGER," +
+					"smart_or_tab_version INTEGER);");
 			db.execSQL("ALTER TABLE game ADD COLUMN server_game_id INTEGER");
 			db.execSQL("ALTER TABLE app ADD COLUMN user_name STRING");
 			db.execSQL("ALTER TABLE app ADD COLUMN server_user_id INTEGER");
-			db.execSQL("ALTER TABLE ticker_event ADD COLUMN server_ticker_event_id INTEGER");
-			db.execSQL("ALTER TABLE ticker_activity ADD COLUMN server_ticker_activity_id INTEGER");
 			
 		}
 		
