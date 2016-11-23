@@ -92,7 +92,7 @@ public class SmartPlayerList extends ListActivity {
 		sqlHelper=new HelperSQL(this);
 		model=sqlHelper.getAllPlayerCursorByTeamID(team_id);
 		startManagingCursor(model);
-		adapter=new HelperAdapterPlayer(SmartPlayerList.this, model, null);
+		adapter=new HelperAdapterPlayer(SmartPlayerList.this, model, null, null);
 		setListAdapter(adapter);
 		        
 	}

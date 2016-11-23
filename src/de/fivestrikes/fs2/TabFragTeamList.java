@@ -80,12 +80,12 @@ public class TabFragTeamList extends ListFragment {
 		
 		model=sqlHelper.getAllTeamCursor();
 		getActivity().startManagingCursor(model);
-		adapter = new HelperAdapterTeam(getActivity(), model, team_id);
+		FragmentManager fragmentManager = getFragmentManager();
+		adapter = new HelperAdapterTeam(getActivity(), model, team_id, fragmentManager);
 		setListAdapter(adapter);
 		
 		if (team_id != null) {
 			
-			FragmentManager fragmentManager = getFragmentManager();
 			FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 			TabFragTeamEdit fragment = new TabFragTeamEdit();
 			fragment.setArguments(args);

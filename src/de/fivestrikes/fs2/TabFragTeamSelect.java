@@ -77,7 +77,8 @@ public class TabFragTeamSelect extends ListFragment {
 		
 		model=sqlHelper.getAllTeamCursor();
 		getActivity().startManagingCursor(model);
-		adapter = new HelperAdapterTeam(getActivity(), model, null);
+		FragmentManager fragmentManager = getFragmentManager();
+		adapter = new HelperAdapterTeam(getActivity(), model, null, fragmentManager);
 		setListAdapter(adapter);	
 		
 		return inflater.inflate(R.layout.list, container, false);

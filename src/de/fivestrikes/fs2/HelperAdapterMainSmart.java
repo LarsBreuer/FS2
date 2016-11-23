@@ -35,7 +35,8 @@ public class HelperAdapterMainSmart extends ArrayAdapter<String> {
 		if (position == 1) icon.setImageResource(R.drawable.game);
 		if (position == 2) icon.setImageResource(R.drawable.game);
 		if (position == 3) icon.setImageResource(R.drawable.statistic);
-		if (position == 4) icon.setImageResource(R.drawable.login);
+		if (position == 4) icon.setImageResource(R.drawable.info);
+		if (position == 5) icon.setImageResource(R.drawable.login);
 
 		return rowView;
 	}

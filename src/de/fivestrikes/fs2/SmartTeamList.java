@@ -78,7 +78,7 @@ public class SmartTeamList extends ListActivity {
 		
 		model=sqlHelper.getAllTeamCursor();
 		startManagingCursor(model);
-		adapter=new HelperAdapterTeam(SmartTeamList.this, model, null);
+		adapter=new HelperAdapterTeam(SmartTeamList.this, model, null, null);
 		adapter.notifyDataSetChanged();
 		setListAdapter(adapter);
 		        
@@ -98,7 +98,7 @@ public class SmartTeamList extends ListActivity {
 			
 			Intent i=new Intent(SmartTeamList.this, SmartPlayerList.class);
 			i.putExtras(args);
-			startActivity(i);
+			startActivity(i); 
 			
 		} else {
 			

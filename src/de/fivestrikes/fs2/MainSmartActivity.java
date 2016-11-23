@@ -13,6 +13,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.ListActivity;
 import android.app.AlertDialog;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
@@ -101,6 +102,7 @@ public class MainSmartActivity extends ListActivity {
 								getResources().getString(R.string.game),
 								getResources().getString(R.string.game_fast),
 								getResources().getString(R.string.statistic),
+								getResources().getString(R.string.info),
 								login_or_logout};
 		
 		HelperAdapterMainSmart adapter = new HelperAdapterMainSmart(MainSmartActivity.this, values);
@@ -196,6 +198,12 @@ public class MainSmartActivity extends ListActivity {
 		if (position == 3) startActivity(new Intent(getApplicationContext(), SmartStatList.class));
 		if (position == 4) {
 			
+			Uri uri = Uri.parse( "http://www.fivesweb.de/hilfe" );
+			startActivity( new Intent( Intent.ACTION_VIEW, uri ) );
+			
+		}
+		if (position == 5) {
+			
 			if (auth_token.equals("")) {
 				
 				startActivity(new Intent(getApplicationContext(), LoginActivity.class));
@@ -238,7 +246,8 @@ public class MainSmartActivity extends ListActivity {
 								getResources().getString(R.string.game),
 								getResources().getString(R.string.game_fast),
 								getResources().getString(R.string.statistic),
-								getResources().getString(R.string.login)};
+								getResources().getString(R.string.info),
+								login_or_logout};
 						
 						HelperAdapterMainSmart adapter = new HelperAdapterMainSmart(MainSmartActivity.this, values);
 						setListAdapter(adapter);
@@ -284,10 +293,11 @@ public class MainSmartActivity extends ListActivity {
 /* Zelltexte anlegen */
 
 		values = new String[] { getResources().getString(R.string.team), 
-								getResources().getString(R.string.game),
-								getResources().getString(R.string.game_fast),
-								getResources().getString(R.string.statistic),
-								login_or_logout};
+				getResources().getString(R.string.game),
+				getResources().getString(R.string.game_fast),
+				getResources().getString(R.string.statistic),
+				getResources().getString(R.string.info),
+				login_or_logout};
 		
 		HelperAdapterMainSmart adapter = new HelperAdapterMainSmart(MainSmartActivity.this, values);
 		setListAdapter(adapter);

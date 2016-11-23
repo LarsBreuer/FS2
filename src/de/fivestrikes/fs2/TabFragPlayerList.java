@@ -83,19 +83,20 @@ public class TabFragPlayerList extends ListFragment {
     
 	public void refreshContent(String team_id, String player_id, Bundle args) {
     	
+		FragmentManager fragmentManager = getFragmentManager();
+		
 		if (team_id != null) {
 		
 			sqlHelper=new HelperSQL(getActivity());
 			model=sqlHelper.getAllPlayerCursorByTeamID(team_id);
 			getActivity().startManagingCursor(model);
-			adapter=new HelperAdapterPlayer(getActivity(), model, player_id);
+			adapter=new HelperAdapterPlayer(getActivity(), model, player_id, fragmentManager);
 			setListAdapter(adapter);  
 			
 		}
 		
 		if (player_id != null) {
 			
-			FragmentManager fragmentManager = getFragmentManager();
 			FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 			TabFragPlayerEdit fragment = new TabFragPlayerEdit();
 			fragment.setArguments(args);

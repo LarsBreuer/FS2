@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.database.Cursor;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,8 +39,10 @@ public class HelperAdapterTeam extends HelperBaseAdapter {
 	String team_type_id=null;
 	ArrayList<String> listClubData = new ArrayList<String>();
 	ArrayList<String> listTeamData = new ArrayList<String>();
+	double screenInch = 0;
+	FragmentManager fragmentManager;
 
-	public HelperAdapterTeam(Context context, Cursor c, String id) {
+	public HelperAdapterTeam(Context context, Cursor c, String id, FragmentManager contentFragmentManager) {
 		super(context, c);
 		team_id = id;
 		sqlHelper=new HelperSQL(context);
@@ -45,6 +50,8 @@ public class HelperAdapterTeam extends HelperBaseAdapter {
 		fctHelper=new HelperFunction();
 		screenDensity=fctHelper.getScreenDensity(context);
 		lytHelper=new HelperLayout();
+		screenInch = fctHelper.getScreenInch(context);
+		fragmentManager = contentFragmentManager;
 	}
 
 	@Override
@@ -170,8 +177,15 @@ Log.v("HelperAdapterTeam server_club_id", String.valueOf(server_club_id));
 			dialogButton1.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					dialog.dismiss();
-					getCtxt().startActivity(new Intent(getCtxt(), SmartTeamList.class));
+					if(screenInch > 6) {
+						Bundle args = new Bundle();
+						args.putString("TeamID", team_id);
+						TabFragTeamList fragTeamList = (TabFragTeamList) fragmentManager.findFragmentById(R.id.frag_team_list);
+						fragTeamList.refreshContent(team_id, args);
+					} else {
+						dialog.dismiss();
+						getCtxt().startActivity(new Intent(getCtxt(), SmartTeamList.class));
+					}
 				}
 			});
 

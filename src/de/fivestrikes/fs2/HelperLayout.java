@@ -876,7 +876,7 @@ public class HelperLayout {
 		   			
 		   				dialog.dismiss();
 		   			
-		   				if (sqlHelper.count_team_game(team_id)	> 0) {
+		   				if (sqlHelper.count_team_game(team_id) > 0) {
 		   					
 		   					// DialogBox einrichten
 							final Dialog dialog = new Dialog(ctxt);
@@ -1393,7 +1393,7 @@ public class HelperLayout {
 						args.putString("PlayerPositionFirst", player_position_first);
 						args.putString("PlayerPositionSecond", player_position_second);
 						args.putString("PlayerPositionSecond", player_position_third);
-					        
+					      
 						FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 						TabFragPlayerMerge fragment = new TabFragPlayerMerge();
 						fragment.setArguments(args);
@@ -1914,8 +1914,10 @@ public class HelperLayout {
 		final class GameSyncTask extends AsyncTask<String, Void, Void> {
 			protected Void doInBackground(final String... cargs) {
 				try {
+Log.v("HelperLayout server_team_home_id", String.valueOf(server_team_home_id));
+Log.v("HelperLayout server_team_away_id", String.valueOf(server_team_away_id));
 					if (server_team_home_id != null && server_team_away_id != null) {
-						
+Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 1");
 						/* 
 						 * 
 						 *  Das Spiel synchronisieren 
@@ -1926,13 +1928,14 @@ public class HelperLayout {
 						
 						// Kontrollieren ob Spiel schon synchronisert wurde.
 						// Falls noch nicht, dann jetzt synchronisieren.
-						
+Log.v("HelperLayout server_game_id", String.valueOf(server_game_id));					
 						if (server_game_id == null) {
-							
+Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 2");
 							// JSON object to hold the information, which is sent to the server
 							JSONObject jsonObjSend = new JSONObject();
-							
+	
 							try {
+Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 3");
 				                        // Spieldaten auf den Rails-Server übertragen 
 				                        jsonObjSend.put("user_id", user_id);
 				                        jsonObjSend.put("team_home_id", server_team_home_id);
@@ -1954,18 +1957,23 @@ public class HelperLayout {
 				                        Log.i(TAG, jsonObjSend.toString(2));
 				                        
 							} catch (JSONException e) {
+Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 4");
 								e.printStackTrace();
 							}
 							
 							// Send the HttpPostRequest and receive a JSONObject in return
 							JSONObject jsonObjRecv = HttpClient.SendHttpPost(URL_GAMES, jsonObjSend, null);
+Log.v("HelperLayout jsonObjRecv", String.valueOf(jsonObjRecv));
+Log.v("HelperLayout URL_GAMES", String.valueOf(URL_GAMES));	
 							try {
+Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 5");
 								Log.v("jsonObjRecv Game", jsonObjRecv.toString());
 								Log.v("Die ID lautet: ", jsonObjRecv.get("id").toString());
 								server_game_id = jsonObjRecv.get("id").toString();
 								sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, server_game_id);
 							}
 							catch (JSONException e) {
+Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
@@ -1986,7 +1994,7 @@ public class HelperLayout {
 	
 						JSONArray tickerArray = new JSONArray();
 						Boolean player_sync = true;
-						
+
 						try {
 							
 							// Tickerdaten des Spiels auf den Server übertragen 
@@ -2141,7 +2149,7 @@ public class HelperLayout {
 						}
 						
 						// Ticker-Array nur senden, wenn alle Spieler synchronisiert sind und das Array nicht leer ist
-	// Abfrage, ob Array nicht leer ist;
+						// Abfrage, ob Array nicht leer ist;
 						if (player_sync == true) {
 							
 							// Send the HttpPostRequest and receive a JSONObject in return
@@ -2220,11 +2228,13 @@ public class HelperLayout {
 						
 	/** TODO -0- => Async einrichten während laden. Am Ende Meldung, dass Synchronisation erfolgreich war */
 					} else {
+						Log.v("HelperLayout", "messageBoxHandler2.sendEmptyMessage 1 aufgerufen");
 						messageBoxHandler2.sendEmptyMessage(0);					
 					}
 				
 				} catch(RuntimeException re) {
 					re.printStackTrace();
+					Log.v("HelperLayout", "messageBoxHandler2.sendEmptyMessage 2 aufgerufen");
 					messageBoxHandler2.sendEmptyMessage(0);
 				}
 				
@@ -13272,13 +13282,14 @@ public class HelperLayout {
 				}
 				
 				// ... Ballbesitz ändern, wenn der Eintrag der zeitlich letzte Tickereintrag war und wenn ein Tor geworfen wurde
-				if (maxTime <= activity_ticker_time) {
+				// => geändert, da es bei 2-Minuten-Strafen zu Fehlern kam
+				//if (maxTime <= activity_ticker_time) {
 					if (!activity_id.equals(miss_id) && !activity_id.equals(miss_7m_id) && !activity_id.equals(miss_fb_id)) {
 						
 						sqlHelper.changePossession(game_id, possession_against, ticker_event_id, activity_ticker_time + 10, realtime, activity_result, res);
 						ticker_possession_id = sqlHelper.getLastTickerActivityID();
 					}
-				}
+				//}
 				
 				if (!activity_id.equals(miss_id) && !activity_id.equals(miss_7m_id) && !activity_id.equals(miss_fb_id)) {
 					

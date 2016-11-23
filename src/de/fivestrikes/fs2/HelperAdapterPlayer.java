@@ -8,8 +8,10 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.database.Cursor;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,8 +44,10 @@ public class HelperAdapterPlayer extends HelperBaseAdapter {
 	String player_position_second=null;
 	String player_position_third=null;
 	ArrayList<String> listPlayerData = new ArrayList<String>();
+	FragmentManager fragmentManager;
+	double screenInch = 0;
 	
-	public HelperAdapterPlayer(Context context, Cursor c, String id) {
+	public HelperAdapterPlayer(Context context, Cursor c, String id, FragmentManager contentFragmentManager) {
 		super(context, c);
 		player_id = id;
 		sqlHelper=new HelperSQL(context);
@@ -52,6 +56,8 @@ public class HelperAdapterPlayer extends HelperBaseAdapter {
 		screenDensity=fctHelper.getScreenDensity(context);
 		lytHelper=new HelperLayout();
 		playerHelper= new SmartPlayerList();
+		fragmentManager = contentFragmentManager;
+		screenInch = fctHelper.getScreenInch(context);
 	}
 
 	@Override
@@ -176,10 +182,19 @@ public class HelperAdapterPlayer extends HelperBaseAdapter {
 			dialogButton1.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					dialog.dismiss();
-					Intent i=new Intent(getCtxt(), SmartPlayerList.class);
-					i.putExtra("TeamID", team_id);
-					getCtxt().startActivity(i);
+					if(screenInch > 6) {
+						Bundle args = new Bundle();
+						args.putString("PlayerID", player_id);
+						args.putString("TeamID", team_id);
+						dialog.dismiss();
+						TabFragPlayerList fragPlayerList = (TabFragPlayerList) fragmentManager.findFragmentById(R.id.frag_player_list);
+						fragPlayerList.refreshContent(team_id, player_id, args);
+					} else {
+						dialog.dismiss();
+						Intent i=new Intent(getCtxt(), SmartPlayerList.class);
+						i.putExtra("TeamID", team_id);
+						getCtxt().startActivity(i);
+					}
 				}
 			});
 

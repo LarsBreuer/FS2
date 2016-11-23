@@ -79,19 +79,16 @@ public class MainActivity extends Activity {
 		}
 
 /* Layoutfelder definieren */
-		
-		TextView text=(TextView)findViewById(R.id.display_density);
-		TextView text2=(TextView)findViewById(R.id.display_size);
-		TextView text3=(TextView)findViewById(R.id.display_inch);
 		ImageView imgMainImage=(ImageView) findViewById(R.id.main_image);
 			
 /* Layoutfelder einrichten */
-		
+/** TODO -1- => Info über Screengrößen in eigenen Screen einbauen unter "Info" */
+		/*
 		// Textfelder
 		text.setText("Display Density: " + String.valueOf(screenDensity));
 		text2.setText(screenSize);
 		text3.setText("Inch: " + String.valueOf(screenInch));
-		
+		*/
 		// Bilder
 		picSize=350;
 		if(screenDensity<2.5){

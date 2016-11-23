@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
@@ -74,6 +75,7 @@ public class MainTabActivity extends Activity {
 		ImageButton btnMainTeam=(ImageButton) findViewById(R.id.main_team);
 		ImageButton btnMainGame=(ImageButton) findViewById(R.id.main_game);
 		ImageButton btnMainGameFast=(ImageButton) findViewById(R.id.main_game_fast);
+		ImageButton btnMainInfo=(ImageButton) findViewById(R.id.main_info);
 		ImageButton btnMainStatistic=(ImageButton) findViewById(R.id.main_statistic);
 		ImageButton btnMainLogin=(ImageButton) findViewById(R.id.main_login);
 		btn_login = (Button) findViewById(R.id.btn_login);
@@ -104,6 +106,8 @@ public class MainTabActivity extends Activity {
 		lytHelper.scaleImage(btnMainGameFast, picSize, "LinearLayout");
 		btnMainStatistic.setImageResource(R.drawable.statistic);
 		lytHelper.scaleImage(btnMainStatistic, picSize, "LinearLayout");
+		btnMainInfo.setImageResource(R.drawable.info);
+		lytHelper.scaleImage(btnMainInfo, picSize, "LinearLayout");
 		btnMainLogin.setImageResource(R.drawable.login);
 		lytHelper.scaleImage(btnMainLogin, picSize, "LinearLayout");
 		
@@ -212,34 +216,8 @@ public class MainTabActivity extends Activity {
 	
 	public void btnTabInfoClick (View view){
 		
-		// DialogBox einrichten
-		final Dialog dialog = new Dialog(MainTabActivity.this);
-		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		dialog.setContentView(R.layout.custom_dialog);
-
-		// Texte setzen
-		TextView title = (TextView) dialog.findViewById(R.id.title);
-		TextView text = (TextView) dialog.findViewById(R.id.text);
-		title.setText(R.string.text_patience);
-		text.setText(R.string.text_function_not_available);
-		
-		// Button definieren
-		LinearLayout lyt_button2 = (LinearLayout) dialog.findViewById(R.id.lyt_button2);
-		lyt_button2.removeAllViews();
-		LinearLayout lyt_button3 = (LinearLayout) dialog.findViewById(R.id.lyt_button3);
-		lyt_button3.removeAllViews();
-		
-		Button dialogButton1 = (Button) dialog.findViewById(R.id.button1);
-		dialogButton1.setText(R.string.okay);
-		
-		dialogButton1.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				dialog.dismiss();
-			}
-		});
-
-		dialog.show();
+		Uri uri = Uri.parse( "http://www.fivesweb.de/hilfe" );
+		startActivity( new Intent( Intent.ACTION_VIEW, uri ) );
 		
 	}
 	

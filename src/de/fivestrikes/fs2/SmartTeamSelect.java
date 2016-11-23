@@ -65,7 +65,7 @@ public class SmartTeamSelect extends ListActivity {
 		
 		model=sqlHelper.getAllTeamCursor();
 		startManagingCursor(model);
-		adapter=new HelperAdapterTeam(SmartTeamSelect.this, model, null);
+		adapter=new HelperAdapterTeam(SmartTeamSelect.this, model, null, null); 
 		setListAdapter(adapter);		
 		
 	}

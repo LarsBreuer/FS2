@@ -152,6 +152,8 @@ public class HelperOnlineGetJSON {
 		try {
 
 	            // Getting Array of Contacts
+			Log.v("HelperOnlineGetJSON json", String.valueOf(json));
+			Log.v("HelperOnlineGetJSON TAG_TEAMS", String.valueOf(TAG_TEAMS));
 	            teams = json.getJSONArray(TAG_TEAMS);
 	             
 	            // looping through All Contacts
