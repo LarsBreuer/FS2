@@ -188,7 +188,7 @@ class TickerEventHolder {
 		ArrayList<Integer> mainActivityList = sqlHelper.getTickerEventMainActivity(String.valueOf(ticker_event_id), res);
 		Integer ticker_activity_id = mainActivityList.get(0);
 		home_or_away = mainActivityList.get(1);
-		
+
 		String goals_home = String.valueOf(sqlHelper.count_ticker_goals(game_id, null, 1, time));
 		String goals_away = String.valueOf(sqlHelper.count_ticker_goals(game_id, null, 0, time));
 		String ticker_result = goals_home + " : " + goals_away;
@@ -250,11 +250,13 @@ class TickerEventHolder {
 		
 		// Teamfarbe setzen
 /** TODO -4- => Farbe an die Vereinsfarbe anpassen */
-		if (home_or_away == 1){
-			team_color.setBackgroundColor(0xFF404895);
-		}
-		if (home_or_away == 0){
-			team_color.setBackgroundColor(0xFFCB061D);
+		if (home_or_away != null) {
+			if (home_or_away == 1){
+				team_color.setBackgroundColor(0xFF404895);
+			}
+			if (home_or_away == 0){
+				team_color.setBackgroundColor(0xFFCB061D); 
+			}
 		}
 		
 		DisplayMetrics metrics = res.getDisplayMetrics();

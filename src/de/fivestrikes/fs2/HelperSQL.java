@@ -176,7 +176,7 @@ class HelperSQL extends SQLiteOpenHelper {
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		
 		if (oldVersion<2) {
-			Log.v("HelperSQL oldVersion", String.valueOf(oldVersion));
+			
 			db.execSQL("CREATE TABLE app (	_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
 					"stat_game_activities STRING," +
 					"first_time_tutorial INTEGER," +
@@ -1811,7 +1811,7 @@ class HelperSQL extends SQLiteOpenHelper {
 		for (cTicker.moveToFirst(); !cTicker.isAfterLast(); cTicker.moveToNext()) {
 
 			ticker_id = getTickerActivityID(cTicker);
-			
+	
 			if (getTickerActivityIDByID(ticker_id).equals(defense_error_id) || getTickerActivityIDByID(ticker_id).equals(block_error_id) || 
 					getTickerActivityIDByID(ticker_id).equals(defense_success_id) || getTickerActivityIDByID(ticker_id).equals(block_success_id)) {
 				if (value < 1) {

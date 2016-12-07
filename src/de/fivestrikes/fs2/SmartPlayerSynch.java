@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
@@ -30,6 +31,7 @@ public class SmartPlayerSynch extends ListActivity {
 	String player_position_first=null;
 	String player_position_second=null;
 	String player_position_third=null;
+	TextView headline = null;
 	TextView text = null;
 	HelperSQL sqlHelper=null;
 	HelperOnlineJSONParser jsonHelper=null;
@@ -68,8 +70,12 @@ public class SmartPlayerSynch extends ListActivity {
 		
 /* Layoutfelder definieren und Inhalte setzen */
 		
+		headline = (TextView) findViewById(R.id.headline);
+		headline.setText(getResources().getString(R.string.player_synchro));
 		text = (TextView) findViewById(R.id.text);
 		text.setText(getResources().getString(R.string.text_player_search_explain));
+		LinearLayout lyt_button = (LinearLayout) findViewById(R.id.lyt_button);
+		lyt_button.removeAllViews();
 		LinearLayout lyt_button_all = (LinearLayout) findViewById(R.id.lyt_button_all);
 		lyt_button_all.removeAllViews();
 		

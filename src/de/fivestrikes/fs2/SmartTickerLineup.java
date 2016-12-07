@@ -317,9 +317,8 @@ public class SmartTickerLineup extends ListActivity {
 	    	}
 	    	
 	    	// Tickermeldung generieren
-	    	Log.v("SmartTickerLineup ctxt", String.valueOf(ctxt));
 	    	String ticker_event_note = txtHelper.generateTickerEventNote(ticker_event_id, ctxt, res);
-		sqlHelper.updateTickerEvent(String.valueOf(ticker_event_id), null, null, ticker_event_note, null);
+		sqlHelper.updateTickerEvent(String.valueOf(ticker_event_id), null, time_lineup, ticker_event_note, null);
 	    	
 	    	if (home_or_away.equals(1)) {
 			

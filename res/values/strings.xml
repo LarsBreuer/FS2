@@ -284,6 +284,7 @@
     <string name="stage_of_life">Altersstufe</string>
     <string name="level">Spielstärke</string>
     <string name="synchro">Synchronisieren</string>
+    <string name="player_synchro">Spieler synchronisieren</string>
     <string name="merge">Verschmelzen</string>
     <string name="team_choose_online">Internet (empfohlen)</string>
     <string name="Local">Lokal</string>

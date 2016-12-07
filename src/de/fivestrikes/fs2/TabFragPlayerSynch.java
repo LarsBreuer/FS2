@@ -20,6 +20,7 @@ public class TabFragPlayerSynch extends ListFragment {
 	private static Context context;
 	String strTeamName=null;
 	HelperOnlineGetJSON getJsonHelper=null;
+	TextView headline = null;
 	TextView text = null;
 	View view = null;
 	EditText edit_team_search = null;
@@ -42,8 +43,12 @@ public class TabFragPlayerSynch extends ListFragment {
 		
 /* Layoutfelder definieren und Inhalte setzen */
 		
+		headline = (TextView) view.findViewById(R.id.headline);
+		headline.setText(getResources().getString(R.string.player_synchro));
 		text = (TextView) view.findViewById(R.id.text);
 		text.setText(getResources().getString(R.string.text_player_search_explain));
+		LinearLayout lyt_button = (LinearLayout) view.findViewById(R.id.lyt_button);
+		lyt_button.removeAllViews();
 		LinearLayout lyt_button_all = (LinearLayout) view.findViewById(R.id.lyt_button_all);
 		lyt_button_all.removeAllViews();
 		

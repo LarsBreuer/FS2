@@ -17,14 +17,14 @@
 	
 		<LinearLayout
     		android:layout_width="16dip"
-    		android:layout_height="wrap_content"
+    		android:layout_height="fill_parent"
     		android:orientation="vertical"
     	>
     
 			<View 
 		    	android:id="@+id/rowTickerTeamColor"
         		android:layout_width="16dip"
-  				android:layout_height="wrap_content"
+  				android:layout_height="fill_parent"
   				android:background="@color/heimblau"
     		/>
 		
