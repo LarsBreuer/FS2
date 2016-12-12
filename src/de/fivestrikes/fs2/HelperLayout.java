@@ -18,6 +18,9 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import de.fivestrikes.fs2.inappbilling.util.IabHelper;
+import de.fivestrikes.fs2.inappbilling.util.IabResult;
+import de.fivestrikes.fs2.inappbilling.util.Inventory;
 
 import android.app.Activity;
 import android.app.ActivityGroup;
@@ -75,6 +78,8 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import de.fivestrikes.fs2.inappbilling.util.Purchase;
 
 public class HelperLayout {
 	
@@ -289,6 +294,10 @@ public class HelperLayout {
 	private static final String URL_GAMES = "http://calm-waters-7359.herokuapp.com/games.json";
 	private static final String URL_TICKER = "http://calm-waters-7359.herokuapp.com/multiple_ticker_activities.json";
 	private static final String URL_TICKER_EVENT = "http://calm-waters-7359.herokuapp.com/multiple_ticker_events.json";
+	public boolean mIsPremium = false;
+	public final static String SKU_UNLIMITED_VERSION = "unlimited_version";
+	Boolean change;
+	IabHelper mHelper;
 	
 	protected ProgressDialog progressDialog;
 	
@@ -8098,84 +8107,173 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
  *
  */
 	
-	public void InputDepth(Context ctxt, String game_id, int position, Boolean bool) {
+	public void InputDepth(final Context ctxt, String game_id, int position, Boolean bool) {
 		
 		sqlHelper=new HelperSQL(ctxt);
+		change = false;
 		
-		switch(position){
-	    	
-			case 0:
+/** TODO -1- => PublicKey verstecken. */
+		String base64EncodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAh99+dNG/SPzRB2WjrzjwiTtAc2l2tpbojMpz7vHmdxR7ahUY0zOfgtSaryxwMGRdL59Y8wNKDhntjOLj7qwj1oT8mUeBAXDrzDo+D2i1w1vzgCRxwffsunRoDidmftzIFce/I+DAAvf05QwGprtKDplmZl1o4rMkVUFHcgoIMstqTE6GdF330XpJyXsGsXAIDK0NXFLSFbFjaK+52PVVbQ6ViqPbvGaeApnTt5nl0GCwheV0oNP397KVqtAKKbGRIMDnyN9zVB0POWO7o8x+ph7ybQwCsGQKiypNgQJnmXgjZ4WJnlQDWjDVAf6/RA/4xhl30H55Z+ICtG+t6fO7KQIDAQAB";
+		mHelper = new IabHelper(ctxt, base64EncodedPublicKey);
+		
+		// Prüfen, ob Eingabetiefe von Wurfecke, Wurftechnik und Detail zu technischem Fehler geändert werden soll 
+		// und Nutzer keinen Premium Account hat
+		if (position == 1 || position == 2 || position == 6) {
 			
-				if (bool.equals(true)) {
-					sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, 1, null, null, null, null, null, null, null, null);
-				} else {
-					sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, null, null, null, null, null, null, null, null);
+			IabHelper.QueryInventoryFinishedListener mGotInventoryListener = new IabHelper.QueryInventoryFinishedListener() {
+				
+				public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
+					
+					if (result.isFailure()) {
+						// handle error here
+					} else {
+						// does the user have the premium upgrade?
+						mIsPremium = inventory.hasPurchase(SKU_UNLIMITED_VERSION);
+						
+					}
 				}
-				break;
+			};
 			
-			case 1:
-			
-				if (bool.equals(true)) {
-					sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1, null, null, null, null, null, null, null);
-				} else {
-					sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, null, null, null, null, null, null, null);
-				}
-				break;
+			// Falls Nutzer keinen Premium-Account hat => Aufforderung, einen Premium-Account abzuschließen
+			if (!mIsPremium) {
+				
+				// DialogBox einrichten
+				final Dialog dialog = new Dialog(ctxt);
+				dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+				dialog.setContentView(R.layout.custom_dialog);
 
-			case 2:
+				// Texte setzen
+				TextView title = (TextView) dialog.findViewById(R.id.title);
+				TextView text = (TextView) dialog.findViewById(R.id.text);
+				title.setText(R.string.pro_version);
+				text.setText(R.string.text_pro_version);
+					
+				// Button definieren
+				LinearLayout lyt_button3 = (LinearLayout) dialog.findViewById(R.id.lyt_button3);
+				lyt_button3.removeAllViews();
+				
+				Button dialogButton1 = (Button) dialog.findViewById(R.id.button1);
+				dialogButton1.setText(R.string.yes);
+				
+				dialogButton1.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+/** TODO -0- => Individuellen payload einbauen? */ 
+						String payload = "abc";
+						mHelper.launchPurchaseFlow(((Activity)ctxt), SKU_UNLIMITED_VERSION, 10001,
+								mPurchaseFinishedListener, payload);
+						
+						dialog.dismiss();
+						
+					}
+				});
+				
+				Button dialogButton2 = (Button) dialog.findViewById(R.id.button2);
+				dialogButton2.setText(R.string.no);
+				
+				dialogButton2.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						
+						dialog.dismiss();
+						
+					}
+				});
+
+				dialog.show();
+				// Ende Dialogbox einrichten
+				
+				
+				
+			} else {
+				
+				change = true;
+				
+			}
 			
-				if (bool.equals(true)) {
-					sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1, null, null, null, null, null, null);
-				} else {
-					sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, null, null, null, null, null, null);
-				}
-				break;
+		} else {
+
+			change = true;
 			
-			case 3:
+		}
+		
+		if (change == true) {
 			
-				if (bool.equals(true)) {
-					sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1, null, null, null, null, null);
-				} else {
-					sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, null, null, null, null, null);
-				}
-				break;
+			switch(position){
+		    	
+				case 0:
 			
-			case 4:
+					if (bool.equals(true)) {
+						sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, 1, null, null, null, null, null, null, null, null);
+					} else {
+						sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, null, null, null, null, null, null, null, null);
+					}
+					break;
 			
-				if (bool.equals(true)) {
-					sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1, null, null, null, null);
-				} else {
-					sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, null, null, null, null);
-				}
-				break;
+				case 1:
 			
-			case 5:
+					if (bool.equals(true)) {
+						sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1, null, null, null, null, null, null, null);
+					} else {
+						sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, null, null, null, null, null, null, null);
+					}
+					break;
+
+				case 2:
+			
+					if (bool.equals(true)) {
+						sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1, null, null, null, null, null, null);
+					} else {
+						sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, null, null, null, null, null, null);
+					}
+					break;
+			
+				case 3:
+			
+					if (bool.equals(true)) {
+						sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1, null, null, null, null, null);
+					} else {
+						sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, null, null, null, null, null);
+					}
+					break;
+			
+				case 4:
+			
+					if (bool.equals(true)) {
+						sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1, null, null, null, null);
+					} else {
+						sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, null, null, null, null);
+					}
+					break;
+			
+				case 5:
 	
-				if (bool.equals(true)) {
-					sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1, null, null, null);
-				} else {
-					sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, null, null, null);
-				}
-				break;
+					if (bool.equals(true)) {
+						sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1, null, null, null);
+					} else {
+						sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, null, null, null);
+					}
+					break;
 				
-			case 6:
+				case 6:
 				
-				if (bool.equals(true)) {
-					sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1, null, null);
-				} else {
-					sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, null, null);
-				}
-				break;
+					if (bool.equals(true)) {
+						sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1, null, null);
+					} else {
+						sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, null, null);
+					}
+					break;
 				
-			case 7:
+				case 7:
 				
-				if (bool.equals(true)) {
-					sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1, null);
-				} else {
-					sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, null);
-				}
-				break;
+					if (bool.equals(true)) {
+						sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1, null);
+					} else {
+						sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, null);
+					}
+					break;
 			
+			}
 		}
 	}
 	
@@ -13637,4 +13735,23 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 			
 		}
 	}
+	
+	// Kontrollieren, ob Kauf erfolgreich war
+	IabHelper.OnIabPurchaseFinishedListener mPurchaseFinishedListener
+			  = new IabHelper.OnIabPurchaseFinishedListener() {
+		
+		public void onIabPurchaseFinished(IabResult result, Purchase purchase) {
+			
+			if (result.isFailure()) {
+				Log.d("Helper Layout InputDepth", "Error purchasing: " + result);
+			} else {
+				
+				if (purchase.getSku().equals(SKU_UNLIMITED_VERSION)) {
+					
+					change = true;
+					
+				}
+			}
+		}
+	};
 }

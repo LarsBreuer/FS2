@@ -137,14 +137,14 @@ class HelperSQL extends SQLiteOpenHelper {
 											"gk_home_id INTEGER, " +			// 12
 											"gk_away_id INTEGER, " +			// 13
 	  			 							"game_note TEXT, " +					// 14
-	  			 							"input_player INTEGER DEFAULT 0, " +	// 15
-											"input_area INTEGER DEFAULT 0, " +	// 16
-											"input_throwing_technique INTEGER DEFAULT 0, " +	// 17
-											"input_assist INTEGER DEFAULT 0, " +	// 18
-											"input_defense INTEGER DEFAULT 0, " +	// 19
-											"input_mark INTEGER DEFAULT 0, " +	// 20
-											"input_tech_fault INTEGER DEFAULT 0, " +	// 21
-	  			 							"input_text INTEGER DEFAULT 0, " +		//22
+	  			 							"input_player INTEGER DEFAULT 0, " +	// 15	0
+											"input_area INTEGER DEFAULT 0, " +	// 16	1
+											"input_throwing_technique INTEGER DEFAULT 0, " +	// 17	2
+											"input_assist INTEGER DEFAULT 0, " +	// 18	3
+											"input_defense INTEGER DEFAULT 0, " +	// 19	4
+											"input_mark INTEGER DEFAULT 0, " +	// 20	5
+											"input_tech_fault INTEGER DEFAULT 0, " +	// 21	6
+	  			 							"input_text INTEGER DEFAULT 0, " +		//22	7
 											"server_game_id INTEGER);");				// 23			
 		db.execSQL("CREATE TABLE ticker_event (_id INTEGER PRIMARY KEY AUTOINCREMENT," +
 												"game_id INTEGER," +

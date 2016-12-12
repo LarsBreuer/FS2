@@ -1,5 +1,9 @@
 package de.fivestrikes.fs2;
 
+import de.fivestrikes.fs2.inappbilling.util.IabHelper;
+import de.fivestrikes.fs2.inappbilling.util.IabResult;
+import de.fivestrikes.fs2.inappbilling.util.Purchase;
+import de.fivestrikes.fs2.inappbilling.util.Inventory;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.os.Bundle;
@@ -14,6 +18,7 @@ import android.widget.Toast;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.database.Cursor;
 
 public class MainActivity extends Activity {
 	
@@ -25,6 +30,10 @@ public class MainActivity extends Activity {
 	float screenDensity;
 	String screenSize;
 	private final int SPLASH_DISPLAY_LENGTH = 2500;
+	IabHelper mHelper;
+	public boolean mIsPremium = false;
+	public final static String SKU_UNLIMITED_VERSION = "unlimited_version";
+	String game_id = null;
 
 	@Override
 	public void onCreate(Bundle icicle) {
@@ -32,14 +41,69 @@ public class MainActivity extends Activity {
 		super.onCreate(icicle);
 		
 /* Fehlermeldung bei JSON Ladevorgang verhindern */
-/** TODO -1- => Kostenpflichtige App einbauen */
-/** TODO -0- => AsyncTask einbauen - siehe meine Beschreibung in der ToDo Handball App */
 		
 		if (android.os.Build.VERSION.SDK_INT > 9) {
 			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 			StrictMode.setThreadPolicy(policy);
 		}
 		
+/* Create ServiceConnection for IInAppBillingService */
+/** TODO -1- => PublicKey verstecken. Etwa so:
+ * You can split it into pieces like this
+ *  String piece1 = "SDFGJKGB4UIH234WE/FRT23RSDF/3DFUISDFVWE";
+ *  String piece2 = "SDFGJKGB4UIHUISDFVWE";
+ *  String piece3 = "BDYASGBDNAWGRET24IYE23das4saGBENWKD";
+ *  String piece4 = "432423SDF23R/+SDDS";
+ *  
+ *  mHelper = new IabHelper(this, piece1 + piece2 + piece3 + piece4);
+ *  
+ *  */
+		
+		String base64EncodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAh99+dNG/SPzRB2WjrzjwiTtAc2l2tpbojMpz7vHmdxR7ahUY0zOfgtSaryxwMGRdL59Y8wNKDhntjOLj7qwj1oT8mUeBAXDrzDo+D2i1w1vzgCRxwffsunRoDidmftzIFce/I+DAAvf05QwGprtKDplmZl1o4rMkVUFHcgoIMstqTE6GdF330XpJyXsGsXAIDK0NXFLSFbFjaK+52PVVbQ6ViqPbvGaeApnTt5nl0GCwheV0oNP397KVqtAKKbGRIMDnyN9zVB0POWO7o8x+ph7ybQwCsGQKiypNgQJnmXgjZ4WJnlQDWjDVAf6/RA/4xhl30H55Z+ICtG+t6fO7KQIDAQAB";
+		mHelper = new IabHelper(this, base64EncodedPublicKey);
+		
+		mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
+			
+			public void onIabSetupFinished(IabResult result) {
+				
+			      if (!result.isSuccess()) {
+			      	
+			      		// Oh no, there was a problem.
+			      		Log.d("MainActivity", "Problem setting up In-app Billing: " + result);
+			      		
+			      }
+			      	
+			      // Hooray, IAB is fully set up!
+			
+			}
+		});
+		
+		// Pro-Elemente aus Eingabetiefe entfernen, falls Nutzer nicht die Pro-Variante gekauft hat
+		IabHelper.QueryInventoryFinishedListener mGotInventoryListener = new IabHelper.QueryInventoryFinishedListener() {
+			
+			public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
+				
+				if (result.isFailure()) {
+					// handle error here
+				} else {
+					// does the user have the premium upgrade?
+					mIsPremium = inventory.hasPurchase(SKU_UNLIMITED_VERSION);
+					
+					// Falls Nutzer keinen Premium-Account hat => Eingabetiefe von Wurfecke, Wurftechnik und Detail zu technischem Fehler aller Spiele auf Null setzen
+					if (!mIsPremium){
+						
+						Cursor c = sqlHelper.getAllGameCursor();
+						for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+							
+							game_id = sqlHelper.getGameID(c);
+							sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, 0, null, null, null, 0, null, null);		
+							
+						}
+					}
+				}
+			}
+		};
+
 /* Helper generieren */
 /** TODO -3- => Erster Start einsetzen, u.a. auch Eingabe, welche Sprache und ob man Tablet oder Smartphone will */
 		sqlHelper=new HelperSQL(this);
@@ -125,5 +189,14 @@ public class MainActivity extends Activity {
 				
 			}
 		}, SPLASH_DISPLAY_LENGTH);
-	}   
+	}
+	
+	@Override
+	public void onDestroy() {
+		
+		super.onDestroy();
+		if (mHelper != null) mHelper.dispose();
+		mHelper = null;
+		
+	}
 }
