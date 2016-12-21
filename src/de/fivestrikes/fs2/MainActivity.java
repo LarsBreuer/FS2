@@ -59,7 +59,7 @@ public class MainActivity extends Activity {
  *  
  *  */
 		
-		/*
+		
 		String base64EncodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAh99+dNG/SPzRB2WjrzjwiTtAc2l2tpbojMpz7vHmdxR7ahUY0zOfgtSaryxwMGRdL59Y8wNKDhntjOLj7qwj1oT8mUeBAXDrzDo+D2i1w1vzgCRxwffsunRoDidmftzIFce/I+DAAvf05QwGprtKDplmZl1o4rMkVUFHcgoIMstqTE6GdF330XpJyXsGsXAIDK0NXFLSFbFjaK+52PVVbQ6ViqPbvGaeApnTt5nl0GCwheV0oNP397KVqtAKKbGRIMDnyN9zVB0POWO7o8x+ph7ybQwCsGQKiypNgQJnmXgjZ4WJnlQDWjDVAf6/RA/4xhl30H55Z+ICtG+t6fO7KQIDAQAB";
 		mHelper = new IabHelper(this, base64EncodedPublicKey);
 		
@@ -82,7 +82,7 @@ public class MainActivity extends Activity {
 			      }			
 			}
 		});
-		*/
+		
 		
 /* Helper generieren */
 /** TODO -3- => Erster Start einsetzen, u.a. auch Eingabe, welche Sprache und ob man Tablet oder Smartphone will */
