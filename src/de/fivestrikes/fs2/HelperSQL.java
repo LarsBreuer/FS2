@@ -1262,12 +1262,6 @@ class HelperSQL extends SQLiteOpenHelper {
 			
 	}
 	
-	
-	
-	
-	
-	
-	
 	public void deleteGameServerID(String id) {
 		
 		ContentValues cv=new ContentValues();
@@ -1347,15 +1341,6 @@ class HelperSQL extends SQLiteOpenHelper {
 		getWritableDatabase().update("ticker_activity", cv, "_ID=?", args);
 		
 	}
-	
-
-	
-	
-	
-	
-	
-	
-	
 	
 	// Spieldaten abfragen
 	

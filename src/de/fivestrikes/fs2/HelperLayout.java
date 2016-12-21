@@ -298,6 +298,10 @@ public class HelperLayout {
 	public final static String SKU_UNLIMITED_VERSION = "unlimited_version";
 	Boolean change;
 	IabHelper mHelper;
+	int inventPosition; 
+	Boolean inventBool;
+	Context inventCtxt;
+	String invent_game_id;
 	
 	protected ProgressDialog progressDialog;
 	
@@ -4602,7 +4606,6 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 						@Override
 						public void onClick(View v) {
 							dialog.dismiss();
-							finishActivity(team_id, args);
 						}
 					});
 
@@ -8111,93 +8114,39 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 		
 		sqlHelper=new HelperSQL(ctxt);
 		change = false;
-		
-/** TODO -1- => PublicKey verstecken. */
-		String base64EncodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAh99+dNG/SPzRB2WjrzjwiTtAc2l2tpbojMpz7vHmdxR7ahUY0zOfgtSaryxwMGRdL59Y8wNKDhntjOLj7qwj1oT8mUeBAXDrzDo+D2i1w1vzgCRxwffsunRoDidmftzIFce/I+DAAvf05QwGprtKDplmZl1o4rMkVUFHcgoIMstqTE6GdF330XpJyXsGsXAIDK0NXFLSFbFjaK+52PVVbQ6ViqPbvGaeApnTt5nl0GCwheV0oNP397KVqtAKKbGRIMDnyN9zVB0POWO7o8x+ph7ybQwCsGQKiypNgQJnmXgjZ4WJnlQDWjDVAf6/RA/4xhl30H55Z+ICtG+t6fO7KQIDAQAB";
-		mHelper = new IabHelper(ctxt, base64EncodedPublicKey);
+		inventBool = bool;
+		inventPosition = position;
+		inventCtxt = ctxt;
+		invent_game_id = game_id;
 		
 		// Prüfen, ob Eingabetiefe von Wurfecke, Wurftechnik und Detail zu technischem Fehler geändert werden soll 
 		// und Nutzer keinen Premium Account hat
 		if (position == 1 || position == 2 || position == 6) {
 			
-			IabHelper.QueryInventoryFinishedListener mGotInventoryListener = new IabHelper.QueryInventoryFinishedListener() {
-				
-				public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
-					
-					if (result.isFailure()) {
-						// handle error here
-					} else {
-						// does the user have the premium upgrade?
-						mIsPremium = inventory.hasPurchase(SKU_UNLIMITED_VERSION);
-						
-					}
-				}
-			};
+			/** TODO -1- => PublicKey verstecken. */
+			String base64EncodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAh99+dNG/SPzRB2WjrzjwiTtAc2l2tpbojMpz7vHmdxR7ahUY0zOfgtSaryxwMGRdL59Y8wNKDhntjOLj7qwj1oT8mUeBAXDrzDo+D2i1w1vzgCRxwffsunRoDidmftzIFce/I+DAAvf05QwGprtKDplmZl1o4rMkVUFHcgoIMstqTE6GdF330XpJyXsGsXAIDK0NXFLSFbFjaK+52PVVbQ6ViqPbvGaeApnTt5nl0GCwheV0oNP397KVqtAKKbGRIMDnyN9zVB0POWO7o8x+ph7ybQwCsGQKiypNgQJnmXgjZ4WJnlQDWjDVAf6/RA/4xhl30H55Z+ICtG+t6fO7KQIDAQAB";
+			mHelper = new IabHelper(ctxt, base64EncodedPublicKey);
 			
-			// Falls Nutzer keinen Premium-Account hat => Aufforderung, einen Premium-Account abzuschließen
-			if (!mIsPremium) {
+			mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
 				
-				// DialogBox einrichten
-				final Dialog dialog = new Dialog(ctxt);
-				dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-				dialog.setContentView(R.layout.custom_dialog);
-
-				// Texte setzen
-				TextView title = (TextView) dialog.findViewById(R.id.title);
-				TextView text = (TextView) dialog.findViewById(R.id.text);
-				title.setText(R.string.pro_version);
-				text.setText(R.string.text_pro_version);
+				public void onIabSetupFinished(IabResult result) {
 					
-				// Button definieren
-				LinearLayout lyt_button3 = (LinearLayout) dialog.findViewById(R.id.lyt_button3);
-				lyt_button3.removeAllViews();
-				
-				Button dialogButton1 = (Button) dialog.findViewById(R.id.button1);
-				dialogButton1.setText(R.string.yes);
-				
-				dialogButton1.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-/** TODO -0- => Individuellen payload einbauen? */ 
-						String payload = "abc";
-						mHelper.launchPurchaseFlow(((Activity)ctxt), SKU_UNLIMITED_VERSION, 10001,
-								mPurchaseFinishedListener, payload);
-						
-						dialog.dismiss();
-						
-					}
-				});
-				
-				Button dialogButton2 = (Button) dialog.findViewById(R.id.button2);
-				dialogButton2.setText(R.string.no);
-				
-				dialogButton2.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						
-						dialog.dismiss();
-						
-					}
-				});
+				      if (!result.isSuccess()) {
 
-				dialog.show();
-				// Ende Dialogbox einrichten
-				
-				
-				
-			} else {
-				
-				change = true;
-				
-			}
+				      		// Oh no, there was a problem.
+				      		Log.d("HelperLayout InputDepth", "Problem setting up In-app Billing: " + result);
+				      		
+				      } else {
+				      	
+					      // Prüfen, ob Nutzer den Premium-Account hat
+				      		if (mHelper != null) mHelper.flagEndAsync();
+						mHelper.queryInventoryAsync(mGotInventoryListener);
+					      
+				      }			
+				}
+			});
 			
 		} else {
-
-			change = true;
-			
-		}
-		
-		if (change == true) {
 			
 			switch(position){
 		    	
@@ -8274,7 +8223,7 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 					break;
 			
 			}
-		}
+		} 
 	}
 	
 	
@@ -13749,6 +13698,148 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 				if (purchase.getSku().equals(SKU_UNLIMITED_VERSION)) {
 					
 					change = true;
+					
+				}
+			}
+		}
+	};
+	
+	IabHelper.QueryInventoryFinishedListener mGotInventoryListener = new IabHelper.QueryInventoryFinishedListener() {
+		
+		public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
+			
+			if (result.isFailure()) {
+				Log.v("HelperLayout QueryInventoryFinishedListener result", String.valueOf(result));
+			} else {
+				// does the user have the premium upgrade?
+				mIsPremium = inventory.hasPurchase(SKU_UNLIMITED_VERSION);
+				
+				// Falls Nutzer keinen Premium-Account hat => Aufforderung, einen Premium-Account abzuschließen
+				if (mIsPremium == true) {
+					
+					switch(inventPosition){
+				    	
+					case 0:
+				
+						if (inventBool.equals(true)) {
+							sqlHelper.updateGame(invent_game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, 1, null, null, null, null, null, null, null, null);
+						} else {
+							sqlHelper.updateGame(invent_game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, null, null, null, null, null, null, null, null);
+						}
+						break;
+				
+					case 1:
+						
+						if (inventBool.equals(true)) {
+							sqlHelper.updateGame(invent_game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1, null, null, null, null, null, null, null);
+						} else {
+							sqlHelper.updateGame(invent_game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, null, null, null, null, null, null, null);
+						}
+						break;
+
+					case 2:
+				
+						if (inventBool.equals(true)) {
+							sqlHelper.updateGame(invent_game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1, null, null, null, null, null, null);
+						} else {
+							sqlHelper.updateGame(invent_game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, null, null, null, null, null, null);
+						}
+						break;
+				
+					case 3:
+				
+						if (inventBool.equals(true)) {
+							sqlHelper.updateGame(invent_game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1, null, null, null, null, null);
+						} else {
+							sqlHelper.updateGame(invent_game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, null, null, null, null, null);
+						}
+						break;
+				
+					case 4:
+				
+						if (inventBool.equals(true)) {
+							sqlHelper.updateGame(invent_game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1, null, null, null, null);
+						} else {
+							sqlHelper.updateGame(invent_game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, null, null, null, null);
+						}
+						break;
+				
+					case 5:
+		
+						if (inventBool.equals(true)) {
+							sqlHelper.updateGame(invent_game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1, null, null, null);
+						} else {
+							sqlHelper.updateGame(invent_game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, null, null, null);
+						}
+						break;
+					
+					case 6:
+					
+						if (inventBool.equals(true)) {
+							sqlHelper.updateGame(invent_game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1, null, null);
+						} else {
+							sqlHelper.updateGame(invent_game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, null, null);
+						}
+						break;
+					
+					case 7:
+					
+						if (inventBool.equals(true)) {
+							sqlHelper.updateGame(invent_game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1, null);
+						} else {
+							sqlHelper.updateGame(invent_game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, null);
+						}
+						break;
+				
+				}
+					
+				} else {
+					
+					// DialogBox einrichten
+					final Dialog dialog = new Dialog(inventCtxt);
+					dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+					dialog.setContentView(R.layout.custom_dialog);
+
+					// Texte setzen
+					TextView title = (TextView) dialog.findViewById(R.id.title);
+					TextView text = (TextView) dialog.findViewById(R.id.text);
+					title.setText(R.string.pro_version);
+					text.setText(R.string.text_pro_version);
+						
+					// Button definieren
+					LinearLayout lyt_button3 = (LinearLayout) dialog.findViewById(R.id.lyt_button3);
+					lyt_button3.removeAllViews();
+					
+					Button dialogButton1 = (Button) dialog.findViewById(R.id.button1);
+					dialogButton1.setText(R.string.yes);
+					
+					dialogButton1.setOnClickListener(new View.OnClickListener() {
+						@Override
+						public void onClick(View v) {
+	/** TODO -0- => Individuellen payload einbauen? */ 
+							String payload = "abc";
+							mHelper.launchPurchaseFlow(((Activity)inventCtxt), SKU_UNLIMITED_VERSION, 10001,
+									mPurchaseFinishedListener, payload);
+							
+							dialog.dismiss();
+							
+						}
+					});
+					
+					Button dialogButton2 = (Button) dialog.findViewById(R.id.button2);
+					dialogButton2.setText(R.string.no);
+					
+					dialogButton2.setOnClickListener(new View.OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							
+							dialog.dismiss();
+							
+						}
+					});
+
+					dialog.show();
+					// Ende Dialogbox einrichten
 					
 				}
 			}

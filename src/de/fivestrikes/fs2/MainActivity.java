@@ -59,6 +59,7 @@ public class MainActivity extends Activity {
  *  
  *  */
 		
+		/*
 		String base64EncodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAh99+dNG/SPzRB2WjrzjwiTtAc2l2tpbojMpz7vHmdxR7ahUY0zOfgtSaryxwMGRdL59Y8wNKDhntjOLj7qwj1oT8mUeBAXDrzDo+D2i1w1vzgCRxwffsunRoDidmftzIFce/I+DAAvf05QwGprtKDplmZl1o4rMkVUFHcgoIMstqTE6GdF330XpJyXsGsXAIDK0NXFLSFbFjaK+52PVVbQ6ViqPbvGaeApnTt5nl0GCwheV0oNP397KVqtAKKbGRIMDnyN9zVB0POWO7o8x+ph7ybQwCsGQKiypNgQJnmXgjZ4WJnlQDWjDVAf6/RA/4xhl30H55Z+ICtG+t6fO7KQIDAQAB";
 		mHelper = new IabHelper(this, base64EncodedPublicKey);
 		
@@ -67,43 +68,22 @@ public class MainActivity extends Activity {
 			public void onIabSetupFinished(IabResult result) {
 				
 			      if (!result.isSuccess()) {
-			      	
+
 			      		// Oh no, there was a problem.
 			      		Log.d("MainActivity", "Problem setting up In-app Billing: " + result);
 			      		
-			      }
+			      } else {
 			      	
-			      // Hooray, IAB is fully set up!
-			
+			      		Log.v("MainActivity", "startSetup mHelper war erfolgreich");
+				      Log.v("MainActivity mHelper", String.valueOf(mHelper));
+				      // Pro-Elemente aus Eingabetiefe entfernen, falls Nutzer nicht die Pro-Variante gekauft hat
+				      mHelper.queryInventoryAsync(false, mGotInventoryListener);
+			      	
+			      }			
 			}
 		});
+		*/
 		
-		// Pro-Elemente aus Eingabetiefe entfernen, falls Nutzer nicht die Pro-Variante gekauft hat
-		IabHelper.QueryInventoryFinishedListener mGotInventoryListener = new IabHelper.QueryInventoryFinishedListener() {
-			
-			public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
-				
-				if (result.isFailure()) {
-					// handle error here
-				} else {
-					// does the user have the premium upgrade?
-					mIsPremium = inventory.hasPurchase(SKU_UNLIMITED_VERSION);
-					
-					// Falls Nutzer keinen Premium-Account hat => Eingabetiefe von Wurfecke, Wurftechnik und Detail zu technischem Fehler aller Spiele auf Null setzen
-					if (!mIsPremium){
-						
-						Cursor c = sqlHelper.getAllGameCursor();
-						for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
-							
-							game_id = sqlHelper.getGameID(c);
-							sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, 0, null, null, null, 0, null, null);		
-							
-						}
-					}
-				}
-			}
-		};
-
 /* Helper generieren */
 /** TODO -3- => Erster Start einsetzen, u.a. auch Eingabe, welche Sprache und ob man Tablet oder Smartphone will */
 		sqlHelper=new HelperSQL(this);
@@ -168,7 +148,7 @@ public class MainActivity extends Activity {
 /* Wartezeit vor Start der App setzen */
 	
 		/* New Handler startet die Main-Activity 
-		 * und schließt den Startbiland nach ein paar Sekunden.*/
+		 * und schließt das Startbild nach ein paar Sekunden.*/
 		
 		new Handler().postDelayed(new Runnable(){
 			
@@ -181,6 +161,7 @@ public class MainActivity extends Activity {
 				if(screenInch > 6) {
 					mainIntent = new Intent(MainActivity.this, MainTabActivity.class);
 				} else {
+					Log.v("MainActivity", "App wird weiter geleitet");
 					mainIntent = new Intent(MainActivity.this, MainSmartActivity.class);
 				}
 				
@@ -190,6 +171,42 @@ public class MainActivity extends Activity {
 			}
 		}, SPLASH_DISPLAY_LENGTH);
 	}
+	
+	// Pro-Elemente aus Eingabetiefe entfernen, falls Nutzer nicht die Pro-Variante gekauft hat
+	IabHelper.QueryInventoryFinishedListener mGotInventoryListener = new IabHelper.QueryInventoryFinishedListener() {
+		
+		public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
+			
+			Log.v("MainActivity", "QueryInventoryFinishedListener aufgerufen");
+			
+			if (result.isFailure()) {
+				
+				Log.v("MainActivity", "Bei der Abfrage des Premium-Accounts ist es zu einem Fehler gekommen");
+				Log.v("MainActivity result", String.valueOf(result));
+				
+			} else {
+				// does the user have the premium upgrade?
+				mIsPremium = inventory.hasPurchase(SKU_UNLIMITED_VERSION);
+				
+				Log.v("MainActivity", "Abfrage, ob Premium-Account");
+				Log.v("MainActivity mIsPremium", String.valueOf(mIsPremium));
+				
+				// Falls Nutzer keinen Premium-Account hat => Eingabetiefe von Wurfecke, Wurftechnik und Detail zu technischem Fehler aller Spiele auf Null setzen
+				if (!mIsPremium){
+					
+					Log.v("MainActivity", "Nutzer ist nicht Premium");
+					
+					Cursor c = sqlHelper.getAllGameCursor();
+					for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+						
+						game_id = sqlHelper.getGameID(c);
+						sqlHelper.updateGame(game_id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, 0, null, null, null, 0, null, null);		
+						
+					}
+				}
+			}
+		}
+	};
 	
 	@Override
 	public void onDestroy() {

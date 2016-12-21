@@ -488,7 +488,7 @@
     <string name="register">Registrieren</string>
     <string name="text_logout">Möchtest Du Dich wirklich ausloggen?</string>
     <string name="text_logout_success">Dein Logout war erfolgreich.</string>
-    <string name="text_pro_version">Für diese Funtkion brauchst Du die Pro Version. Diese ist für 3 Euro erhältlich. Möchtest Du die Pro Version erwerben?</string>
+    <string name="text_pro_version">Für diese Funtkion brauchst Du die Pro Version. Diese ist für 2,99 Euro erhältlich. Möchtest Du die Pro Version erwerben?</string>
     <string name="transfer_finished">Übertragung abgeschlossen</string>
     <string name="user_name">Username</string>
     <string name="confirm_password">Passwort bestätigen</string>
