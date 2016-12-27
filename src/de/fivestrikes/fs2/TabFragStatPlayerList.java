@@ -7,18 +7,14 @@ import java.util.Date;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
+import android.app.ProgressDialog;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.CursorAdapter;
 import android.widget.TextView;
 import android.widget.ListView;
 
@@ -116,7 +112,6 @@ public class TabFragStatPlayerList extends ListFragment {
 	
 	@Override
 	public void onListItemClick(ListView list, View view, int position, long id) {
-		
 		// Spieldaten erhalten
 		player_id = player.get(position);
 		args.putString("PlayerID", player_id);
@@ -125,18 +120,69 @@ public class TabFragStatPlayerList extends ListFragment {
 		HelperAdapterStatPlayerList adapter = new HelperAdapterStatPlayerList(getActivity(), player, player_id);
 		setListAdapter(adapter);
 		
-		// Spielerfenster aktualisieren
-		FragmentManager fragmentManager = getFragmentManager();
-		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-		
-		TabFragStatPlayerOverview fragOverview = new TabFragStatPlayerOverview();
-		fragOverview.setArguments(args);
-		fragmentTransaction.replace(R.id.frag_stat_player_content_1, fragOverview);
-		
-		TabFragStatPlayerStat fragStat = new TabFragStatPlayerStat();
-		fragStat.setArguments(args);
-		fragmentTransaction.replace(R.id.frag_stat_player_content_2, fragStat);
-		fragmentTransaction.commit();
-		
+		startTask();
 	}
+	
+	/// Async Task + Progress Dialog
+	
+	private void startTask() {
+		if (getProgressDialog() == null) {
+			uiHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					setProgressDialog(ProgressDialog.show(getContext(), null, TabFragStatPlayerList.this.getString(R.string.in_progress), true));
+				}
+			});
+		}
+		new LoadingTask().execute(args);
+	}
+	
+	private ProgressDialog progressDialog;
+	private Handler uiHandler = new Handler();
+	
+	final class LoadingTask extends AsyncTask<Bundle, Void, Void> {
+		protected Void doInBackground(final Bundle... args) {
+			if (args == null) {
+				return null;
+			}
+			
+			// Spielerfenster aktualisieren
+			FragmentManager fragmentManager = getFragmentManager();
+			FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+			
+			TabFragStatPlayerOverview fragOverview = new TabFragStatPlayerOverview();
+			fragOverview.setArguments(args[0]);
+			fragmentTransaction.replace(R.id.frag_stat_player_content_1, fragOverview);
+			
+			TabFragStatPlayerStat fragStat = new TabFragStatPlayerStat();
+			fragStat.setArguments(args[0]);
+			fragmentTransaction.replace(R.id.frag_stat_player_content_2, fragStat);
+			fragmentTransaction.commit();
+			
+			uiHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					dismissProgressDialog();
+				}
+			});
+			
+			return null;
+		}
+	};
+
+	public void dismissProgressDialog() {
+		if (getProgressDialog() != null && getProgressDialog().isShowing()) {
+			getProgressDialog().dismiss();
+		}
+	}
+
+	public ProgressDialog getProgressDialog() {
+		return progressDialog;
+	}
+
+	public void setProgressDialog(ProgressDialog progressDialog) {
+		this.progressDialog = progressDialog;
+	}
+	
+	///
 }
