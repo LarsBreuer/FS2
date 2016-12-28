@@ -10025,6 +10025,8 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 		    		@Override
 		    		public void onClick(View v) {
 		    			
+		    			// Der Code, der die lytStatPlayerStat Methode benutzt, muss den ProgressDialog erstellen... das sollte optimalerweise in einer Actitity sein.
+		    			
 		    			FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 		    			
 		    			TabFragStatPlayerPositionOverview fragOverview = new TabFragStatPlayerPositionOverview();
@@ -11312,6 +11314,8 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 		    		
 		    		@Override
 		    		public void onClick(View v) {
+		    			
+		    			// Der Code, der die lytStatPlayerPositionIndividual Methode benutzt, muss den ProgressDialog erstellen... das sollte optimalerweise in einer Actitity sein.
 		    			
 		    			FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 		    			
