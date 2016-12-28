@@ -2,18 +2,15 @@ package de.fivestrikes.fs2;
 
 import android.app.ActionBar;
 import android.app.ListActivity;
+import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.res.Resources;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.RadioGroup;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 public class SmartStatPlayerStat extends ListActivity {
@@ -30,17 +27,9 @@ public class SmartStatPlayerStat extends ListActivity {
 		setContentView(R.layout.stat_player_stat);
 		view = findViewById(android.R.id.content);
 		
-/* Helper generieren */
-		
-		lytHelper = new HelperLayout();
-		
 /* Daten aus Activity laden */ 
 	        
 		args = getIntent().getExtras();
-		
-/* Layout festlegen */
-		
-		lytHelper.lytStatPlayerStat(args, view, null, activity);
 		
 /* Action Bar konfigurieren */
 		
@@ -48,6 +37,12 @@ public class SmartStatPlayerStat extends ListActivity {
 		actionBar.setDisplayHomeAsUpEnabled(true);
 		actionBar.show();
 		
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		startTask();
 	}
 	
 /*
@@ -101,5 +96,62 @@ public class SmartStatPlayerStat extends ListActivity {
 	private void CreateMenu(Menu menu) {
 		
 	}
-		
+	
+	/// Async Task + Progress Dialog
+	
+	private void startTask() {
+		if (getProgressDialog() == null) {
+			uiHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					setProgressDialog(ProgressDialog.show(SmartStatPlayerStat.this, null, getString(R.string.in_progress), true));
+				}
+			});
+		}
+		new LoadingTask().execute(args);
+	}
+	
+	private ProgressDialog progressDialog;
+	private Handler uiHandler = new Handler();
+	
+	final class LoadingTask extends AsyncTask<Bundle, Void, Void> {
+		protected Void doInBackground(final Bundle... args) {
+			if (args == null) {
+				return null;
+			}
+			
+			/* Helper generieren */
+			
+			lytHelper = new HelperLayout();
+			
+			/* Layout festlegen */
+			
+			lytHelper.lytStatPlayerStat(SmartStatPlayerStat.this.args, view, null, activity);
+			
+			uiHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					dismissProgressDialog();
+				}
+			});
+			
+			return null;
+		}
+	};
+
+	public void dismissProgressDialog() {
+		if (getProgressDialog() != null && getProgressDialog().isShowing()) {
+			getProgressDialog().dismiss();
+		}
+	}
+
+	public ProgressDialog getProgressDialog() {
+		return progressDialog;
+	}
+
+	public void setProgressDialog(ProgressDialog progressDialog) {
+		this.progressDialog = progressDialog;
+	}
+	
+	///
 }
