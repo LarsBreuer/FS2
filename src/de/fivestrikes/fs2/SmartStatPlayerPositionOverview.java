@@ -1,41 +1,18 @@
 package de.fivestrikes.fs2;
 
-import java.util.Date;
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.DatePickerDialog;
-import android.app.Dialog;
-import java.text.SimpleDateFormat;
-import android.net.Uri;
+import android.app.ProgressDialog;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.util.Log;
-import android.view.ContextThemeWrapper;
-import android.view.LayoutInflater;
+import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.DatePicker;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.pm.ActivityInfo;
-import android.database.Cursor;
 
 public class SmartStatPlayerPositionOverview extends Activity {
 
+	Bundle args;
 	HelperLayout lytHelper = null;
 	View view;
 	
@@ -45,26 +22,23 @@ public class SmartStatPlayerPositionOverview extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.stat_position_overview);
 		view = findViewById(android.R.id.content);
-		Bundle args;
-		
-/* Helper generieren */
-		
-		lytHelper = new HelperLayout();
 		
 /* Daten aus Activity laden */ 
 	        
 		args = getIntent().getExtras();
 		
-/* Layout festlegen */
-		
-		lytHelper.lytStatPlayerPositionOverview(args, view, null);
-
 /* Action Bar konfigurieren */
 		
 		ActionBar actionBar = getActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);
 		actionBar.show();
 
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		startTask();
 	}
 	
 /* Action Bar einrichten */
@@ -100,4 +74,61 @@ public class SmartStatPlayerPositionOverview extends Activity {
 		
 	}
 	    
+	/// Async Task + Progress Dialog
+	
+	private void startTask() {
+		if (getProgressDialog() == null) {
+			uiHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					setProgressDialog(ProgressDialog.show(SmartStatPlayerPositionOverview.this, null, getString(R.string.in_progress), true));
+				}
+			});
+		}
+		new LoadingTask().execute(args);
+	}
+	
+	private ProgressDialog progressDialog;
+	private Handler uiHandler = new Handler();
+	
+	final class LoadingTask extends AsyncTask<Bundle, Void, Void> {
+		protected Void doInBackground(final Bundle... args) {
+			if (args == null) {
+				return null;
+			}
+			
+			/* Helper generieren */
+			
+			lytHelper = new HelperLayout();
+
+			/* Layout festlegen */
+			
+			lytHelper.lytStatPlayerPositionOverview(SmartStatPlayerPositionOverview.this.args, view, null);
+			
+			uiHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					dismissProgressDialog();
+				}
+			});
+			
+			return null;
+		}
+	};
+
+	public void dismissProgressDialog() {
+		if (getProgressDialog() != null && getProgressDialog().isShowing()) {
+			getProgressDialog().dismiss();
+		}
+	}
+
+	public ProgressDialog getProgressDialog() {
+		return progressDialog;
+	}
+
+	public void setProgressDialog(ProgressDialog progressDialog) {
+		this.progressDialog = progressDialog;
+	}
+	
+	///
 }
