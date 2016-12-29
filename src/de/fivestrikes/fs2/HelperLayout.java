@@ -24,6 +24,7 @@ import de.fivestrikes.fs2.inappbilling.util.IabResult;
 import de.fivestrikes.fs2.inappbilling.util.Inventory;
 
 import android.app.Activity;
+import android.app.ActivityGroup;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.app.Dialog;
