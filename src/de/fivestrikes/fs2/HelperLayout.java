@@ -18,12 +18,12 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import de.fivestrikes.fs2.inappbilling.util.IabHelper;
 import de.fivestrikes.fs2.inappbilling.util.IabResult;
 import de.fivestrikes.fs2.inappbilling.util.Inventory;
 
 import android.app.Activity;
-import android.app.ActivityGroup;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.app.Dialog;
@@ -9613,21 +9613,33 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 			lyt_overview_smart.removeAllViews();
 			
 			btn_tab_left.setOnClickListener(new View.OnClickListener() {
-		    		
 		    		@Override
 		    		public void onClick(View v) {
-		    			
-		    			FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-		    			
-		    			TabFragStatPlayerPositionOverview fragOverview = new TabFragStatPlayerPositionOverview();
-		    			fragOverview.setArguments(args);
-		    			fragmentTransaction.replace(R.id.frag_stat_player_content_1, fragOverview);
-		    			
-		    			TabFragStatPlayerPositionIndividual fragIndividual = new TabFragStatPlayerPositionIndividual();
-		    			fragIndividual.setArguments(args);
-		    			fragmentTransaction.replace(R.id.frag_stat_player_content_2, fragIndividual);
-		    			fragmentTransaction.commit();
-
+		    			final ProgressDialog progressDialog = ProgressDialog.show(ctxt, null, ctxt.getString(R.string.in_progress), true);
+		    			final Handler uiHandler = new Handler();
+		    			new AsyncTask<Void, Void, Void>() {
+							@Override
+							protected Void doInBackground(Void... params) {
+				    			FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+				    			
+				    			TabFragStatPlayerPositionOverview fragOverview = new TabFragStatPlayerPositionOverview();
+				    			fragOverview.setArguments(args);
+				    			fragmentTransaction.replace(R.id.frag_stat_player_content_1, fragOverview);
+				    			
+				    			TabFragStatPlayerPositionIndividual fragIndividual = new TabFragStatPlayerPositionIndividual();
+				    			fragIndividual.setArguments(args);
+				    			fragmentTransaction.replace(R.id.frag_stat_player_content_2, fragIndividual);
+				    			fragmentTransaction.commit();
+				    			
+				    			uiHandler.post(new Runnable() {
+									@Override
+									public void run() {
+										progressDialog.dismiss();
+									}
+								});
+								return null;
+							}
+		    			}.execute();
 		            }
 		      });
 			
@@ -10021,23 +10033,33 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 			lyt_overview_smart.removeAllViews();
 			
 			btn_right.setOnClickListener(new View.OnClickListener() {
-		    		
 		    		@Override
 		    		public void onClick(View v) {
-		    			
-		    			// Der Code, der die lytStatPlayerStat Methode benutzt, muss den ProgressDialog erstellen... das sollte optimalerweise in einer Actitity sein.
-		    			
-		    			FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-		    			
-		    			TabFragStatPlayerPositionOverview fragOverview = new TabFragStatPlayerPositionOverview();
-		    			fragOverview.setArguments(args);
-		    			fragmentTransaction.replace(R.id.frag_stat_player_content_1, fragOverview);
-		    			
-		    			TabFragStatPlayerPositionIndividual fragIndividual = new TabFragStatPlayerPositionIndividual();
-		    			fragIndividual.setArguments(args);
-		    			fragmentTransaction.replace(R.id.frag_stat_player_content_2, fragIndividual);
-		    			fragmentTransaction.commit();
-
+		    			final ProgressDialog progressDialog = ProgressDialog.show(ctxt, null, ctxt.getString(R.string.in_progress), true);
+		    			final Handler uiHandler = new Handler();
+		    			new AsyncTask<Void, Void, Void>() {
+							@Override
+							protected Void doInBackground(Void... params) {
+				    			FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+				    			
+				    			TabFragStatPlayerPositionOverview fragOverview = new TabFragStatPlayerPositionOverview();
+				    			fragOverview.setArguments(args);
+				    			fragmentTransaction.replace(R.id.frag_stat_player_content_1, fragOverview);
+				    			
+				    			TabFragStatPlayerPositionIndividual fragIndividual = new TabFragStatPlayerPositionIndividual();
+				    			fragIndividual.setArguments(args);
+				    			fragmentTransaction.replace(R.id.frag_stat_player_content_2, fragIndividual);
+				    			fragmentTransaction.commit();
+				    			
+				    			uiHandler.post(new Runnable() {
+									@Override
+									public void run() {
+										progressDialog.dismiss();
+									}
+								});
+								return null;
+							}
+		    			}.execute();
 		            }
 		      });
 			
@@ -11311,23 +11333,33 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 			lyt_overview_smart.removeAllViews();
 			
 			btn_tab_right.setOnClickListener(new View.OnClickListener() {
-		    		
 		    		@Override
 		    		public void onClick(View v) {
-		    			
-		    			// Der Code, der die lytStatPlayerPositionIndividual Methode benutzt, muss den ProgressDialog erstellen... das sollte optimalerweise in einer Actitity sein.
-		    			
-		    			FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-		    			
-		    			TabFragStatPlayerOverview fragOverview = new TabFragStatPlayerOverview();
-		    			fragOverview.setArguments(args);
-		    			fragmentTransaction.replace(R.id.frag_stat_player_content_1, fragOverview);
-		    			
-		    			TabFragStatPlayerStat fragIndividual = new TabFragStatPlayerStat();
-		    			fragIndividual.setArguments(args);
-		    			fragmentTransaction.replace(R.id.frag_stat_player_content_2, fragIndividual);
-		    			fragmentTransaction.commit();
-
+		    			final ProgressDialog progressDialog = ProgressDialog.show(ctxt, null, ctxt.getString(R.string.in_progress), true);
+		    			final Handler uiHandler = new Handler();
+		    			new AsyncTask<Void, Void, Void>() {
+							@Override
+							protected Void doInBackground(Void... params) {
+				    			FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+				    			
+				    			TabFragStatPlayerOverview fragOverview = new TabFragStatPlayerOverview();
+				    			fragOverview.setArguments(args);
+				    			fragmentTransaction.replace(R.id.frag_stat_player_content_1, fragOverview);
+				    			
+				    			TabFragStatPlayerStat fragIndividual = new TabFragStatPlayerStat();
+				    			fragIndividual.setArguments(args);
+				    			fragmentTransaction.replace(R.id.frag_stat_player_content_2, fragIndividual);
+				    			fragmentTransaction.commit();
+				    			
+				    			uiHandler.post(new Runnable() {
+									@Override
+									public void run() {
+										progressDialog.dismiss();
+									}
+								});
+								return null;
+							}
+		    			}.execute();
 		            }
 		      });
 			
