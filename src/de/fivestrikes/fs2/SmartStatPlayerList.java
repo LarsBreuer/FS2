@@ -3,19 +3,16 @@ package de.fivestrikes.fs2;
 import java.util.ArrayList;
 import android.app.ActionBar;
 import android.app.ListActivity;
+import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Spinner;
-import android.widget.TextView;
 
 public class SmartStatPlayerList extends ListActivity {
 
@@ -29,48 +26,25 @@ public class SmartStatPlayerList extends ListActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.list);
 		view = findViewById(android.R.id.content);
-		SmartStatPlayerList activity = this;
-
-		/* Helper generieren */
-
-		lytHelper = new HelperLayout();
-		sqlHelper = new HelperSQL(this);
 
 		/* Daten aus Activity laden */
 
 		args = getIntent().getExtras();
-
-		/* Daten aus Activity laden */
-
-		team_id = args.getString("TeamID");
-		game_id = args.getString("GameID");
-
-		/* Spielerliste definieren und einrichten */
-
-		// Nur Spieler einbinden, die in dem Spiel auch tatsächlich gespielt
-		// haben
-		c = sqlHelper.getAllPlayerCursorByTeamID(team_id);
-		for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
-
-			player_id = sqlHelper.getPlayerID(c);
-			if (sqlHelper.count_ticker_activity(game_id, null, player_id, null, null, null) > 0) {
-				player.add(player_id);
-			}
-
-		}
-		HelperAdapterStatPlayerList adapter = new HelperAdapterStatPlayerList(SmartStatPlayerList.this, player, null);
-		setListAdapter(adapter);
 
 		/* Action Bar konfigurieren */
 
 		ActionBar actionBar = getActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);
 		actionBar.show();
-
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		startTask();
 	}
 
 	@Override
@@ -118,4 +92,76 @@ public class SmartStatPlayerList extends ListActivity {
 
 	}
 
+	/// Async Task + Progress Dialog
+	
+	private void startTask() {
+		if (getProgressDialog() == null) {
+			uiHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					setProgressDialog(ProgressDialog.show(SmartStatPlayerList.this, null, getString(R.string.in_progress), true));
+				}
+			});
+		}
+		new LoadingTask().execute();
+	}
+	
+	private ProgressDialog progressDialog;
+	private Handler uiHandler = new Handler();
+	
+	final class LoadingTask extends AsyncTask<Bundle, Void, Void> {
+		protected Void doInBackground(final Bundle... args) {
+			/* Helper generieren */
+
+			lytHelper = new HelperLayout();
+			sqlHelper = new HelperSQL(SmartStatPlayerList.this);
+
+			/* Daten aus Activity laden */
+
+			team_id = SmartStatPlayerList.this.args.getString("TeamID");
+			game_id = SmartStatPlayerList.this.args.getString("GameID");
+
+			/* Spielerliste definieren und einrichten */
+
+			// Nur Spieler einbinden, die in dem Spiel auch tatsächlich gespielt
+			// haben
+			c = sqlHelper.getAllPlayerCursorByTeamID(team_id);
+			for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+
+				player_id = sqlHelper.getPlayerID(c);
+				if (sqlHelper.count_ticker_activity(game_id, null, player_id, null, null, null) > 0) {
+					player.add(player_id);
+				}
+
+			}
+
+			uiHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					HelperAdapterStatPlayerList adapter = new HelperAdapterStatPlayerList(SmartStatPlayerList.this, player, null);
+					setListAdapter(adapter);
+					
+					dismissProgressDialog();
+				}
+			});
+			
+			return null;
+		}
+	};
+
+	public void dismissProgressDialog() {
+		if (getProgressDialog() != null && getProgressDialog().isShowing()) {
+			getProgressDialog().dismiss();
+		}
+	}
+
+	public ProgressDialog getProgressDialog() {
+		return progressDialog;
+	}
+
+	public void setProgressDialog(ProgressDialog progressDialog) {
+		this.progressDialog = progressDialog;
+	}
+	
+	///
 }

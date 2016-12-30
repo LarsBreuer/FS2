@@ -9663,105 +9663,128 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 /* Button definieren */
 			
 			btn_left.setOnClickListener(new View.OnClickListener() {
-		    		
 		    		@Override
 		    		public void onClick(View v) {
 		    			
 		    			i = new Intent(ctxt, SmartStatPlayerPositionIndividual.class);
-					i.putExtras(args);
-					((Activity)ctxt).startActivity(i);
-					((Activity)ctxt).finish();
+		    			i.putExtras(args);
+		    			((Activity)ctxt).startActivity(i);
+		    			((Activity)ctxt).finish();
 
 		            }
 		      });
 			
 			btn_up.setOnClickListener(new View.OnClickListener() {
-		    		
 		    		@Override
 		    		public void onClick(View v) {
-		    			
-		    			// Vorherigen Spieler ermitteln
-		    			// Cursor aller Spieler ermitteln
-		    			c = sqlHelper.getAllPlayerCursorByTeamID(team_id);
-		    			ArrayList<String> player = new ArrayList<String>();
-		    			Integer player_active_nr = null;
-		    			int counter = 0;
-		    			
-		    			for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
-		    				
-		    				player_team_id = sqlHelper.getPlayerID(c);
-		    				
-		    				// Überprüfen, ob der Spieler in dem Spiel gespielt hat
-		    				if (sqlHelper.count_ticker_activity(game_id, null, player_team_id, null, null, null) > 0) {
-		    					
-		    					player.add(player_team_id);	
-		    					// Falls Spieler identisch mit dem angezeigten Spieler, dann Nummer notieren
-			    				if (player_id.equals(player_team_id)) player_active_nr = counter;
-		    					// Zählen, wie viele Spieler in dem Spiel aktiv waren
-			    				counter = counter + 1;
-		    				
-		    				}
-		    			}
-		    			
-		    			// ID des vorherigen Spieler ermitteln; falls es der erste Spieler war, ID des letzten Spielers ermitteln
-		    			if (player_active_nr.equals(0)) {
-		    				player_id = player.get(counter - 1);
-		    			} else {
-		    				player_id = player.get(player_active_nr - 1);
-		    			}
-		    			
-		    			args.putString("PlayerID", player_id);
-		    			
-					i = new Intent(ctxt, SmartStatPlayerStat.class);
-					i.putExtras(args);
-					((Activity)ctxt).startActivity(i);
-					((Activity)ctxt).finish();
+		    			final ProgressDialog progressDialog = ProgressDialog.show(ctxt, null, ctxt.getString(R.string.in_progress), true);
+		    			final Handler uiHandler = new Handler();
+		    			new AsyncTask<Void, Void, Void>() {
+							@Override
+							protected Void doInBackground(Void... params) {
+				    			// Vorherigen Spieler ermitteln
+				    			// Cursor aller Spieler ermitteln
+				    			c = sqlHelper.getAllPlayerCursorByTeamID(team_id);
+				    			ArrayList<String> player = new ArrayList<String>();
+				    			Integer player_active_nr = null;
+				    			int counter = 0;
+				    			
+				    			for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+				    				
+				    				player_team_id = sqlHelper.getPlayerID(c);
+				    				
+				    				// Überprüfen, ob der Spieler in dem Spiel gespielt hat
+				    				if (sqlHelper.count_ticker_activity(game_id, null, player_team_id, null, null, null) > 0) {
+				    					
+				    					player.add(player_team_id);	
+				    					// Falls Spieler identisch mit dem angezeigten Spieler, dann Nummer notieren
+					    				if (player_id.equals(player_team_id)) player_active_nr = counter;
+				    					// Zählen, wie viele Spieler in dem Spiel aktiv waren
+					    				counter = counter + 1;
+				    				
+				    				}
+				    			} 
+				    			
+				    			// ID des vorherigen Spieler ermitteln; falls es der erste Spieler war, ID des letzten Spielers ermitteln
+				    			if (player_active_nr.equals(0)) {
+				    				player_id = player.get(counter - 1);
+				    			} else {
+				    				player_id = player.get(player_active_nr - 1);
+				    			}
+				    			
+				    			args.putString("PlayerID", player_id);
 
+				    			uiHandler.post(new Runnable() {
+									@Override
+									public void run() {
+										progressDialog.dismiss();
+										
+										i = new Intent(ctxt, SmartStatPlayerStat.class);
+										i.putExtras(args);
+										((Activity)ctxt).startActivity(i);
+										((Activity)ctxt).finish();
+									}
+								});
+								return null;
+							}
+		    			}.execute();
 		            }
 		      });
 			
 			btn_down.setOnClickListener(new View.OnClickListener() {
-		    		
 		    		@Override
 		    		public void onClick(View v) {
-		    			
-		    			// Vorherigen Spieler ermitteln
-		    			// Cursor aller Spieler ermitteln
-		    			c = sqlHelper.getAllPlayerCursorByTeamID(team_id);
-		    			ArrayList<String> player = new ArrayList<String>();
-		    			Integer player_active_nr = null;
-		    			int counter = 0;
-		    			
-		    			for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
-		    				
-		    				player_team_id = sqlHelper.getPlayerID(c);
-		    				
-		    				// Überprüfen, ob der Spieler in dem Spiel gespielt hat
-		    				if (sqlHelper.count_ticker_activity(game_id, null, player_team_id, null, null, null) > 0) {
-		    					
-		    					player.add(player_team_id);	
-		    					// Falls Spieler identisch mit dem angezeigten Spieler, dann Nummer notieren
-			    				if (player_id.equals(player_team_id)) player_active_nr = counter;
-		    					// Zählen, wie viele Spieler in dem Spiel aktiv waren
-			    				counter = counter + 1;
-		    				
-		    				}
-		    			}
-		    			
-		    			// ID des vorherigen Spieler ermitteln; falls es der erste Spieler war, ID des letzten Spielers ermitteln
-		    			if (player_active_nr.equals(counter - 1)) {
-		    				player_id = player.get(0);
-		    			} else {
-		    				player_id = player.get(player_active_nr + 1);
-		    			}
-		    			
-		    			args.putString("PlayerID", player_id);
-	
-					i = new Intent(ctxt, SmartStatPlayerStat.class);
-					i.putExtras(args);
-					((Activity)ctxt).startActivity(i);
-					((Activity)ctxt).finish();
-		    			
+		    			final ProgressDialog progressDialog = ProgressDialog.show(ctxt, null, ctxt.getString(R.string.in_progress), true);
+		    			final Handler uiHandler = new Handler();
+		    			new AsyncTask<Void, Void, Void>() {
+							@Override
+							protected Void doInBackground(Void... params) {
+				    			// Vorherigen Spieler ermitteln
+				    			// Cursor aller Spieler ermitteln
+				    			c = sqlHelper.getAllPlayerCursorByTeamID(team_id);
+				    			ArrayList<String> player = new ArrayList<String>();
+				    			Integer player_active_nr = null;
+				    			int counter = 0;
+				    			
+				    			for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+				    				
+				    				player_team_id = sqlHelper.getPlayerID(c);
+				    				
+				    				// Überprüfen, ob der Spieler in dem Spiel gespielt hat
+				    				if (sqlHelper.count_ticker_activity(game_id, null, player_team_id, null, null, null) > 0) {
+				    					
+				    					player.add(player_team_id);	
+				    					// Falls Spieler identisch mit dem angezeigten Spieler, dann Nummer notieren
+					    				if (player_id.equals(player_team_id)) player_active_nr = counter;
+				    					// Zählen, wie viele Spieler in dem Spiel aktiv waren
+					    				counter = counter + 1;
+				    				
+				    				}
+				    			}
+				    			
+				    			// ID des vorherigen Spieler ermitteln; falls es der erste Spieler war, ID des letzten Spielers ermitteln
+				    			if (player_active_nr.equals(counter - 1)) {
+				    				player_id = player.get(0);
+				    			} else {
+				    				player_id = player.get(player_active_nr + 1);
+				    			}
+				    			
+				    			args.putString("PlayerID", player_id);
+				    			
+				    			uiHandler.post(new Runnable() {
+									@Override
+									public void run() {
+										progressDialog.dismiss();
+										
+						    			i = new Intent(ctxt, SmartStatPlayerStat.class);
+						    			i.putExtras(args);
+						    			((Activity)ctxt).startActivity(i);
+						    			((Activity)ctxt).finish();
+									}
+								});
+								return null;
+							}
+		    			}.execute();
 		            }
 		      });
 			
@@ -9770,10 +9793,10 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 		    		@Override
 		    		public void onClick(View v) {
 
-					i = new Intent(ctxt, SmartStatPlayerStat.class);
-					i.putExtras(args);
-					((Activity)ctxt).startActivity(i);
-					((Activity)ctxt).finish();
+		    			i = new Intent(ctxt, SmartStatPlayerStat.class);
+		    			i.putExtras(args);
+		    			((Activity)ctxt).startActivity(i);
+		    			((Activity)ctxt).finish();
 
 		            }
 		      });
@@ -10088,113 +10111,136 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 		    		@Override
 		    		public void onClick(View v) {
 		    			
-					i = new Intent(ctxt, SmartStatPlayerFirst.class);
-					i.putExtras(args);
-					((Activity)ctxt).startActivity(i);
-					((Activity)ctxt).finish();
+						i = new Intent(ctxt, SmartStatPlayerFirst.class);
+						i.putExtras(args);
+						((Activity)ctxt).startActivity(i);
+						((Activity)ctxt).finish();
 
 		            }
 		      });
 			
 			btn_up.setOnClickListener(new View.OnClickListener() {
-		    		
 		    		@Override
 		    		public void onClick(View v) {
-		    			
-		    			// Vorherigen Spieler ermitteln
-		    			// Cursor aller Spieler ermitteln
-		    			c = sqlHelper.getAllPlayerCursorByTeamID(team_id);
-		    			ArrayList<String> player = new ArrayList<String>();
-		    			Integer player_active_nr = null;
-		    			int counter = 0;
-		    			
-		    			for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
-		    				
-		    				player_team_id = sqlHelper.getPlayerID(c);
-		    				
-		    				// Überprüfen, ob der Spieler in dem Spiel gespielt hat
-		    				if (sqlHelper.count_ticker_activity(game_id, null, player_team_id, null, null, null) > 0) {
-		    					
-		    					player.add(player_team_id);	
-		    					// Falls Spieler identisch mit dem angezeigten Spieler, dann Nummer notieren
-			    				if (player_id.equals(player_team_id)) player_active_nr = counter;
-		    					// Zählen, wie viele Spieler in dem Spiel aktiv waren
-			    				counter = counter + 1;
-		    				
-		    				}
-		    			}
-		    			
-		    			// ID des vorherigen Spieler ermitteln; falls es der erste Spieler war, ID des letzten Spielers ermitteln
-		    			if (player_active_nr.equals(0)) {
-		    				player_id = player.get(counter - 1);
-		    			} else {
-		    				player_id = player.get(player_active_nr - 1);
-		    			}
-		    			
-		    			args.putString("PlayerID", player_id);
-		    			
-					i = new Intent(ctxt, SmartStatPlayerStat.class);
-					i.putExtras(args);
-					((Activity)ctxt).startActivity(i);
-					((Activity)ctxt).finish();
-
+		    			final ProgressDialog progressDialog = ProgressDialog.show(ctxt, null, ctxt.getString(R.string.in_progress), true);
+		    			final Handler uiHandler = new Handler();
+		    			new AsyncTask<Void, Void, Void>() {
+							@Override
+							protected Void doInBackground(Void... params) {
+				    			// Vorherigen Spieler ermitteln
+				    			// Cursor aller Spieler ermitteln
+				    			c = sqlHelper.getAllPlayerCursorByTeamID(team_id);
+				    			ArrayList<String> player = new ArrayList<String>();
+				    			Integer player_active_nr = null;
+				    			int counter = 0;
+				    			
+				    			for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+				    				
+				    				player_team_id = sqlHelper.getPlayerID(c);
+				    				
+				    				// Überprüfen, ob der Spieler in dem Spiel gespielt hat
+				    				if (sqlHelper.count_ticker_activity(game_id, null, player_team_id, null, null, null) > 0) {
+				    					
+				    					player.add(player_team_id);	
+				    					// Falls Spieler identisch mit dem angezeigten Spieler, dann Nummer notieren
+					    				if (player_id.equals(player_team_id)) player_active_nr = counter;
+				    					// Zählen, wie viele Spieler in dem Spiel aktiv waren
+					    				counter = counter + 1;
+				    				
+				    				}
+				    			}
+				    			
+				    			// ID des vorherigen Spieler ermitteln; falls es der erste Spieler war, ID des letzten Spielers ermitteln
+				    			if (player_active_nr.equals(0)) {
+				    				player_id = player.get(counter - 1);
+				    			} else {
+				    				player_id = player.get(player_active_nr - 1);
+				    			}
+				    			
+				    			args.putString("PlayerID", player_id);
+				    			
+				    			uiHandler.post(new Runnable() {
+									@Override
+									public void run() {
+										progressDialog.dismiss();
+										
+										i = new Intent(ctxt, SmartStatPlayerStat.class);
+										i.putExtras(args);
+										((Activity)ctxt).startActivity(i);
+										((Activity)ctxt).finish();
+									}
+								});
+								return null;
+							}
+		    			}.execute();
 		            }
 		      });
 			
 			btn_down.setOnClickListener(new View.OnClickListener() {
-		    		
 		    		@Override
 		    		public void onClick(View v) {
-		    			
-		    			// Vorherigen Spieler ermitteln
-		    			// Cursor aller Spieler ermitteln
-		    			c = sqlHelper.getAllPlayerCursorByTeamID(team_id);
-		    			ArrayList<String> player = new ArrayList<String>();
-		    			Integer player_active_nr = null;
-		    			int counter = 0;
-		    			
-		    			for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
-		    				
-		    				player_team_id = sqlHelper.getPlayerID(c);
-		    				
-		    				// Überprüfen, ob der Spieler in dem Spiel gespielt hat
-		    				if (sqlHelper.count_ticker_activity(game_id, null, player_team_id, null, null, null) > 0) {
-		    					
-		    					player.add(player_team_id);	
-		    					// Falls Spieler identisch mit dem angezeigten Spieler, dann Nummer notieren
-			    				if (player_id.equals(player_team_id)) player_active_nr = counter;
-		    					// Zählen, wie viele Spieler in dem Spiel aktiv waren
-			    				counter = counter + 1;
-		    				
-		    				}
-		    			}
-		    			
-		    			// ID des vorherigen Spieler ermitteln; falls es der erste Spieler war, ID des letzten Spielers ermitteln
-		    			if (player_active_nr.equals(counter - 1)) {
-		    				player_id = player.get(0);
-		    			} else {
-		    				player_id = player.get(player_active_nr + 1);
-		    			}
-		    			
-		    			args.putString("PlayerID", player_id);
-	
-					i = new Intent(ctxt, SmartStatPlayerStat.class);
-					i.putExtras(args);
-					((Activity)ctxt).startActivity(i);
-					((Activity)ctxt).finish();
-		    			
+		    			final ProgressDialog progressDialog = ProgressDialog.show(ctxt, null, ctxt.getString(R.string.in_progress), true);
+		    			final Handler uiHandler = new Handler();
+		    			new AsyncTask<Void, Void, Void>() {
+							@Override
+							protected Void doInBackground(Void... params) {
+				    			// Vorherigen Spieler ermitteln
+				    			// Cursor aller Spieler ermitteln
+				    			c = sqlHelper.getAllPlayerCursorByTeamID(team_id);
+				    			ArrayList<String> player = new ArrayList<String>();
+				    			Integer player_active_nr = null;
+				    			int counter = 0;
+				    			
+				    			for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+				    				
+				    				player_team_id = sqlHelper.getPlayerID(c);
+				    				
+				    				// Überprüfen, ob der Spieler in dem Spiel gespielt hat
+				    				if (sqlHelper.count_ticker_activity(game_id, null, player_team_id, null, null, null) > 0) {
+				    					
+				    					player.add(player_team_id);	
+				    					// Falls Spieler identisch mit dem angezeigten Spieler, dann Nummer notieren
+					    				if (player_id.equals(player_team_id)) player_active_nr = counter;
+				    					// Zählen, wie viele Spieler in dem Spiel aktiv waren
+					    				counter = counter + 1;
+				    				
+				    				}
+				    			}
+				    			
+				    			// ID des vorherigen Spieler ermitteln; falls es der erste Spieler war, ID des letzten Spielers ermitteln
+				    			if (player_active_nr.equals(counter - 1)) {
+				    				player_id = player.get(0);
+				    			} else {
+				    				player_id = player.get(player_active_nr + 1);
+				    			}
+				    			
+				    			args.putString("PlayerID", player_id);
+				    			
+				    			uiHandler.post(new Runnable() {
+									@Override
+									public void run() {
+										progressDialog.dismiss();
+										
+										i = new Intent(ctxt, SmartStatPlayerStat.class);
+										i.putExtras(args);
+										((Activity)ctxt).startActivity(i);
+										((Activity)ctxt).finish();
+									}
+								});
+								return null;
+							}
+		    			}.execute();
 		            }
 		      });
 			
 			btn_right.setOnClickListener(new View.OnClickListener() {
-		    		
 		    		@Override
 		    		public void onClick(View v) {
 
-					i = new Intent(ctxt, SmartStatPlayerPositionOverview.class);
-					i.putExtras(args);
-					((Activity)ctxt).startActivity(i);
-					((Activity)ctxt).finish();
+		    			i = new Intent(ctxt, SmartStatPlayerPositionOverview.class);
+		    			i.putExtras(args);
+		    			((Activity)ctxt).startActivity(i);
+		    			((Activity)ctxt).finish();
 
 		            }
 		      });
@@ -10847,100 +10893,124 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 		    		public void onClick(View v) {
 		    			
 		    			i = new Intent(ctxt, SmartStatPlayerStat.class);
-					i.putExtras(args);
-					((Activity)ctxt).startActivity(i);
-					((Activity)ctxt).finish();
+		    			i.putExtras(args);
+		    			((Activity)ctxt).startActivity(i);
+		    			((Activity)ctxt).finish();
 
 		            }
 		      });
 			
 			btn_up.setOnClickListener(new View.OnClickListener() {
-		    		
 		    		@Override
 		    		public void onClick(View v) {
-		    			
-		    			// Vorherigen Spieler ermitteln
-		    			// Cursor aller Spieler ermitteln
-		    			c = sqlHelper.getAllPlayerCursorByTeamID(team_id);
-		    			ArrayList<String> player = new ArrayList<String>();
-		    			Integer player_active_nr = null;
-		    			int counter = 0;
-		    			
-		    			for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
-		    				
-		    				player_team_id = sqlHelper.getPlayerID(c);
-		    				
-		    				// Überprüfen, ob der Spieler in dem Spiel gespielt hat
-		    				if (sqlHelper.count_ticker_activity(game_id, null, player_team_id, null, null, null) > 0) {
-		    					
-		    					player.add(player_team_id);	
-		    					// Falls Spieler identisch mit dem angezeigten Spieler, dann Nummer notieren
-			    				if (player_id.equals(player_team_id)) player_active_nr = counter;
-		    					// Zählen, wie viele Spieler in dem Spiel aktiv waren
-			    				counter = counter + 1;
-		    				
-		    				}
-		    			}
-		    			
-		    			// ID des vorherigen Spieler ermitteln; falls es der erste Spieler war, ID des letzten Spielers ermitteln
-		    			if (player_active_nr.equals(0)) {
-		    				player_id = player.get(counter - 1);
-		    			} else {
-		    				player_id = player.get(player_active_nr - 1);
-		    			}
-		    			
-		    			args.putString("PlayerID", player_id);
-		    			
-		    			i = new Intent(ctxt, SmartStatPlayerPositionOverview.class);
-					i.putExtras(args);
-					((Activity)ctxt).startActivity(i);
-					((Activity)ctxt).finish();
-
+		    			final ProgressDialog progressDialog = ProgressDialog.show(ctxt, null, ctxt.getString(R.string.in_progress), true);
+		    			final Handler uiHandler = new Handler();
+		    			new AsyncTask<Void, Void, Void>() {
+							@Override
+							protected Void doInBackground(Void... params) {
+				    			// Vorherigen Spieler ermitteln
+				    			// Cursor aller Spieler ermitteln
+				    			c = sqlHelper.getAllPlayerCursorByTeamID(team_id);
+				    			ArrayList<String> player = new ArrayList<String>();
+				    			Integer player_active_nr = null;
+				    			int counter = 0;
+				    			
+				    			for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+				    				
+				    				player_team_id = sqlHelper.getPlayerID(c);
+				    				
+				    				// Überprüfen, ob der Spieler in dem Spiel gespielt hat
+				    				if (sqlHelper.count_ticker_activity(game_id, null, player_team_id, null, null, null) > 0) {
+				    					
+				    					player.add(player_team_id);	
+				    					// Falls Spieler identisch mit dem angezeigten Spieler, dann Nummer notieren
+					    				if (player_id.equals(player_team_id)) player_active_nr = counter;
+				    					// Zählen, wie viele Spieler in dem Spiel aktiv waren
+					    				counter = counter + 1;
+				    				
+				    				}
+				    			}
+				    			
+				    			// ID des vorherigen Spieler ermitteln; falls es der erste Spieler war, ID des letzten Spielers ermitteln
+				    			if (player_active_nr.equals(0)) {
+				    				player_id = player.get(counter - 1);
+				    			} else {
+				    				player_id = player.get(player_active_nr - 1);
+				    			}
+				    			
+				    			args.putString("PlayerID", player_id);
+				    			
+				    			uiHandler.post(new Runnable() {
+									@Override
+									public void run() {
+										progressDialog.dismiss();
+										
+						    			i = new Intent(ctxt, SmartStatPlayerPositionOverview.class);
+										i.putExtras(args);
+										((Activity)ctxt).startActivity(i);
+										((Activity)ctxt).finish();
+									}
+								});
+								return null;
+							}
+		    			}.execute();
 		            }
 		      });
 			
 			btn_down.setOnClickListener(new View.OnClickListener() {
-		    		
 		    		@Override
 		    		public void onClick(View v) {
-		    			
-		    			// Vorherigen Spieler ermitteln
-		    			// Cursor aller Spieler ermitteln
-		    			c = sqlHelper.getAllPlayerCursorByTeamID(team_id);
-		    			ArrayList<String> player = new ArrayList<String>();
-		    			Integer player_active_nr = null;
-		    			int counter = 0;
-		    			
-		    			for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
-		    				
-		    				player_team_id = sqlHelper.getPlayerID(c);
-		    				
-		    				// Überprüfen, ob der Spieler in dem Spiel gespielt hat
-		    				if (sqlHelper.count_ticker_activity(game_id, null, player_team_id, null, null, null) > 0) {
-		    					
-		    					player.add(player_team_id);	
-		    					// Falls Spieler identisch mit dem angezeigten Spieler, dann Nummer notieren
-			    				if (player_id.equals(player_team_id)) player_active_nr = counter;
-		    					// Zählen, wie viele Spieler in dem Spiel aktiv waren
-			    				counter = counter + 1;
-		    				
-		    				}
-		    			}
-		    			
-		    			// ID des vorherigen Spieler ermitteln; falls es der erste Spieler war, ID des letzten Spielers ermitteln
-		    			if (player_active_nr.equals(counter - 1)) {
-		    				player_id = player.get(0);
-		    			} else {
-		    				player_id = player.get(player_active_nr + 1);
-		    			}
-		    			
-		    			args.putString("PlayerID", player_id);
-		    			
-		    			i = new Intent(ctxt, SmartStatPlayerPositionOverview.class);
-					i.putExtras(args);
-					((Activity)ctxt).startActivity(i);
-					((Activity)ctxt).finish();
-		    			
+		    			final ProgressDialog progressDialog = ProgressDialog.show(ctxt, null, ctxt.getString(R.string.in_progress), true);
+		    			final Handler uiHandler = new Handler();
+		    			new AsyncTask<Void, Void, Void>() {
+							@Override
+							protected Void doInBackground(Void... params) {
+				    			// Vorherigen Spieler ermitteln
+				    			// Cursor aller Spieler ermitteln
+				    			c = sqlHelper.getAllPlayerCursorByTeamID(team_id);
+				    			ArrayList<String> player = new ArrayList<String>();
+				    			Integer player_active_nr = null;
+				    			int counter = 0;
+				    			
+				    			for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+				    				
+				    				player_team_id = sqlHelper.getPlayerID(c);
+				    				
+				    				// Überprüfen, ob der Spieler in dem Spiel gespielt hat
+				    				if (sqlHelper.count_ticker_activity(game_id, null, player_team_id, null, null, null) > 0) {
+				    					
+				    					player.add(player_team_id);	
+				    					// Falls Spieler identisch mit dem angezeigten Spieler, dann Nummer notieren
+					    				if (player_id.equals(player_team_id)) player_active_nr = counter;
+				    					// Zählen, wie viele Spieler in dem Spiel aktiv waren
+					    				counter = counter + 1;
+				    				
+				    				}
+				    			}
+				    			
+				    			// ID des vorherigen Spieler ermitteln; falls es der erste Spieler war, ID des letzten Spielers ermitteln
+				    			if (player_active_nr.equals(counter - 1)) {
+				    				player_id = player.get(0);
+				    			} else {
+				    				player_id = player.get(player_active_nr + 1);
+				    			}
+				    			
+				    			args.putString("PlayerID", player_id);
+				    			
+				    			uiHandler.post(new Runnable() {
+									@Override
+									public void run() {
+										progressDialog.dismiss();
+										
+						    			i = new Intent(ctxt, SmartStatPlayerPositionOverview.class);
+										i.putExtras(args);
+										((Activity)ctxt).startActivity(i);
+										((Activity)ctxt).finish();
+									}
+								});
+								return null;
+							}
+		    			}.execute();
 		            }
 		      });
 			
@@ -10950,9 +11020,9 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 		    		public void onClick(View v) {
 
 		    			i = new Intent(ctxt, SmartStatPlayerPositionIndividual.class);
-					i.putExtras(args);
-					((Activity)ctxt).startActivity(i);
-					((Activity)ctxt).finish();
+		    			i.putExtras(args);
+		    			((Activity)ctxt).startActivity(i);
+		    			((Activity)ctxt).finish();
 
 		            }
 		      });
@@ -11389,111 +11459,134 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 		    		public void onClick(View v) {
 		    			
 		    			i = new Intent(ctxt, SmartStatPlayerPositionOverview.class);
-					i.putExtras(args);
-					((Activity)ctxt).startActivity(i);
-					((Activity)ctxt).finish();
+		    			i.putExtras(args);
+		    			((Activity)ctxt).startActivity(i);
+		    			((Activity)ctxt).finish();
 
 		            }
 		      });
 			
 			btn_up.setOnClickListener(new View.OnClickListener() {
-				
 		    		@Override
 		    		public void onClick(View v) {
-		    			
-		    			// Vorherigen Spieler ermitteln
-		    			// Cursor aller Spieler ermitteln
-		    			c = sqlHelper.getAllPlayerCursorByTeamID(team_id);
-		    			ArrayList<String> player = new ArrayList<String>();
-		    			Integer player_active_nr = null;
-		    			int counter = 0;
-		    			
-		    			for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
-		    				
-		    				player_team_id = sqlHelper.getPlayerID(c);
-		    				
-		    				// Überprüfen, ob der Spieler in dem Spiel gespielt hat
-		    				if (sqlHelper.count_ticker_activity(game_id, null, player_team_id, null, null, null) > 0) {
-		    					
-		    					player.add(player_team_id);	
-		    					// Falls Spieler identisch mit dem angezeigten Spieler, dann Nummer notieren
-			    				if (player_id.equals(player_team_id)) player_active_nr = counter;
-		    					// Zählen, wie viele Spieler in dem Spiel aktiv waren
-			    				counter = counter + 1;
-		    				
-		    				}
-		    			}
-		    			
-		    			// ID des vorherigen Spieler ermitteln; falls es der erste Spieler war, ID des letzten Spielers ermitteln
-		    			if (player_active_nr.equals(0)) {
-		    				player_id = player.get(counter - 1);
-		    			} else {
-		    				player_id = player.get(player_active_nr - 1);
-		    			}
-		    			
-		    			args.putString("PlayerID", player_id);
-		    			
-		    			i = new Intent(ctxt, SmartStatPlayerPositionIndividual.class);
-					i.putExtras(args);
-					((Activity)ctxt).startActivity(i);
-
+		    			final ProgressDialog progressDialog = ProgressDialog.show(ctxt, null, ctxt.getString(R.string.in_progress), true);
+		    			final Handler uiHandler = new Handler();
+		    			new AsyncTask<Void, Void, Void>() {
+							@Override
+							protected Void doInBackground(Void... params) {
+				    			// Vorherigen Spieler ermitteln
+				    			// Cursor aller Spieler ermitteln
+				    			c = sqlHelper.getAllPlayerCursorByTeamID(team_id);
+				    			ArrayList<String> player = new ArrayList<String>();
+				    			Integer player_active_nr = null;
+				    			int counter = 0;
+				    			
+				    			for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+				    				
+				    				player_team_id = sqlHelper.getPlayerID(c);
+				    				
+				    				// Überprüfen, ob der Spieler in dem Spiel gespielt hat
+				    				if (sqlHelper.count_ticker_activity(game_id, null, player_team_id, null, null, null) > 0) {
+				    					
+				    					player.add(player_team_id);	
+				    					// Falls Spieler identisch mit dem angezeigten Spieler, dann Nummer notieren
+					    				if (player_id.equals(player_team_id)) player_active_nr = counter;
+				    					// Zählen, wie viele Spieler in dem Spiel aktiv waren
+					    				counter = counter + 1;
+				    				
+				    				}
+				    			}
+				    			
+				    			// ID des vorherigen Spieler ermitteln; falls es der erste Spieler war, ID des letzten Spielers ermitteln
+				    			if (player_active_nr.equals(0)) {
+				    				player_id = player.get(counter - 1);
+				    			} else {
+				    				player_id = player.get(player_active_nr - 1);
+				    			}
+				    			
+				    			args.putString("PlayerID", player_id);
+				    			
+				    			uiHandler.post(new Runnable() {
+									@Override
+									public void run() {
+										progressDialog.dismiss();
+										
+						    			i = new Intent(ctxt, SmartStatPlayerPositionIndividual.class);
+										i.putExtras(args);
+										((Activity)ctxt).startActivity(i);
+									}
+								});
+								return null;
+							}
+		    			}.execute();
 		            }
 		      });
 			
 			btn_down.setOnClickListener(new View.OnClickListener() {
-				
 		    		@Override
 		    		public void onClick(View v) {
-		    			
-		    			// Vorherigen Spieler ermitteln
-		    			// Cursor aller Spieler ermitteln
-		    			c = sqlHelper.getAllPlayerCursorByTeamID(team_id);
-		    			ArrayList<String> player = new ArrayList<String>();
-		    			Integer player_active_nr = null;
-		    			int counter = 0;
-		    			
-		    			for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
-		    				
-		    				player_team_id = sqlHelper.getPlayerID(c);
-		    				
-		    				// Überprüfen, ob der Spieler in dem Spiel gespielt hat
-		    				if (sqlHelper.count_ticker_activity(game_id, null, player_team_id, null, null, null) > 0) {
-		    					
-		    					player.add(player_team_id);	
-		    					// Falls Spieler identisch mit dem angezeigten Spieler, dann Nummer notieren
-			    				if (player_id.equals(player_team_id)) player_active_nr = counter;
-		    					// Zählen, wie viele Spieler in dem Spiel aktiv waren
-			    				counter = counter + 1;
-		    				
-		    				}
-		    			}
-		    			
-		    			// ID des vorherigen Spieler ermitteln; falls es der erste Spieler war, ID des letzten Spielers ermitteln
-		    			if (player_active_nr.equals(counter - 1)) {
-		    				player_id = player.get(0);
-		    			} else {
-		    				player_id = player.get(player_active_nr + 1);
-		    			}
-		    			
-		    			args.putString("PlayerID", player_id);
-		    			
-		    			i = new Intent(ctxt, SmartStatPlayerPositionIndividual.class);
-					i.putExtras(args);
-					((Activity)ctxt).startActivity(i);
-					((Activity)ctxt).finish();
-		    			
+		    			final ProgressDialog progressDialog = ProgressDialog.show(ctxt, null, ctxt.getString(R.string.in_progress), true);
+		    			final Handler uiHandler = new Handler();
+		    			new AsyncTask<Void, Void, Void>() {
+							@Override
+							protected Void doInBackground(Void... params) {
+				    			// Vorherigen Spieler ermitteln
+				    			// Cursor aller Spieler ermitteln
+				    			c = sqlHelper.getAllPlayerCursorByTeamID(team_id);
+				    			ArrayList<String> player = new ArrayList<String>();
+				    			Integer player_active_nr = null;
+				    			int counter = 0;
+				    			
+				    			for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+				    				
+				    				player_team_id = sqlHelper.getPlayerID(c);
+				    				
+				    				// Überprüfen, ob der Spieler in dem Spiel gespielt hat
+				    				if (sqlHelper.count_ticker_activity(game_id, null, player_team_id, null, null, null) > 0) {
+				    					
+				    					player.add(player_team_id);	
+				    					// Falls Spieler identisch mit dem angezeigten Spieler, dann Nummer notieren
+					    				if (player_id.equals(player_team_id)) player_active_nr = counter;
+				    					// Zählen, wie viele Spieler in dem Spiel aktiv waren
+					    				counter = counter + 1;
+				    				
+				    				}
+				    			}
+				    			
+				    			// ID des vorherigen Spieler ermitteln; falls es der erste Spieler war, ID des letzten Spielers ermitteln
+				    			if (player_active_nr.equals(counter - 1)) {
+				    				player_id = player.get(0);
+				    			} else {
+				    				player_id = player.get(player_active_nr + 1);
+				    			}
+				    			
+				    			args.putString("PlayerID", player_id);
+				    			
+				    			uiHandler.post(new Runnable() {
+									@Override
+									public void run() {
+										progressDialog.dismiss();
+										
+						    			i = new Intent(ctxt, SmartStatPlayerPositionIndividual.class);
+										i.putExtras(args);
+										((Activity)ctxt).startActivity(i);
+										((Activity)ctxt).finish();
+									}
+								});
+								return null;
+							}
+		    			}.execute();
 		            }
 		      });
 			
 			btn_right.setOnClickListener(new View.OnClickListener() {
-				
 		    		@Override
 		    		public void onClick(View v) {
 
 		    			i = new Intent(ctxt, SmartStatPlayerFirst.class);
-					i.putExtras(args);
-					((Activity)ctxt).startActivity(i);
-					((Activity)ctxt).finish();
+		    			i.putExtras(args);
+		    			((Activity)ctxt).startActivity(i);
+		    			((Activity)ctxt).finish();
 
 		            }
 		      });
