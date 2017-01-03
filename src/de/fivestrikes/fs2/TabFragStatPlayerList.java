@@ -130,7 +130,7 @@ public class TabFragStatPlayerList extends ListFragment {
 			uiHandler.post(new Runnable() {
 				@Override
 				public void run() {
-					setProgressDialog(ProgressDialog.show(getContext(), null, TabFragStatPlayerList.this.getString(R.string.in_progress), true));
+					setProgressDialog(ProgressDialog.show(getActivity(), null, TabFragStatPlayerList.this.getString(R.string.in_progress), true));
 				}
 			});
 		}
