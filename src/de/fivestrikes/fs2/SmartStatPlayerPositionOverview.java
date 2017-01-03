@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -96,6 +97,8 @@ public class SmartStatPlayerPositionOverview extends Activity {
 			if (args == null) {
 				return null;
 			}
+			
+			Looper.prepare();
 			
 			/* Helper generieren */
 			

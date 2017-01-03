@@ -50,6 +50,7 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -9621,6 +9622,8 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 		    			new AsyncTask<Void, Void, Void>() {
 							@Override
 							protected Void doInBackground(Void... params) {
+								Looper.prepare();
+								
 				    			FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 				    			
 				    			TabFragStatPlayerPositionOverview fragOverview = new TabFragStatPlayerPositionOverview();
@@ -9682,6 +9685,8 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 		    			new AsyncTask<Void, Void, Void>() {
 							@Override
 							protected Void doInBackground(Void... params) {
+								Looper.prepare();
+								
 				    			// Vorherigen Spieler ermitteln
 				    			// Cursor aller Spieler ermitteln
 				    			c = sqlHelper.getAllPlayerCursorByTeamID(team_id);
@@ -9739,6 +9744,8 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 		    			new AsyncTask<Void, Void, Void>() {
 							@Override
 							protected Void doInBackground(Void... params) {
+								Looper.prepare();
+								
 				    			// Vorherigen Spieler ermitteln
 				    			// Cursor aller Spieler ermitteln
 				    			c = sqlHelper.getAllPlayerCursorByTeamID(team_id);
@@ -10064,6 +10071,8 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 		    			new AsyncTask<Void, Void, Void>() {
 							@Override
 							protected Void doInBackground(Void... params) {
+								Looper.prepare();
+								
 				    			FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 				    			
 				    			TabFragStatPlayerPositionOverview fragOverview = new TabFragStatPlayerPositionOverview();
@@ -10127,6 +10136,8 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 		    			new AsyncTask<Void, Void, Void>() {
 							@Override
 							protected Void doInBackground(Void... params) {
+								Looper.prepare();
+								
 				    			// Vorherigen Spieler ermitteln
 				    			// Cursor aller Spieler ermitteln
 				    			c = sqlHelper.getAllPlayerCursorByTeamID(team_id);
@@ -10184,6 +10195,8 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 		    			new AsyncTask<Void, Void, Void>() {
 							@Override
 							protected Void doInBackground(Void... params) {
+								Looper.prepare();
+								
 				    			// Vorherigen Spieler ermitteln
 				    			// Cursor aller Spieler ermitteln
 				    			c = sqlHelper.getAllPlayerCursorByTeamID(team_id);
@@ -10908,6 +10921,8 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 		    			new AsyncTask<Void, Void, Void>() {
 							@Override
 							protected Void doInBackground(Void... params) {
+								Looper.prepare();
+								
 				    			// Vorherigen Spieler ermitteln
 				    			// Cursor aller Spieler ermitteln
 				    			c = sqlHelper.getAllPlayerCursorByTeamID(team_id);
@@ -10965,6 +10980,8 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 		    			new AsyncTask<Void, Void, Void>() {
 							@Override
 							protected Void doInBackground(Void... params) {
+								Looper.prepare();
+								
 				    			// Vorherigen Spieler ermitteln
 				    			// Cursor aller Spieler ermitteln
 				    			c = sqlHelper.getAllPlayerCursorByTeamID(team_id);
@@ -11411,6 +11428,8 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 		    			new AsyncTask<Void, Void, Void>() {
 							@Override
 							protected Void doInBackground(Void... params) {
+								Looper.prepare();
+								
 				    			FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 				    			
 				    			TabFragStatPlayerOverview fragOverview = new TabFragStatPlayerOverview();
@@ -11474,6 +11493,8 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 		    			new AsyncTask<Void, Void, Void>() {
 							@Override
 							protected Void doInBackground(Void... params) {
+								Looper.prepare();
+								
 				    			// Vorherigen Spieler ermitteln
 				    			// Cursor aller Spieler ermitteln
 				    			c = sqlHelper.getAllPlayerCursorByTeamID(team_id);
@@ -11530,6 +11551,8 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 		    			new AsyncTask<Void, Void, Void>() {
 							@Override
 							protected Void doInBackground(Void... params) {
+								Looper.prepare();
+								
 				    			// Vorherigen Spieler ermitteln
 				    			// Cursor aller Spieler ermitteln
 				    			c = sqlHelper.getAllPlayerCursorByTeamID(team_id);

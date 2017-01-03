@@ -12,6 +12,7 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -145,6 +146,8 @@ public class TabFragStatPlayerList extends ListFragment {
 			if (args == null) {
 				return null;
 			}
+			
+			Looper.prepare();
 			
 			// Spielerfenster aktualisieren
 			FragmentManager fragmentManager = getFragmentManager();

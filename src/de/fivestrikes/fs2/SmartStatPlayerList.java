@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -112,6 +113,8 @@ public class SmartStatPlayerList extends ListActivity {
 	final class LoadingTask extends AsyncTask<Bundle, Void, Void> {
 		protected Void doInBackground(final Bundle... args) {
 			/* Helper generieren */
+			
+			Looper.prepare();
 
 			lytHelper = new HelperLayout();
 			sqlHelper = new HelperSQL(SmartStatPlayerList.this);
