@@ -6,7 +6,7 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
+import android.os.Message;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;;
@@ -72,7 +72,13 @@ public class SmartStatPlayerFirst extends Activity {
 	/// Async Task + Progress Dialog
 	
 	private ProgressDialog progressDialog;
-	private Handler uiHandler = new Handler();
+	final Handler uiHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			dismissProgressDialog();
+		}
+	};
+	
 	private void startTask() {
 		args = getIntent().getExtras();
 		if (getProgressDialog() == null) {
@@ -93,31 +99,33 @@ public class SmartStatPlayerFirst extends Activity {
 				return null;
 			}
 			
-			Looper.prepare();
-			
-			/* Helper generieren */
-			
-			lytHelper = new HelperLayout();
-
-			/* Layout festlegen */
-			
-			// Integer home_or_away = args[0].getInt("HomeOrAway");
-			lytHelper.lytStatPlayerOverview(SmartStatPlayerFirst.this.args, view, null);
-			
 			uiHandler.post(new Runnable() {
 				@Override
 				public void run() {
+					/* Layout festlegen */
+					lytHelper = new HelperLayout();
+
+					/* Helper generieren */
+					// Integer home_or_away = args[0].getInt("HomeOrAway");
+					lytHelper.lytStatPlayerOverview(SmartStatPlayerFirst.this.args, view, null);
+					
 					dismissProgressDialog();
 				}
 			});
-			
+
 			return null;
 		}
 	};
 
 	public void dismissProgressDialog() {
 		if (getProgressDialog() != null && getProgressDialog().isShowing()) {
-			getProgressDialog().dismiss();
+			uiHandler.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					getProgressDialog().dismiss();
+					setProgressDialog(null);
+				}
+			}, 500);
 		}
 	}
 

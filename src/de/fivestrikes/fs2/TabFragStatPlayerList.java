@@ -12,7 +12,7 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -139,32 +139,35 @@ public class TabFragStatPlayerList extends ListFragment {
 	}
 	
 	private ProgressDialog progressDialog;
-	private Handler uiHandler = new Handler();
+	final Handler uiHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			dismissProgressDialog();
+		}
+	};
 	
 	final class LoadingTask extends AsyncTask<Bundle, Void, Void> {
 		protected Void doInBackground(final Bundle... args) {
 			if (args == null) {
 				return null;
 			}
-			
-			Looper.prepare();
-			
-			// Spielerfenster aktualisieren
-			FragmentManager fragmentManager = getFragmentManager();
-			FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-			
-			TabFragStatPlayerOverview fragOverview = new TabFragStatPlayerOverview();
-			fragOverview.setArguments(args[0]);
-			fragmentTransaction.replace(R.id.frag_stat_player_content_1, fragOverview);
-			
-			TabFragStatPlayerStat fragStat = new TabFragStatPlayerStat();
-			fragStat.setArguments(args[0]);
-			fragmentTransaction.replace(R.id.frag_stat_player_content_2, fragStat);
-			fragmentTransaction.commit();
-			
+
 			uiHandler.post(new Runnable() {
 				@Override
 				public void run() {
+					// Spielerfenster aktualisieren
+					FragmentManager fragmentManager = getFragmentManager();
+					FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+					
+					TabFragStatPlayerOverview fragOverview = new TabFragStatPlayerOverview();
+					fragOverview.setArguments(args[0]);
+					fragmentTransaction.replace(R.id.frag_stat_player_content_1, fragOverview);
+					
+					TabFragStatPlayerStat fragStat = new TabFragStatPlayerStat();
+					fragStat.setArguments(args[0]);
+					fragmentTransaction.replace(R.id.frag_stat_player_content_2, fragStat);
+					fragmentTransaction.commit();
+					
 					dismissProgressDialog();
 				}
 			});
@@ -175,7 +178,13 @@ public class TabFragStatPlayerList extends ListFragment {
 
 	public void dismissProgressDialog() {
 		if (getProgressDialog() != null && getProgressDialog().isShowing()) {
-			getProgressDialog().dismiss();
+			uiHandler.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					getProgressDialog().dismiss();
+					setProgressDialog(null);
+				}
+			}, 500);
 		}
 	}
 

@@ -9,7 +9,7 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
+import android.os.Message;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -108,39 +108,42 @@ public class SmartStatPlayerList extends ListActivity {
 	}
 	
 	private ProgressDialog progressDialog;
-	private Handler uiHandler = new Handler();
+	final Handler uiHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			dismissProgressDialog();
+		}
+	};
 	
 	final class LoadingTask extends AsyncTask<Bundle, Void, Void> {
 		protected Void doInBackground(final Bundle... args) {
-			/* Helper generieren */
-			
-			Looper.prepare();
-
-			lytHelper = new HelperLayout();
-			sqlHelper = new HelperSQL(SmartStatPlayerList.this);
-
-			/* Daten aus Activity laden */
-
-			team_id = SmartStatPlayerList.this.args.getString("TeamID");
-			game_id = SmartStatPlayerList.this.args.getString("GameID");
-
-			/* Spielerliste definieren und einrichten */
-
-			// Nur Spieler einbinden, die in dem Spiel auch tatsächlich gespielt
-			// haben
-			c = sqlHelper.getAllPlayerCursorByTeamID(team_id);
-			for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
-
-				player_id = sqlHelper.getPlayerID(c);
-				if (sqlHelper.count_ticker_activity(game_id, null, player_id, null, null, null) > 0) {
-					player.add(player_id);
-				}
-
-			}
-
 			uiHandler.post(new Runnable() {
 				@Override
 				public void run() {
+					/* Helper generieren */
+
+					lytHelper = new HelperLayout();
+					sqlHelper = new HelperSQL(SmartStatPlayerList.this);
+
+					/* Daten aus Activity laden */
+
+					team_id = SmartStatPlayerList.this.args.getString("TeamID");
+					game_id = SmartStatPlayerList.this.args.getString("GameID");
+
+					/* Spielerliste definieren und einrichten */
+
+					// Nur Spieler einbinden, die in dem Spiel auch tatsächlich gespielt
+					// haben
+					c = sqlHelper.getAllPlayerCursorByTeamID(team_id);
+					for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+
+						player_id = sqlHelper.getPlayerID(c);
+						if (sqlHelper.count_ticker_activity(game_id, null, player_id, null, null, null) > 0) {
+							player.add(player_id);
+						}
+
+					}
+					
 					HelperAdapterStatPlayerList adapter = new HelperAdapterStatPlayerList(SmartStatPlayerList.this, player, null);
 					setListAdapter(adapter);
 					
@@ -154,7 +157,13 @@ public class SmartStatPlayerList extends ListActivity {
 
 	public void dismissProgressDialog() {
 		if (getProgressDialog() != null && getProgressDialog().isShowing()) {
-			getProgressDialog().dismiss();
+			uiHandler.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					getProgressDialog().dismiss();
+					setProgressDialog(null);
+				}
+			}, 500);
 		}
 	}
 

@@ -6,7 +6,7 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
+import android.os.Message;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,7 +33,6 @@ public class SmartStatPlayerPositionOverview extends Activity {
 		ActionBar actionBar = getActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);
 		actionBar.show();
-
 	}
 	
 	@Override
@@ -90,27 +89,30 @@ public class SmartStatPlayerPositionOverview extends Activity {
 	}
 	
 	private ProgressDialog progressDialog;
-	private Handler uiHandler = new Handler();
+	final Handler uiHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			dismissProgressDialog();
+		}
+	};
 	
 	final class LoadingTask extends AsyncTask<Bundle, Void, Void> {
 		protected Void doInBackground(final Bundle... args) {
 			if (args == null) {
 				return null;
 			}
-			
-			Looper.prepare();
-			
-			/* Helper generieren */
-			
-			lytHelper = new HelperLayout();
 
-			/* Layout festlegen */
-			
-			lytHelper.lytStatPlayerPositionOverview(SmartStatPlayerPositionOverview.this.args, view, null);
-			
 			uiHandler.post(new Runnable() {
 				@Override
 				public void run() {
+					/* Helper generieren */
+					
+					lytHelper = new HelperLayout();
+
+					/* Layout festlegen */
+					
+					lytHelper.lytStatPlayerPositionOverview(SmartStatPlayerPositionOverview.this.args, view, null);
+					
 					dismissProgressDialog();
 				}
 			});
@@ -121,7 +123,13 @@ public class SmartStatPlayerPositionOverview extends Activity {
 
 	public void dismissProgressDialog() {
 		if (getProgressDialog() != null && getProgressDialog().isShowing()) {
-			getProgressDialog().dismiss();
+			uiHandler.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					getProgressDialog().dismiss();
+					setProgressDialog(null);
+				}
+			}, 500);
 		}
 	}
 

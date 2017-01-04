@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
+import android.os.Message;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -113,7 +113,12 @@ public class SmartStatPlayerStat extends ListActivity {
 	}
 	
 	private ProgressDialog progressDialog;
-	private Handler uiHandler = new Handler();
+	final Handler uiHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			dismissProgressDialog();
+		}
+	};
 	
 	final class LoadingTask extends AsyncTask<Bundle, Void, Void> {
 		protected Void doInBackground(final Bundle... args) {
@@ -121,19 +126,17 @@ public class SmartStatPlayerStat extends ListActivity {
 				return null;
 			}
 			
-			Looper.prepare();
-			
-			/* Helper generieren */
-			
-			lytHelper = new HelperLayout();
-			
-			/* Layout festlegen */
-			
-			lytHelper.lytStatPlayerStat(SmartStatPlayerStat.this.args, view, null, activity);
-			
 			uiHandler.post(new Runnable() {
 				@Override
 				public void run() {
+					/* Helper generieren */
+					
+					lytHelper = new HelperLayout();
+					
+					/* Layout festlegen */
+					
+					lytHelper.lytStatPlayerStat(SmartStatPlayerStat.this.args, view, null, activity);
+					
 					dismissProgressDialog();
 				}
 			});
@@ -144,7 +147,13 @@ public class SmartStatPlayerStat extends ListActivity {
 
 	public void dismissProgressDialog() {
 		if (getProgressDialog() != null && getProgressDialog().isShowing()) {
-			getProgressDialog().dismiss();
+			uiHandler.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					getProgressDialog().dismiss();
+					setProgressDialog(null);
+				}
+			}, 500);
 		}
 	}
 
