@@ -102,12 +102,7 @@ public class SmartStatPlayerStat extends ListActivity {
 	
 	private void startTask() {
 		if (getProgressDialog() == null) {
-			uiHandler.post(new Runnable() {
-				@Override
-				public void run() {
-					setProgressDialog(ProgressDialog.show(SmartStatPlayerStat.this, null, getString(R.string.in_progress), true));
-				}
-			});
+			setProgressDialog(ProgressDialog.show(SmartStatPlayerStat.this, null, getString(R.string.in_progress), true));
 		}
 		new LoadingTask().execute(args);
 	}

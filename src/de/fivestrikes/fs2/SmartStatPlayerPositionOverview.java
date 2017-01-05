@@ -78,12 +78,7 @@ public class SmartStatPlayerPositionOverview extends Activity {
 	
 	private void startTask() {
 		if (getProgressDialog() == null) {
-			uiHandler.post(new Runnable() {
-				@Override
-				public void run() {
-					setProgressDialog(ProgressDialog.show(SmartStatPlayerPositionOverview.this, null, getString(R.string.in_progress), true));
-				}
-			});
+			setProgressDialog(ProgressDialog.show(SmartStatPlayerPositionOverview.this, null, getString(R.string.in_progress), true));;
 		}
 		new LoadingTask().execute(args);
 	}

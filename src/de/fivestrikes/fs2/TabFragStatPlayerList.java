@@ -128,12 +128,7 @@ public class TabFragStatPlayerList extends ListFragment {
 	
 	private void startTask() {
 		if (getProgressDialog() == null) {
-			uiHandler.post(new Runnable() {
-				@Override
-				public void run() {
-					setProgressDialog(ProgressDialog.show(getActivity(), null, TabFragStatPlayerList.this.getString(R.string.in_progress), true));
-				}
-			});
+			setProgressDialog(ProgressDialog.show(getActivity(), null, TabFragStatPlayerList.this.getString(R.string.in_progress), true));
 		}
 		new LoadingTask().execute(args);
 	}

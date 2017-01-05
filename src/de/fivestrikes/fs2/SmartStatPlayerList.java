@@ -97,12 +97,7 @@ public class SmartStatPlayerList extends ListActivity {
 	
 	private void startTask() {
 		if (getProgressDialog() == null) {
-			uiHandler.post(new Runnable() {
-				@Override
-				public void run() {
-					setProgressDialog(ProgressDialog.show(SmartStatPlayerList.this, null, getString(R.string.in_progress), true));
-				}
-			});
+			setProgressDialog(ProgressDialog.show(SmartStatPlayerList.this, null, getString(R.string.in_progress), true));
 		}
 		new LoadingTask().execute();
 	}

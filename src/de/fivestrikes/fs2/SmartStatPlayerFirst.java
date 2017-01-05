@@ -82,12 +82,7 @@ public class SmartStatPlayerFirst extends Activity {
 	private void startTask() {
 		args = getIntent().getExtras();
 		if (getProgressDialog() == null) {
-			uiHandler.post(new Runnable() {
-				@Override
-				public void run() {
-					setProgressDialog(ProgressDialog.show(SmartStatPlayerFirst.this, null, getString(R.string.in_progress), true));
-				}
-			});
+			setProgressDialog(ProgressDialog.show(SmartStatPlayerFirst.this, null, getString(R.string.in_progress), true));
 		}
 		new LoadingTask().execute(getIntent().getExtras());
 	}
