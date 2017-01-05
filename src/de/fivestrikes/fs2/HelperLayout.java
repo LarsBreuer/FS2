@@ -50,7 +50,6 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -304,6 +303,7 @@ public class HelperLayout {
 	Boolean inventBool;
 	Context inventCtxt;
 	String invent_game_id;
+	private static final int DELAY = 500;
 	
 	protected ProgressDialog progressDialog;
 	
@@ -9636,7 +9636,12 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 						    			fragmentTransaction.replace(R.id.frag_stat_player_content_2, fragIndividual);
 						    			fragmentTransaction.commit();
 										
-										progressDialog.dismiss();
+						    			uiHandler.postDelayed(new Runnable() {
+						    				@Override
+						    				public void run() {
+						    					progressDialog.dismiss();
+						    				}
+						    			}, DELAY);
 									}
 								});
 								return null;
@@ -9715,17 +9720,18 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 				    			
 				    			args.putString("PlayerID", player_id);
 								
-				    			uiHandler.post(new Runnable() {
-									@Override
-									public void run() {
+				    			uiHandler.postDelayed(new Runnable() {
+				    				@Override
+				    				public void run() {
 										progressDialog.dismiss();
 										
 										i = new Intent(ctxt, SmartStatPlayerStat.class);
 										i.putExtras(args);
 										((Activity)ctxt).startActivity(i);
 										((Activity)ctxt).finish();
-									}
-								});
+				    				}
+				    			}, DELAY);
+				    			
 								return null;
 							}
 		    			}.execute();
@@ -9771,18 +9777,19 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 				    			}
 				    			
 				    			args.putString("PlayerID", player_id);
-				    			
-				    			uiHandler.post(new Runnable() {
-									@Override
-									public void run() {
+
+				    			uiHandler.postDelayed(new Runnable() {
+				    				@Override
+				    				public void run() {
 										progressDialog.dismiss();
 										
 						    			i = new Intent(ctxt, SmartStatPlayerStat.class);
 						    			i.putExtras(args);
 						    			((Activity)ctxt).startActivity(i);
 						    			((Activity)ctxt).finish();
-									}
-								});
+				    				}
+				    			}, DELAY);
+				    			
 								return null;
 							}
 		    			}.execute();
@@ -10078,8 +10085,13 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 						    			fragIndividual.setArguments(args);
 						    			fragmentTransaction.replace(R.id.frag_stat_player_content_2, fragIndividual);
 						    			fragmentTransaction.commit();
-										
-										progressDialog.dismiss();
+
+										uiHandler.postDelayed(new Runnable() {
+											@Override
+											public void run() {
+												progressDialog.dismiss();
+											}
+										}, DELAY);
 									}
 								});
 								return null;
@@ -10160,17 +10172,18 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 				    			
 				    			args.putString("PlayerID", player_id);
 				    			
-				    			uiHandler.post(new Runnable() {
-									@Override
-									public void run() {
+				    			uiHandler.postDelayed(new Runnable() {
+				    				@Override
+				    				public void run() {
 										progressDialog.dismiss();
 										
 										i = new Intent(ctxt, SmartStatPlayerStat.class);
 										i.putExtras(args);
 										((Activity)ctxt).startActivity(i);
 										((Activity)ctxt).finish();
-									}
-								});
+				    				}
+				    			}, DELAY);
+				    			
 								return null;
 							}
 		    			}.execute();
@@ -10217,17 +10230,18 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 				    			
 				    			args.putString("PlayerID", player_id);
 				    			
-				    			uiHandler.post(new Runnable() {
-									@Override
-									public void run() {
+				    			uiHandler.postDelayed(new Runnable() {
+				    				@Override
+				    				public void run() {
 										progressDialog.dismiss();
 										
 										i = new Intent(ctxt, SmartStatPlayerStat.class);
 										i.putExtras(args);
 										((Activity)ctxt).startActivity(i);
 										((Activity)ctxt).finish();
-									}
-								});
+				    				}
+				    			}, DELAY);
+				    			
 								return null;
 							}
 		    			}.execute();
@@ -10941,17 +10955,18 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 				    			
 				    			args.putString("PlayerID", player_id);
 				    			
-				    			uiHandler.post(new Runnable() {
-									@Override
-									public void run() {
+				    			uiHandler.postDelayed(new Runnable() {
+				    				@Override
+				    				public void run() {
 										progressDialog.dismiss();
 										
 						    			i = new Intent(ctxt, SmartStatPlayerPositionOverview.class);
 										i.putExtras(args);
 										((Activity)ctxt).startActivity(i);
 										((Activity)ctxt).finish();
-									}
-								});
+				    				}
+				    			}, DELAY);
+
 								return null;
 							}
 		    			}.execute();
@@ -10998,17 +11013,18 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 				    			
 				    			args.putString("PlayerID", player_id);
 				    			
-				    			uiHandler.post(new Runnable() {
-									@Override
-									public void run() {
+				    			uiHandler.postDelayed(new Runnable() {
+				    				@Override
+				    				public void run() {
 										progressDialog.dismiss();
 										
 						    			i = new Intent(ctxt, SmartStatPlayerPositionOverview.class);
 										i.putExtras(args);
 										((Activity)ctxt).startActivity(i);
 										((Activity)ctxt).finish();
-									}
-								});
+				    				}
+				    			}, DELAY);
+				    			
 								return null;
 							}
 		    			}.execute();
@@ -11426,7 +11442,12 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 						    			fragmentTransaction.replace(R.id.frag_stat_player_content_2, fragIndividual);
 						    			fragmentTransaction.commit();
 										
-										progressDialog.dismiss();
+										uiHandler.postDelayed(new Runnable() {
+											@Override
+											public void run() {
+												progressDialog.dismiss();
+											}
+										}, DELAY);
 									}
 								});
 								return null;
@@ -11506,17 +11527,18 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 				    			}
 				    			
 				    			args.putString("PlayerID", player_id);
-				    			
-				    			uiHandler.post(new Runnable() {
-									@Override
-									public void run() {
+
+				    			uiHandler.postDelayed(new Runnable() {
+				    				@Override
+				    				public void run() {
 										progressDialog.dismiss();
 										
 						    			i = new Intent(ctxt, SmartStatPlayerPositionIndividual.class);
 										i.putExtras(args);
 										((Activity)ctxt).startActivity(i);
-									}
-								});
+				    				}
+				    			}, DELAY);
+				    			
 								return null;
 							}
 		    			}.execute();
@@ -11562,18 +11584,19 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 				    			}
 				    			
 				    			args.putString("PlayerID", player_id);
-				    			
-				    			uiHandler.post(new Runnable() {
-									@Override
-									public void run() {
+
+				    			uiHandler.postDelayed(new Runnable() {
+				    				@Override
+				    				public void run() {
 										progressDialog.dismiss();
 										
 						    			i = new Intent(ctxt, SmartStatPlayerPositionIndividual.class);
 										i.putExtras(args);
 										((Activity)ctxt).startActivity(i);
 										((Activity)ctxt).finish();
-									}
-								});
+				    				}
+				    			}, DELAY);
+				    			
 								return null;
 							}
 		    			}.execute();
