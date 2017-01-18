@@ -27,8 +27,8 @@
 			<Button 
         		android:id="@+id/left"
         		android:background="@drawable/arrow_left"
-        		android:layout_width="18dp"
-        		android:layout_height="18dp"
+        		android:layout_width="36dp"
+        		android:layout_height="36dp"
         		android:gravity="left"
     		/>
 			
@@ -60,8 +60,8 @@
 			<Button 
         		android:id="@+id/right"
         		android:background="@drawable/arrow_right"
-        		android:layout_width="18dp"
-        		android:layout_height="18dp"
+        		android:layout_width="36dp"
+        		android:layout_height="36dp"
     		/>
 		
 		</LinearLayout>
