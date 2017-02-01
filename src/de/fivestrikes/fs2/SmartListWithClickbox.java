@@ -57,8 +57,12 @@ public class SmartListWithClickbox extends ListActivity {
 		TextView text = (TextView) findViewById(R.id.text);
 		LinearLayout lyt_button = (LinearLayout) findViewById(R.id.lyt_button);
 		lyt_button.removeAllViews();
+		/* 
+		 * Auskommentiert, da es zu Fehlern beim In-App-Kauf kam, wenn man alle Felder aktiviert
+		 * 
 		Button btn_all_in = (Button) findViewById(R.id.all_in);
 		Button btn_all_out = (Button) findViewById(R.id.all_out);
+		*/
 		Button btn_back = (Button) findViewById(R.id.back);
 		
 		if (strInput.equals("InputDepth")) {
@@ -139,6 +143,10 @@ public class SmartListWithClickbox extends ListActivity {
 		HelperAdapterTextWithClickbox adapter = new HelperAdapterTextWithClickbox(SmartListWithClickbox.this, values, game_id, args);
 		setListAdapter(adapter);
 		
+		/*
+		 * Auskommentiert, da es zu Fehlern beim In-App-Kauf kam, wenn man alle Felder aktiviert
+		 * 
+		
 		btn_all_in.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -180,6 +188,7 @@ public class SmartListWithClickbox extends ListActivity {
 				
 			}
 		});
+		 */
 		
 		btn_back.setOnClickListener(new View.OnClickListener() {
 			

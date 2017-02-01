@@ -1,6 +1,7 @@
 package de.fivestrikes.fs2;
 
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -11,6 +12,7 @@ import android.os.Message;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -59,6 +61,8 @@ public class SmartTeamOnline extends ListActivity {
 		btn_team_search.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
+				InputMethodManager inputManager = (InputMethodManager) ((Activity)context).getSystemService(Context.INPUT_METHOD_SERVICE); 
+				inputManager.hideSoftInputFromWindow(((Activity)context).getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
 				searchTeams();
 			}
 		});

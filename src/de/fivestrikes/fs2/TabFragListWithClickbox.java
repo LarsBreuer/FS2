@@ -66,8 +66,11 @@ public class TabFragListWithClickbox extends ListFragment {
 		TextView text = (TextView) view.findViewById(R.id.text);
 		LinearLayout lyt_button = (LinearLayout) view.findViewById(R.id.lyt_button);
 		lyt_button.removeAllViews();
+		 /* 
+		  * Auskommentiert, da es zu Fehlern beim In-App-Kauf kam, wenn man alle Felder aktiviert
 		Button btn_all_in = (Button) view.findViewById(R.id.all_in);
 		Button btn_all_out = (Button) view.findViewById(R.id.all_out);
+		  */
 		Button btn_back = (Button) view.findViewById(R.id.back);
 
 		if (strInput.equals("InputDepth")) {
@@ -147,7 +150,8 @@ public class TabFragListWithClickbox extends ListFragment {
 		}
 		HelperAdapterTextWithClickbox adapter = new HelperAdapterTextWithClickbox(getActivity(), values, game_id, args);
 		setListAdapter(adapter);
-		
+		/* 
+		  * Auskommentiert, da es zu Fehlern beim In-App-Kauf kam, wenn man alle Felder aktiviert
 		btn_all_in.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -189,6 +193,7 @@ public class TabFragListWithClickbox extends ListFragment {
 				
 			}
 		});
+		*/
 		
 		btn_back.setOnClickListener(new View.OnClickListener() {
 			

@@ -56,7 +56,7 @@
 	</EditText>
 
 	<TextView 
-	    android:text="@string/password" 
+	    android:text="@string/password_with_hint" 
         android:layout_width="300dp"
         android:layout_height="36dp"
         android:gravity="left|bottom"

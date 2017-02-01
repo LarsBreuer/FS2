@@ -9,9 +9,11 @@ import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 
@@ -48,6 +50,8 @@ public class TabFragTeamOnline extends ListFragment {
 		btn_team_search.setOnClickListener(new View.OnClickListener() {
 			@Override
             public void onClick(View v) {
+				InputMethodManager inputManager = (InputMethodManager) ((Activity)context).getSystemService(Context.INPUT_METHOD_SERVICE); 
+				inputManager.hideSoftInputFromWindow(((Activity)context).getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
 				searchTeams();
 			}
 		});

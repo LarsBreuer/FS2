@@ -282,6 +282,7 @@
     <string name="male">Männlich</string>
     <string name="email_address">E-Mail Adresse</string>
     <string name="password">Passwort</string>
+    <string name="password_with_hint">Passwort (mind. 8 Zeichen)</string>
     <string name="stage_of_life">Altersstufe</string>
     <string name="level">Spielstärke</string>
     <string name="synchro">Synchronisieren</string>
@@ -321,6 +322,11 @@
     <string name="text_function_not_available">Diese Funktion steht noch nicht zur Verfügung.</string>
     <string name="text_login_not_possible">Das Synchronisieren mit dem Server ist nicht möglich, da Du nicht eingeloggt bist.</string>
     <string name="text_synchro_game_not_possible">Das Synchronisieren des Spiels mit dem Server ist nicht möglich, da zumindest eine Mannschaft nicht synchronisiert ist.</string>
+    <string name="text_synch_info_title">(Live-) Ticker</string>
+    <string name="text_synch_info">Du kannst den Ticker zu diesem Spiel auf Deiner Webseite einbauen. Kopiere einfach den untenstehenden Link in den Code Deiner Webseite ein.\n\nDie Größe des Tickers kannst Du an das Layout Deiner Webseite anpassen. Ändere hierzu in dem nachfolgenden Code einfach den Wert für die Breite (width) bzw. Höhe (height) des Tickerfensters.\n\nWeitere Informationen zu dem Ticker findest Du in der Hilfe unter Statistik &gt; (Live-)Ticker</string>
+    <string name="text_synch_link_1">&lt;iframe src=\"http://www.fivesweb.de/frame/game?game=</string>
+    <string name="text_synch_link_2">\" width=\"400\" height=\"400\"&gt;&lt;/iframe&gt;</string>
+    <string name="text_synch_info_not_possible">Du hast das Spiel noch nicht mit dem FIVES-Server synchronisiert. Um das Spiel mit dem Server zu synchronisieren müssen alle Spieler, die an dem Spiel teilnehmen, synchronisiert sein.\n\nEine Hilfe zu den ersten Schritten findest Du unter dem nachfolgenden Button.</string>
     <string name="male_female">Geschlecht</string>
     <string name="gents">Herren</string>
     <string name="minis">Minis</string>
@@ -502,4 +508,5 @@
     <string name="players_sync">Spieler werden synchronisiert...</string>
     <string name="team_search">Mannschaften werden durchsucht...</string>
     <string name="in_progress">Wird geladen...</string>
+    <string name="online_help">Online-Hilfe aufrufen</string>
 </resources>

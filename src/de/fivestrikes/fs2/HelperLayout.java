@@ -47,6 +47,7 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -599,7 +600,7 @@ public class HelperLayout {
 						
 				InputMethodManager inputManager = (InputMethodManager) ((Activity)ctxt).getSystemService(Context.INPUT_METHOD_SERVICE); 
 				inputManager.hideSoftInputFromWindow(((Activity)ctxt).getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-						
+				
 			}
 		});
 		
@@ -1772,6 +1773,7 @@ public class HelperLayout {
 		btn_team_away = (Button) view.findViewById(R.id.team_away);
 		Button btn_input_depth = (Button) view.findViewById(R.id.input_depth);
 		Button btn_synch = (Button) view.findViewById(R.id.synch);
+		Button btn_info = (Button) view.findViewById(R.id.ticker_info);
 		Button btn_save = (Button) view.findViewById(R.id.save);
 		Button btn_delete = (Button) view.findViewById(R.id.delete);
 /** TODO -3- => Runde Button bei Spiel editieren einbauen */ 
@@ -2269,6 +2271,33 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 					Log.e(TAG, "Exception: " + re.getMessage());
 					progressDialog.dismiss();
 				}
+			}
+		});
+		
+		/* Synchronisieren */
+		btn_info.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				
+				args = new Bundle();
+				args.putString("GameID", game_id);
+				
+				if (screenInch > 6) {
+					
+					FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+					TabFragSynchInfo fragment = new TabFragSynchInfo();
+					fragment.setArguments(args);
+					fragmentTransaction.replace(R.id.frag_game_edit, fragment);
+					fragmentTransaction.commit();
+					
+				} else {
+					
+					Intent i = new Intent(ctxt, SmartSynchInfo.class);
+        				i.putExtras(args);
+        				((Activity)ctxt).startActivity(i);
+					
+				}
+				
 			}
 		});
 		
@@ -12848,7 +12877,79 @@ Log.v("HelperLayout lytGameEdit GameSyncTask", "Schritt 6");
 			}
 		});
 	}
+
 	
+/*
+ * 
+ * Eingabe der Wurfecke 
+ *
+ */
+			
+	public void lytSynchInfo(Bundle contentArgs, final View contentView, final FragmentManager contentFragmentManager) {
+			
+		view = contentView;
+		ctxt = view.getContext();
+		res = ctxt.getResources();
+		fragmentManager = contentFragmentManager;
+		args = contentArgs;
+		
+/* Helper definieren */
+		sqlHelper = new HelperSQL(ctxt);
+		fctHelper = new HelperFunction();
+		txtHelper = new HelperText();
+		
+/* Bildschirmgröße ermitteln */
+
+		screenInch = fctHelper.getScreenInch(ctxt);
+			
+		if(screenInch > 6) {
+			
+			
+			
+		}
+			
+/* Daten aus Activity laden */
+			
+		if (args != null) {
+			
+			game_id = args.getString("GameID");
+			server_game_id = sqlHelper.getServerGameID(game_id);
+
+		}
+		
+		TextView headline = (TextView) view.findViewById(R.id.headline);
+		TextView text = (TextView) view.findViewById(R.id.text);
+		TextView link = (TextView) view.findViewById(R.id.link);
+		Button btn_help = (Button) view.findViewById(R.id.synch_help);
+		
+		headline.setText(res.getString(R.string.text_synch_info_title));
+		
+		String str_link = null;
+		
+		if (server_game_id != null) {
+			
+			text.setText(res.getString(R.string.text_synch_info));
+			str_link = res.getString(R.string.text_synch_link_1) + 
+					    String.valueOf(server_game_id) +
+					    res.getString(R.string.text_synch_link_2);
+			link.setText(str_link);
+			
+		} else {
+			
+			text.setText(res.getString(R.string.text_synch_info_not_possible));
+			
+		}
+		
+		btn_help.setOnClickListener(new View.OnClickListener() {	
+			@Override
+	            public void onClick(View v) {
+				
+				Uri uri = Uri.parse( "http://www.fivesweb.de/hilfe" );
+				((Activity)ctxt).startActivity( new Intent( Intent.ACTION_VIEW, uri ) );
+				
+			}
+		});
+	}
 	
 /*
  * 
